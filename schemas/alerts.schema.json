@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jarvis.ai/schemas/alerts.schema.json",
+  "title": "Alert",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "workspace_id",
+    "source_type",
+    "message",
+    "severity",
+    "status",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "workspace_id": { "type": "string", "format": "uuid" },
+    "source_type": {
+      "type": "string",
+      "enum": ["system", "task", "agent", "project", "objective"]
+    },
+    "source_id": { "type": "string", "format": "uuid" },
+    "message": { "type": "string" },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "warning", "critical"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "acknowledged", "resolved"]
+    },
+    "acknowledged_by_agent_id": { "type": "string", "format": "uuid" },
+    "acknowledged_at": { "type": "string", "format": "date-time" },
+    "resolved_at": { "type": "string", "format": "date-time" },
+    "context": { "type": "object", "additionalProperties": true },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

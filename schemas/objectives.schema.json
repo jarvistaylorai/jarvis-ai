@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jarvis.ai/schemas/objectives.schema.json",
+  "title": "Objective",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "workspace_id",
+    "title",
+    "status",
+    "priority",
+    "progress_percent",
+    "key_results",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "workspace_id": { "type": "string", "format": "uuid" },
+    "project_id": { "type": "string", "format": "uuid" },
+    "parent_objective_id": { "type": "string", "format": "uuid" },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "status": {
+      "type": "string",
+      "enum": ["not_started", "in_progress", "blocked", "completed"]
+    },
+    "priority": {
+      "type": "string",
+      "enum": ["mission_critical", "high", "medium", "low"]
+    },
+    "progress_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+    "owner_agent_id": { "type": "string", "format": "uuid" },
+    "target_date": { "type": "string", "format": "date-time" },
+    "current_phase": { "type": "string" },
+    "key_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "metric_name": { "type": "string" },
+          "metric_target": { "type": "number" },
+          "metric_unit": { "type": "string" },
+          "current_value": { "type": "number" }
+        }
+      }
+    },
+    "metadata": { "type": "object", "additionalProperties": true },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

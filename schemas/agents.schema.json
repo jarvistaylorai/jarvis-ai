@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jarvis.ai/schemas/agents.schema.json",
+  "title": "Agent",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "workspace_id",
+    "name",
+    "handle",
+    "kind",
+    "status",
+    "role",
+    "capability_tags",
+    "assigned_workspace_ids",
+    "utilization_percent",
+    "tasks_completed_24h",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "id": { "type": "string", "format": "uuid" },
+    "workspace_id": { "type": "string", "format": "uuid" },
+    "name": { "type": "string", "minLength": 1 },
+    "handle": { "type": "string", "pattern": "^[a-z0-9_\-]+$" },
+    "kind": {
+      "type": "string",
+      "enum": ["human", "autonomous", "service"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["idle", "active", "error", "offline"]
+    },
+    "role": { "type": "string" },
+    "capability_tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "assigned_workspace_ids": {
+      "type": "array",
+      "items": { "type": "string", "format": "uuid" },
+      "default": []
+    },
+    "current_task_id": { "type": "string", "format": "uuid" },
+    "current_project_id": { "type": "string", "format": "uuid" },
+    "current_channel": { "type": "string" },
+    "utilization_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+    "tasks_completed_24h": { "type": "integer", "minimum": 0 },
+    "last_heartbeat_at": { "type": "string", "format": "date-time" },
+    "error_state": { "type": "string" },
+    "metadata": { "type": "object", "additionalProperties": true },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

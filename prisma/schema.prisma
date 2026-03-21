@@ -1,0 +1,344 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Agent {
+  id             String   @id @default(cuid())
+  workspace      String   @default("business")
+  name           String
+  role           String
+  description    String?
+  capabilities   String   @default("[]") // JSON array of capability tags
+  status         String   @default("idle") // "active" | "idle" | "error"
+  load           String   @default("normal") // "low" | "normal" | "high"
+  layer          String   @default("core") // "core", "infrastructure", "input", "processing", "output"
+  current_task   String?
+  current_project_id String?
+  current_channel String?
+  metadata      String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
+  last_active_at DateTime @default(now())
+  
+  agent_model_config AgentModelConfig?
+}
+
+model Project {
+  id                 String   @id @default(cuid())
+  workspace          String   @default("business")
+  name               String
+  description        String?
+  status             String   @default("IDEA")
+  priority           String   @default("MEDIUM")
+  progress           Int      @default(0)
+  health             String   @default("HEALTHY")
+  automation_enabled Boolean  @default(false)
+  auto_assign        Boolean  @default(true)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+  type               String?
+  system_config      String?
+
+  tasks              Task[]
+  project_activity   ProjectActivity[]
+  objectives         Objective[]
+}
+
+model Task {
+  id             String   @id @default(cuid())
+  workspace      String   @default("business")
+  title          String
+  description    String?
+  status         String   // "pending" | "in-progress" | "completed" | "blocked"
+  priority       String   // "normal" | "high" | "critical"
+  task_type      String   @default("action")
+  project_id     String?
+  project        Project? @relation(fields: [project_id], references: [id])
+  parent_task_id String?
+  list_id        String?
+  list           TaskList? @relation(fields: [list_id], references: [id])
+  phase_id       String?
+  phase          Phase?   @relation(fields: [phase_id], references: [id], onDelete: SetNull)
+  assigned_agent String?
+  assigned_to    String?
+  position       Int      @default(0)
+  dependencies   String   @default("[]")  // JSON string
+  auto_execute  Boolean  @default(false)
+  metadata      String?
+  created_at     String   // legacy string format
+  updated_at     DateTime @default(now()) @updatedAt
+
+  labels         TaskLabelAssignment[]
+  checklists     TaskChecklist[]
+  comments       TaskComment[]
+  attachments    TaskAttachment[]
+}
+
+model TaskList {
+  id         String   @id @default(cuid())
+  workspace  String   @default("business")
+  project_id String
+  name       String
+  position   Int      @default(0)
+  created_at DateTime @default(now())
+
+  tasks      Task[]
+}
+
+model TaskLabel {
+  id         String   @id @default(cuid())
+  workspace  String   @default("business")
+  project_id String
+  name       String
+  color      String
+  position   Int      @default(0)
+
+  tasks      TaskLabelAssignment[]
+}
+
+model TaskLabelAssignment {
+  id       String    @id @default(cuid())
+  task_id  String
+  task     Task      @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  label_id String
+  label    TaskLabel @relation(fields: [label_id], references: [id], onDelete: Cascade)
+
+  @@unique([task_id, label_id])
+}
+
+model TaskChecklist {
+  id      String @id @default(cuid())
+  task_id String
+  task    Task   @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  title   String
+
+  items   TaskChecklistItem[]
+}
+
+model TaskChecklistItem {
+  id           String        @id @default(cuid())
+  checklist_id String
+  checklist    TaskChecklist @relation(fields: [checklist_id], references: [id], onDelete: Cascade)
+  content      String
+  is_completed Boolean       @default(false)
+  position     Int           @default(0)
+}
+
+model TaskComment {
+  id         String   @id @default(cuid())
+  task_id    String
+  task       Task     @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  author     String
+  content    String
+  created_at DateTime @default(now())
+}
+
+model TaskAttachment {
+  id         String   @id @default(cuid())
+  task_id    String
+  task       Task     @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  file_path  String
+  file_name  String
+  created_at DateTime @default(now())
+}
+
+model ProjectActivity {
+  id         String   @id @default(cuid())
+  project_id String
+  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  message    String
+  created_at DateTime @default(now())
+}
+
+model Activity {
+  id             String   @id @default(cuid())
+  workspace      String   @default("business")
+  agent_id       String
+  task_id        String?
+  project_id     String?
+  message        String
+  status         String   // "success" | "running"
+  category       String   @default("event")
+  severity       String   @default("info")
+  payload        String?
+  latency_ms     Int?
+  tokens_input   Int?
+  tokens_output  Int?
+  cost_usd       Float?
+  correlation_id String?
+  timestamp      String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @default(now()) @updatedAt
+}
+
+model SystemState {
+  id                String @id @default("global") // Can use dynamic ids representing the workspace
+  workspace         String @default("business")
+  status            String // "NORMAL" | "OVERLOADED" | "BLOCKED" | "IDLE"
+  active_agents     Int    @default(0)
+  pending_tasks     Int    @default(0)
+  blocked_tasks     Int    @default(0)
+  last_evaluated_at String
+}
+
+model Objective {
+  id          String    @id @default(cuid())
+  workspace   String    @default("business")
+  project_id  String?
+  project     Project?  @relation(fields: [project_id], references: [id])
+  title       String
+  description String?
+  status      String    @default("ACTIVE") // "ACTIVE" | "IN_PROGRESS" | "COMPLETED"
+  priority    String    @default("MEDIUM") // "HIGH" | "MEDIUM" | "LOW"
+  progress    Int       @default(0)
+  target_date DateTime?
+  created_at  DateTime  @default(now())
+
+  phases      Phase[]
+}
+
+model Phase {
+  id           String    @id @default(cuid())
+  workspace    String    @default("business")
+  objective_id String
+  objective    Objective @relation(fields: [objective_id], references: [id], onDelete: Cascade)
+  title        String
+  position     Int
+  status       String    @default("NOT_STARTED") // "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
+  progress     Int       @default(0)
+  target_date  DateTime?
+  created_at   DateTime  @default(now())
+
+  tasks        Task[]
+}
+
+model Alert {
+  id                  String   @id @default(cuid())
+  workspace           String   @default("business")
+  type                String   // "BLOCKED_TASK" | "SYSTEM_OVERLOAD" | etc.
+  message             String
+  severity            String   // "CRITICAL" | "HIGH" | "MEDIUM" | "LOW"
+  status              String   // "ACTIVE" | "RESOLVED"
+  created_at          String
+  acknowledged_by     String?
+  acknowledged_at     DateTime?
+  resolved_at         DateTime?
+  context             String?
+  updated_at          DateTime @default(now()) @updatedAt
+}
+
+model AgentMemory {
+  id          String   @id @default(cuid())
+  workspace   String   @default("business")
+  agent_id    String
+  memory_type String   // "TASK_CONTEXT" | "ERROR" | "LEARNING"
+  content     String
+  created_at  String
+}
+
+model AutomationRule {
+  id        String  @id @default(cuid())
+  workspace String  @default("business")
+  trigger   String
+  condition String?
+  action    String
+  enabled   Boolean @default(true)
+}
+
+model FactoryTask {
+  id             String   @id @default(cuid())
+  workspace      String   @default("business")
+  title          String
+  description    String
+  stage          String   @default("ideation") // "ideation" | "planning" | "building" | "qa" | "deployment"
+  status         String   @default("active")   // "active" | "blocked" | "completed"
+  project        String
+  type           String                        // "feature" | "fix" | "system" | "research"
+  assigned_agent String?
+  progress       Int      @default(0)
+  updated_at     DateTime @default(now()) @updatedAt
+  created_at     DateTime @default(now())
+}
+
+model Model {
+  id           String   @id @default(cuid())
+  name         String
+  provider     String
+  cost_per_1k  Float
+  capabilities String   @default("[]") // JSON
+  status       String   @default("active") // "active" | "fallback" | "disabled"
+  
+  configs_as_primary  AgentModelConfig[] @relation("PrimaryModel")
+  configs_as_fallback AgentModelConfig[] @relation("FallbackModel")
+  usage_logs          ModelUsageLog[]
+}
+
+model AgentModelConfig {
+  id              String   @id @default(cuid())
+  agent_id        String   @unique
+  agent           Agent    @relation(fields: [agent_id], references: [id], onDelete: Cascade)
+  
+  primary_model_id   String
+  primary_model      Model    @relation("PrimaryModel", fields: [primary_model_id], references: [id])
+  
+  fallback_model_id  String?
+  fallback_model     Model?   @relation("FallbackModel", fields: [fallback_model_id], references: [id])
+  
+  max_tokens      Int      @default(8192)
+  max_cost        Float    @default(5.0)
+  mode            String   @default("balanced") // "fast" | "intelligence" | "balanced"
+}
+
+model ModelUsageLog {
+  id          String   @id @default(cuid())
+  model_id    String
+  model       Model    @relation(fields: [model_id], references: [id], onDelete: Cascade)
+  agent_id    String?
+  tokens      Int
+  cost        Float
+  task        String?
+  duration    Int?     
+  timestamp   DateTime @default(now())
+}
+
+model ModelRoutingRule {
+  id          String   @id @default(cuid())
+  task_type   String   
+  model_id    String
+  priority    Int      @default(0)
+}
+
+model ProviderSettings {
+  id          String   @id @default(cuid())
+  provider    String   @unique
+  api_key     String?
+  status      String   @default("disconnected")
+}
+
+model SpendLog {
+  id               String   @id @default(cuid())
+  workspace        String   @default("business")
+  agent_id         String
+  model            String
+  provider         String
+  tokens_input     Int      @default(0)
+  tokens_output    Int      @default(0)
+  tokens_total     Int
+  cost             Float
+  task_id          String?
+  project_id       String?
+  created_at       DateTime @default(now())
+}
+
+model SpendLimit {
+  id                 String   @id @default("global")
+  global_daily_limit Float    @default(50.0)
+  per_agent_limit    Float    @default(10.0)
+  per_task_limit     Float    @default(2.0)
+  per_model_limit    Float    @default(20.0)
+}
