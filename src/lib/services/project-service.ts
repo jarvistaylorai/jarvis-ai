@@ -1,11 +1,12 @@
-import type { PaginatedResult, Project, ObjectivePriority, ProjectStatus } from '@contracts';
+import {  PaginatedResult, Project, ObjectivePriority, ProjectStatus  } from '@contracts';
 import type { Prisma } from '@prisma/client';
 import { prisma } from './database';
+import { getWorkspaceId } from '../workspace-utils';
 
 const projectInclude = {
-  tasks: { select: { id: true, status: true, assigned_agent: true, updated_at: true } },
+  tasks: { select: { id: true, status: true, assigned_agent_id: true, updated_at: true } },
   objectives: { select: { id: true } }
-} satisfies Prisma.ProjectInclude;
+};
 
 type ProjectRecord = Prisma.ProjectGetPayload<{ include: typeof projectInclude }>;
 
@@ -70,7 +71,7 @@ function mapProject(record: ProjectRecord): Project {
 
   return {
     id: record.id,
-    workspace_id: record.workspace,
+    workspace_id: record.workspace_id,
     name: record.name,
     description: record.description ?? undefined,
     status: coerceStatus(record.status),
@@ -90,8 +91,9 @@ function mapProject(record: ProjectRecord): Project {
 }
 
 export async function listProjects({ workspaceId, limit = 25, cursor }: ListProjectsParams): Promise<PaginatedResult<Project>> {
-  const projects = await prisma.project.findMany({
-    where: { workspace: workspaceId },
+  const mappedWorkspaceId = getWorkspaceId(workspaceId);
+  const projects = await prisma.projects.findMany({
+    where: { workspace_id: mappedWorkspaceId },
     include: projectInclude,
     orderBy: { updated_at: 'desc' },
     take: limit,

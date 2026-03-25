@@ -23,8 +23,8 @@ export async function PATCH(
       dependencyIds: body.dependency_ids,
       tags: body.tags,
       autoExecute: body.auto_execute,
-      dueAt: body.due_at,
-      startedAt: body.started_at,
+      dueAt: body.due_date || body.due_at,
+      startedAt: body.start_date || body.started_at,
       completedAt: body.completed_at,
       blockedReason: body.blocked_reason,
       metadata: body.metadata
@@ -42,7 +42,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.task.delete({ where: { id } });
+    await prisma.tasks.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('API Error [DELETE /api/tasks/:id]:', error);

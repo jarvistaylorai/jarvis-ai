@@ -5,24 +5,24 @@ const prisma = new PrismaClient();
 
 export default async function GlobalTasksPage() {
   // Fetch all tasks with their project details, labels, etc.
-  const tasks = await prisma.task.findMany({
+  const tasks = await prisma.tasks.findMany({
     include: {
-      project: true,
-      labels: { include: { label: true } },
-      checklists: { include: { items: true } },
-      comments: true,
-      attachments: true,
+      projects: true,
+      task_labels: { include: { labels: true } },
+      task_checklists: { include: { task_checklist_items: true } },
+      task_comments: true,
+      task_attachments: true,
     },
     orderBy: {
       id: 'desc'
     }
   });
 
-  const projects = await prisma.project.findMany({
+  const projects = await prisma.projects.findMany({
     select: { id: true, name: true }
   });
 
-  const labels = await prisma.taskLabel.findMany({
+  const labels = await prisma.labels.findMany({
     distinct: ['name']
   });
 

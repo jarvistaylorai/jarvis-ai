@@ -7,10 +7,11 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const project_id = searchParams.get('project_id');
-    const workspace = searchParams.get('workspace') || 'business';
+    let workspace = searchParams.get('workspace') || '00000000-0000-0000-0000-000000000000';
+    if (workspace === 'business') workspace = '00000000-0000-0000-0000-000000000000';
 
-    const labels = await prisma.taskLabel.findMany({
-      where: project_id ? { project_id, workspace } : { workspace },
+    const labels = await prisma.labels.findMany({
+      where: project_id ? { project_id, workspace_id: workspace } : { workspace_id: workspace },
       orderBy: [{ position: 'asc' }, { name: 'asc' }]
     });
 
@@ -24,19 +25,20 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const workspace = searchParams.get('workspace') || 'business';
+    let workspace = searchParams.get('workspace') || '00000000-0000-0000-0000-000000000000';
+    if (workspace === 'business') workspace = '00000000-0000-0000-0000-000000000000';
     const { project_id, name, color } = await request.json();
 
     if (!project_id || !name || !color) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const count = await prisma.taskLabel.count({
-      where: { project_id, workspace }
+    const count = await prisma.labels.count({
+      where: { project_id, workspace_id: workspace }
     });
 
-    const label = await prisma.taskLabel.create({
-      data: { workspace, project_id, name, color, position: count }
+    const label = await prisma.labels.create({
+      data: { workspace_id: workspace, project_id, name, color, position: count }
     });
 
     return NextResponse.json(label);

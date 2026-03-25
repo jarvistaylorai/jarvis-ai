@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
-import fs from 'fs/promises';
-import { getSafeFsPath } from '../fs-utils';
+import { supabaseAdmin, BUCKET_NAME } from '@/lib/supabase-storage';
 import path from 'path';
 
 const mimeTypes: Record<string, string> = {
@@ -27,30 +26,35 @@ const mimeTypes: Record<string, string> = {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const targetPath = searchParams.get('path');
+    const storagePathRaw = searchParams.get('storagePath');
+    let storagePath = '';
 
-    if (!targetPath) {
-      return new NextResponse('Path parameter is required', { status: 400 });
+    if (storagePathRaw) {
+      storagePath = storagePathRaw;
+    } else {
+      const targetPath = searchParams.get('path');
+      const workspace = searchParams.get('workspace') || 'business';
+
+      if (!targetPath) {
+        return new NextResponse('Path or storagePath parameter is required', { status: 400 });
+      }
+
+      const cleanPath = targetPath.startsWith('/') ? targetPath.slice(1) : targetPath;
+      storagePath = `${workspace}/${cleanPath}`.replace(/\/+/g, '/');
     }
 
-    const absolutePath = getSafeFsPath(targetPath);
+    const { data, error } = await supabaseAdmin.storage.from(BUCKET_NAME).download(storagePath);
 
-    try {
-      const stats = await fs.stat(absolutePath);
-      if (!stats.isFile()) {
-        return new NextResponse('Path is not a file', { status: 400 });
-      }
-    } catch (e: any) {
-      if (e.code === 'ENOENT') {
-        return new NextResponse('File not found', { status: 404 });
-      }
-      throw e;
+    if (error) {
+       console.error("Raw Stream Storage Error:", error);
+       return new NextResponse('File not found', { status: 404 });
     }
 
-    const fileBuffer = await fs.readFile(absolutePath);
-    const ext = path.extname(absolutePath).toLowerCase();
+    const fileBuffer = await data.arrayBuffer();
+    const ext = path.extname(storagePath).toLowerCase();
     const contentType = mimeTypes[ext] || 'application/octet-stream';
 
+    // The NextResponse handler accepts ArrayBuffer natively
     return new NextResponse(fileBuffer, {
       headers: {
         'Content-Type': contentType,

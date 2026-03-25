@@ -11,17 +11,14 @@ export async function PATCH(
     const data = await request.json();
     const resolvedParams = await params;
     
-    const task = await prisma.factoryTask.update({
+    const task = await prisma.tasks.update({
       where: { id: resolvedParams.id },
       data: {
         title: data.title,
         description: data.description,
-        stage: data.stage,
-        status: data.status,
-        project: data.project,
-        type: data.type,
-        assigned_agent: data.assigned_agent,
-        progress: data.progress,
+        status: data.status === 'completed' ? 'completed' : 'pending',
+        type: data.type === 'feature' ? 'action' : 'action',
+        assigned_agent_id: data.assigned_agent,
       },
     });
     return NextResponse.json(task);
@@ -40,7 +37,7 @@ export async function DELETE(
 ) {
   try {
     const resolvedParams = await params;
-    await prisma.factoryTask.delete({
+    await prisma.tasks.delete({
       where: { id: resolvedParams.id },
     });
     return NextResponse.json({ success: true });

@@ -13,11 +13,11 @@ export async function GET(request: Request) {
     
     const timeseries = await prisma.$queryRaw`
       SELECT 
-        DATE(created_at) as date,
+        CAST(created_at AS DATE) as date,
         SUM(cost) as spend
-      FROM SpendLog
+      FROM "spendLog"
       WHERE workspace = ${workspace}
-      GROUP BY date
+      GROUP BY CAST(created_at AS DATE)
       ORDER BY date ASC
       LIMIT 30
     `;

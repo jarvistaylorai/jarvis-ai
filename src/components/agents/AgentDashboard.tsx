@@ -11,7 +11,7 @@ import { TreeAgentCard } from "./TreeAgentCard";
 export function AgentDashboard({ agents }: { agents: Agent[] }) {
   const [view, setView] = useState<"hierarchy" | "roster">("hierarchy");
 
-  const founderAgent = agents.find(a => a.layer === 'founder') || {
+  const founderAgent = agents.find(a => a.layer === 'founder' || a.kind === 'human' || a.name === 'Roy Taylor') || {
     id: "me",
     name: "Roy Taylor",
     role: "Founder & CEO",
@@ -23,9 +23,9 @@ export function AgentDashboard({ agents }: { agents: Agent[] }) {
     last_active_at: new Date().toISOString()
   } as Agent;
 
-  const coreAgent = agents.find(a => a.layer === 'core') || {
+  const coreAgent = agents.find(a => a.layer === 'core' || a.name === 'Jarvis' || a.handle === 'jarvis') || {
     id: "jarvis",
-    name: "Henry",
+    name: "Jarvis",
     role: "Chief of Staff",
     description: "Opus 4.6",
     capabilities: ["Orchestration", "Decision-Making", "Task Delegation"],
@@ -35,9 +35,14 @@ export function AgentDashboard({ agents }: { agents: Agent[] }) {
     last_active_at: new Date().toISOString()
   } as Agent;
 
-  const displayAgents = agents.filter(a => a.layer !== 'founder');
+  const displayAgents = agents.filter(a => a.id !== founderAgent.id && a.name !== 'Roy Taylor');
 
-  const departmentAgents = agents.filter(a => a.layer !== 'founder' && a.layer !== 'core');
+  const departmentAgents = agents.filter(a => 
+    a.id !== founderAgent.id && 
+    a.id !== coreAgent.id &&
+    a.name !== 'Jarvis' &&
+    a.name !== 'Roy Taylor'
+  );
 
   return (
     <div className="w-full animate-in fade-in duration-500 text-white font-sans selection:bg-blue-500/30">

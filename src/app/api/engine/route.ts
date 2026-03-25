@@ -1,167 +1,111 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getWorkspaceId } from '@/lib/workspace-utils';
+import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
-
-function generateId() {
-  return Math.random().toString(36).substring(2, 9);
-}
 
 export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const workspace = searchParams.get('workspace') || 'business';
+    const workspaceStr = searchParams.get('workspace') || 'business';
+    const workspaceId = getWorkspaceId(workspaceStr);
 
     // 1. Read State from DB
     const [
       tasks,
       agents,
-      alerts,
-      systemStateArr,
-      automationRules
+      alerts
     ] = await Promise.all([
-      prisma.task.findMany({ where: { workspace } }),
-      prisma.agent.findMany({ where: { workspace } }),
-      prisma.alert.findMany(),
-      prisma.systemState.findMany(),
-      prisma.automationRule.findMany({ where: { workspace } })
+      prisma.tasks.findMany({ where: { workspace_id: workspaceId } }),
+      prisma.agents.findMany({ where: { workspace_id: workspaceId } }),
+      prisma.alerts.findMany({ where: { workspace_id: workspaceId } })
     ]);
 
-    const systemState = systemStateArr[0] || { id: 'global', status: 'NORMAL', active_agents: 0, pending_tasks: 0, blocked_tasks: 0, last_evaluated_at: new Date().toISOString() };
-    
     let stateMutated = false;
     const taskUpdates: any[] = [];
     const alertCreates: any[] = [];
-    const memoryCreates: any[] = [];
-
-    // Parse dependencies since they are strings in SQLite
-    const parsedTasks = tasks.map((t: any) => ({
-      ...t,
-      dependencies_array: JSON.parse(t.dependencies || '[]')
-    }));
+    const telemetryCreates: any[] = [];
+    const agentUpdates: any[] = [];
 
     // 2. Alerting & Bottlenecks (Task Dependencies)
-    parsedTasks.forEach((task: any) => {
-      if (task.status !== 'completed' && task.dependencies_array && task.dependencies_array.length > 0) {
-        const depsCompleted = task.dependencies_array.every(
-          (depId: string) => parsedTasks.find((t: any) => t.id === depId)?.status === 'completed'
+    tasks.forEach((task: any) => {
+      if (task.status !== 'completed' && task.dependency_ids && task.dependency_ids.length > 0) {
+        const depsCompleted = task.dependency_ids.every(
+          (depId: string) => tasks.find((t: any) => t.id === depId)?.status === 'completed'
         );
         const isBlocked = !depsCompleted;
         
         if (isBlocked && task.status !== 'blocked') {
           task.status = 'blocked';
-          taskUpdates.push(prisma.task.update({ where: { id: task.id }, data: { status: 'blocked' } }));
+          taskUpdates.push(prisma.tasks.update({ where: { id: task.id }, data: { status: 'blocked' } }));
           stateMutated = true;
           
-          // Generate Alert
-          if (!alerts.find((a: any) => a.message.includes(task.id) && a.status === 'ACTIVE')) {
-            alertCreates.push(prisma.alert.create({
+          if (!alerts.find((a: any) => a.message.includes(task.id) && a.status === 'active')) {
+            alertCreates.push(prisma.alerts.create({
               data: {
-                id: 'alert_' + generateId(),
-                type: 'BLOCKED_TASK',
+                id: uuidv4(),
+                workspace_id: workspaceId,
+                source_type: 'engine',
+                source_id: task.id,
                 message: `Task ${task.title} (ID: ${task.id}) is blocked by dependencies.`,
-                severity: 'HIGH',
-                status: 'ACTIVE',
-                created_at: new Date().toISOString()
+                severity: 'critical',
+                status: 'active'
               }
             }));
           }
         } else if (!isBlocked && task.status === 'blocked') {
           task.status = 'pending';
-          taskUpdates.push(prisma.task.update({ where: { id: task.id }, data: { status: 'pending' } }));
+          taskUpdates.push(prisma.tasks.update({ where: { id: task.id }, data: { status: 'pending' } }));
           stateMutated = true;
         }
       }
     });
 
-    // 3. Automation Engine (Simplified Parser)
-    automationRules.forEach((rule: any) => {
-      if (!rule.enabled) return;
-      
-      if (rule.trigger.includes("task.priority == 'critical'") && rule.condition?.includes("task.status == 'pending'")) {
-        const matchAction = rule.action.match(/assign_agent\('([^']+)'\)/);
-        if (matchAction) {
-          const agentName = matchAction[1];
-          parsedTasks.forEach((t: any) => {
-            if (t.priority === 'critical' && t.status === 'pending') {
-              t.assigned_agent = agentName;
-              taskUpdates.push(prisma.task.update({ where: { id: t.id }, data: { assigned_agent: agentName } }));
-              stateMutated = true;
-            }
-          });
-        }
-      }
-      
-      if (rule.trigger.includes("system.status == 'BLOCKED'")) {
-        if (systemState.status === 'BLOCKED') {
-          if (!alerts.find((a: any) => a.message === 'System Execution Blocked' && a.status === 'ACTIVE')) {
-            alertCreates.push(prisma.alert.create({
-              data: {
-                id: 'alert_' + generateId(),
-                type: 'SYSTEM_OVERLOAD',
-                message: 'System Execution Blocked',
-                severity: 'CRITICAL',
-                status: 'ACTIVE',
-                created_at: new Date().toISOString()
-              }
-            }));
-            stateMutated = true;
-          }
-        }
-      }
-    });
-
-    // 4. Autonomous Task Routing
-    const agentUpdates: any[] = [];
+    // 3. Autonomous Task Routing
     const availableAgents = agents.filter((a: any) => a.status === 'active' || a.status === 'idle');
     if (availableAgents.length > 0) {
       let agentIndex = 0;
-      parsedTasks.forEach((task: any) => {
-        if (task.status === 'pending' && (!task.assigned_agent || task.assigned_agent === 'Unassigned')) {
+      tasks.forEach((task: any) => {
+        if (task.status === 'pending' && !task.assigned_agent_id) {
           const selectedAgent = availableAgents[agentIndex % availableAgents.length];
-          task.assigned_agent = selectedAgent.name;
-          task.status = 'in-progress';
+          task.assigned_agent_id = selectedAgent.id;
+          task.status = 'in_progress';
           
-          taskUpdates.push(prisma.task.update({
+          taskUpdates.push(prisma.tasks.update({
              where: { id: task.id },
-             data: { assigned_agent: selectedAgent.name, status: 'in-progress' }
+             data: { assigned_agent_id: selectedAgent.id, status: 'in_progress' }
           }));
 
-          agentUpdates.push(prisma.agent.update({
+          agentUpdates.push(prisma.agents.update({
              where: { id: selectedAgent.id },
-             data: { current_task: task.title, status: 'active' }
+             data: { current_task_id: task.id, status: 'active' }
           }));
 
           agentIndex++;
           stateMutated = true;
           
-          memoryCreates.push(prisma.agentMemory.create({
+          telemetryCreates.push(prisma.telemetry_events.create({
              data: {
-                id: 'mem_' + generateId(),
-                workspace,
+                id: uuidv4(),
+                workspace_id: workspaceId,
                 agent_id: selectedAgent.id,
-                memory_type: 'TASK_CONTEXT',
-                content: `Assigned and commenced work on task: ${task.title}`,
-                created_at: new Date().toISOString()
+                task_id: task.id,
+                project_id: task.project_id,
+                category: 'event',
+                severity: 'info',
+                event_type: 'task_assigned',
+                message: `Agent ${selectedAgent.name} assigned to work on task "${task.title}".`
              }
           }));
-
-          if (task.project_id) {
-            memoryCreates.push(prisma.projectActivity.create({
-               data: {
-                  project_id: task.project_id,
-                  message: `Agent ${selectedAgent.name} assigned to work on task "${task.title}".`
-               }
-            }));
-          }
         }
       });
     }
 
     // 5. System State Engine
-    const blockedTasksCount = parsedTasks.filter((t: any) => t.status === 'blocked').length;
-    const pendingTasksCount = parsedTasks.filter((t: any) => t.status === 'pending').length;
-    const inProgressCount = parsedTasks.filter((t: any) => t.status === 'in-progress').length;
+    const blockedTasksCount = tasks.filter((t: any) => t.status === 'blocked').length;
+    const pendingTasksCount = tasks.filter((t: any) => t.status === 'pending').length;
+    const inProgressCount = tasks.filter((t: any) => t.status === 'in_progress').length;
     const activeAgentsCount = agents.filter((a: any) => a.status === 'active').length;
     
     let newStatus = 'NORMAL';
@@ -169,40 +113,13 @@ export async function POST(request: Request) {
     else if (pendingTasksCount > 2 && activeAgentsCount < 2) newStatus = 'OVERLOADED';
     else if (pendingTasksCount === 0 && inProgressCount === 0 && activeAgentsCount === 0) newStatus = 'IDLE';
 
-    let systemStatePromise = null;
-    if (systemState.status !== newStatus || systemState.blocked_tasks !== blockedTasksCount || systemState.pending_tasks !== pendingTasksCount) {
-       systemStatePromise = prisma.systemState.upsert({
-          where: { id: systemState.id },
-          create: {
-             id: 'global',
-             status: newStatus,
-             blocked_tasks: blockedTasksCount,
-             pending_tasks: pendingTasksCount,
-             active_agents: activeAgentsCount,
-             last_evaluated_at: new Date().toISOString()
-          },
-          update: {
-             status: newStatus,
-             blocked_tasks: blockedTasksCount,
-             pending_tasks: pendingTasksCount,
-             active_agents: activeAgentsCount,
-             last_evaluated_at: new Date().toISOString()
-          }
-       });
-       stateMutated = true;
-    }
-
-    // 6. Execute all PRISMA mutations batched
     if (stateMutated) {
-       const transactions = [
+       await prisma.$transaction([
           ...taskUpdates,
           ...alertCreates,
           ...agentUpdates,
-          ...memoryCreates
-       ];
-       if (systemStatePromise) transactions.push(systemStatePromise);
-
-       await prisma.$transaction(transactions);
+          ...telemetryCreates
+       ]);
     }
 
     return NextResponse.json({ success: true, mutated: stateMutated, status: newStatus });

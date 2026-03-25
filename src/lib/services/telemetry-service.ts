@@ -1,5 +1,6 @@
-import type { PaginatedResult, TelemetryEvent, TelemetryCategory, TelemetrySeverity } from '@contracts';
+import {  PaginatedResult, TelemetryEvent, TelemetryCategory, TelemetrySeverity  } from '@contracts';
 import { prisma } from './database';
+import { getWorkspaceId } from '../workspace-utils';
 
 export type ListTelemetryParams = {
   workspaceId: string;
@@ -35,29 +36,30 @@ export type CreateTelemetryInput = {
 function mapTelemetry(record: any): TelemetryEvent {
   return {
     id: record.id,
-    workspace_id: record.workspace,
+    workspace_id: record.workspace_id,
     agent_id: record.agent_id || undefined,
     task_id: record.task_id || undefined,
     project_id: record.project_id || undefined,
     category: (record.category || TelemetryCategory.EVENT) as TelemetryCategory,
     severity: (record.severity || TelemetrySeverity.INFO) as TelemetrySeverity,
-    event_type: record.event_type || record.status || 'event',
+    event_type: record.event_type || record.event_type || 'event',
     message: record.message,
-    payload: record.payload ? JSON.parse(record.payload) : undefined,
+    payload: record.payload ? (typeof record.payload === 'string' ? JSON.parse(record.payload) : record.payload) : undefined,
     latency_ms: record.latency_ms || undefined,
     tokens_input: record.tokens_input || undefined,
     tokens_output: record.tokens_output || undefined,
     cost_usd: record.cost_usd || undefined,
     correlation_id: record.correlation_id || undefined,
-    created_at: record.created_at?.toISOString?.() || record.timestamp || new Date().toISOString(),
+    created_at: record.created_at?.toISOString?.() || record.created_at || new Date().toISOString(),
     updated_at: record.updated_at?.toISOString?.() || new Date().toISOString()
   };
 }
 
 export async function listTelemetryEvents({ workspaceId, limit = 50, cursor }: ListTelemetryParams): Promise<PaginatedResult<TelemetryEvent>> {
-  const events = await prisma.activity.findMany({
-    where: { workspace: workspaceId },
-    orderBy: { timestamp: 'desc' },
+  const mappedWorkspaceId = getWorkspaceId(workspaceId);
+  const events = await prisma.telemetry_events.findMany({
+    where: { workspace_id: mappedWorkspaceId },
+    orderBy: { created_at: 'desc' },
     take: limit,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
   });
@@ -69,9 +71,10 @@ export async function listTelemetryEvents({ workspaceId, limit = 50, cursor }: L
 }
 
 export async function getTelemetrySummary(workspaceId: string): Promise<TelemetrySummary> {
-  const recent = await prisma.activity.findMany({
-    where: { workspace: workspaceId },
-    orderBy: { timestamp: 'desc' },
+  const mappedWorkspaceId = getWorkspaceId(workspaceId);
+  const recent = await prisma.telemetry_events.findMany({
+    where: { workspace_id: mappedWorkspaceId },
+    orderBy: { created_at: 'desc' },
     take: 20
   });
   const events = recent.map(mapTelemetry);
@@ -88,14 +91,14 @@ export async function getTelemetrySummary(workspaceId: string): Promise<Telemetr
 }
 
 export async function recordTelemetry(input: CreateTelemetryInput): Promise<TelemetryEvent> {
-  const record = await prisma.activity.create({
+  const mappedWorkspaceId = getWorkspaceId(input.workspaceId);
+  const record = await prisma.telemetry_events.create({
     data: {
-      workspace: input.workspaceId,
+      workspace_id: mappedWorkspaceId,
       agent_id: input.agentId || null,
       task_id: input.taskId || null,
       message: input.message,
-      status: input.eventType,
-      timestamp: new Date().toISOString(),
+      event_type: input.eventType,
       category: input.category,
       severity: input.severity,
       payload: input.payload ? JSON.stringify(input.payload) : null,

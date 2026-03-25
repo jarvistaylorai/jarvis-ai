@@ -15,7 +15,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     const body = await request.json();
     const template = body.template || 'Default';
 
-    const project = await prisma.project.findUnique({ where: { id: params.id } });
+    const project = await prisma.projects.findUnique({ where: { id: params.id } });
     if (!project) {
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
@@ -67,15 +67,16 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     }
 
     const mutations = taskTitles.map(title => 
-      prisma.task.create({
+      prisma.tasks.create({
         data: {
           id: 't_' + generateId(),
           title,
           status: 'pending',
           priority: 'normal',
           project_id: project.id,
-          assigned_agent: 'Unassigned',
-          dependencies: "[]",
+          workspace_id: project.workspace_id,
+          assigned_agent_id: null,
+          dependency_ids: [],
           created_at: new Date().toISOString()
         }
       })
@@ -83,9 +84,11 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
     // Use any typing to circumvent the cached Typescript strict schema lint error if any
     mutations.push(
-      (prisma.projectActivity as any).create({
+      (prisma.telemetry_events as any).create({
          data: {
            project_id: project.id,
+           workspace_id: project.workspace_id,
+           event_type: 'bootstrap',
            message: `Bootstrapped project using ${template} template, generating ${taskTitles.length} standard tasks.`
          }
       })

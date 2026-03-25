@@ -8,11 +8,11 @@ const prisma = new PrismaClient();
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const params = await context.params;
-    const project = await prisma.project.findUnique({
+    const project = await prisma.projects.findUnique({
       where: { id: params.id },
       include: {
         tasks: true,
-        project_activity: {
+        telemetry_events: {
           orderBy: { created_at: 'desc' },
         }
       }
@@ -23,7 +23,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     }
 
     // derived agents computation
-    const agentsSet = new Set((project.tasks || []).map(t => t.assigned_agent).filter(Boolean));
+    const agentsSet = new Set((project.tasks || []).map((t: any) => t.assigned_agent_id).filter(Boolean));
 
     return NextResponse.json({
       ...project,
@@ -40,16 +40,18 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     const params = await context.params;
     const body = await request.json();
     
-    const updatedProject = await prisma.project.update({
+    const updatedProject = await prisma.projects.update({
       where: { id: params.id },
       data: body
     });
 
     // Optionally log activity if status changed
     if (body.status) {
-      await prisma.projectActivity.create({
+      await prisma.telemetry_events.create({
         data: {
           project_id: params.id,
+          workspace_id: updatedProject.workspace_id,
+          event_type: 'status_changed',
           message: `Project status updated to ${body.status}`
         }
       });

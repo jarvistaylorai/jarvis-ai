@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { TerminalSquare, Play, Pause, Trash2, Download } from 'lucide-react';
 
-export const TelemetryView = ({ activity = [], activeWorkspace = 'business' }: { activity?: any[], activeWorkspace?: string }) => {
+export const TelemetryView = ({ activity: _a, activeWorkspace = 'business' }: { activity?: any[], activeWorkspace?: string }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom

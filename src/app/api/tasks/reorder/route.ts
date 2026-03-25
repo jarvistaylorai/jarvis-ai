@@ -1,22 +1,20 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { updateTask } from '@/lib/services/task-service';
+import { TaskStatus } from '@contracts';
 
 export async function PATCH(request: Request) {
   try {
     const { task_id, new_list_id, new_position } = await request.json();
 
-    if (!task_id || !new_list_id || new_position === undefined) {
+    if (!task_id || !new_list_id) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const task = await prisma.task.update({
-      where: { id: task_id },
-      data: {
-        list_id: new_list_id,
-        position: new_position
-      }
+    const validStatus = new_list_id.replace('-', '_') as TaskStatus;
+
+    const task = await updateTask(task_id, {
+      status: validStatus,
+      metadata: { position: new_position } // Safely tuck exact sort order into the JSON
     });
 
     return NextResponse.json(task);

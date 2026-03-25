@@ -38,7 +38,7 @@ export async function syncJarvisFilesystemToDatabase(prisma: PrismaClient, works
   for (const project of snapshot.projects || []) {
     if (!project?.id || !project?.name) continue
     transactions.push(
-      prisma.project.upsert({
+      prisma.projects.upsert({
         where: { id: project.id },
         create: {
           id: project.id,
@@ -72,7 +72,7 @@ export async function syncJarvisFilesystemToDatabase(prisma: PrismaClient, works
   for (const agent of snapshot.agents || []) {
     if (!agent?.id || !agent?.name) continue
     transactions.push(
-      prisma.agent.upsert({
+      prisma.agents.upsert({
         where: { id: agent.id },
         create: {
           id: agent.id,
@@ -106,7 +106,7 @@ export async function syncJarvisFilesystemToDatabase(prisma: PrismaClient, works
     if (!task?.id || !task?.title) continue
     const projectId = task.project_id || task.project || null
     transactions.push(
-      prisma.task.upsert({
+      prisma.tasks.upsert({
         where: { id: task.id },
         create: {
           id: task.id,
@@ -147,7 +147,7 @@ export async function syncJarvisFilesystemToDatabase(prisma: PrismaClient, works
     if (!objective?.id || !objective?.title) continue
     const matchedLink = objectiveLinks.find((link: any) => link.objective_id === objective.id && link.entity_type === "project")
     transactions.push(
-      prisma.objective.upsert({
+      prisma.objectives.upsert({
         where: { id: objective.id },
         create: {
           id: objective.id,
@@ -174,7 +174,7 @@ export async function syncJarvisFilesystemToDatabase(prisma: PrismaClient, works
   for (const alert of snapshot.alerts || []) {
     if (!alert?.id || !alert?.message) continue
     transactions.push(
-      prisma.alert.upsert({
+      prisma.alerts.upsert({
         where: { id: alert.id },
         create: {
           id: alert.id,

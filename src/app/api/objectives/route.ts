@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/services/database';
+import { getWorkspaceId } from '@/lib/workspace-utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,21 +58,28 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const workspace = searchParams.get('workspace') || 'business';
+    const mappedWorkspaceId = getWorkspaceId(workspace);
 
-    const objectives = await prisma.objective.findMany({
-      where: { workspace },
+    const objectives = await prisma.objectives.findMany({
+      where: { workspace_id: mappedWorkspaceId },
       include: {
-        project: { select: { id: true, name: true } },
-        phases: {
-          orderBy: { position: 'asc' },
-          include: { tasks: true }
-        }
+        projects: { select: { id: true, name: true } },
+        tasks: true
       },
       orderBy: { created_at: 'desc' }
     });
 
     const computed = objectives.map(obj => {
-      const phasesWithMetrics = obj.phases.map(phase => {
+      // Synthesize a main phase
+      const singlePhase = {
+        id: 'phase-main',
+        title: 'Execution Phase',
+        position: 1,
+        target_date: obj.target_date,
+        tasks: obj.tasks || []
+      };
+      
+      const phasesWithMetrics = [singlePhase].map(phase => {
         const metrics = computePhaseMetrics(phase.tasks);
         return {
           id: phase.id,
@@ -94,7 +100,7 @@ export async function GET(request: Request) {
         priority: obj.priority,
         target_date: obj.target_date,
         created_at: obj.created_at,
-        project: obj.project,
+        project: obj.projects,
         progress: objMetrics.progress,
         status: objMetrics.status,
         last_activity_at: objMetrics.last_activity_at,
@@ -116,19 +122,20 @@ export async function POST(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const workspace = searchParams.get('workspace') || 'business';
+    const mappedWorkspaceId = getWorkspaceId(workspace);
     const body = await request.json();
 
     if (!body.title) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 });
     }
 
-    const objective = await prisma.objective.create({
+    const objective = await prisma.objectives.create({
       data: {
-        workspace,
+        workspace_id: mappedWorkspaceId,
         title: body.title,
         description: body.description || null,
         project_id: body.project_id || null,
-        priority: body.priority || 'MEDIUM',
+        priority: body.priority || 'medium',
         target_date: body.target_date ? new Date(body.target_date) : null,
       }
     });

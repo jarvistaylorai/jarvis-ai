@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const logs = await prisma.modelUsageLog.findMany({
+    const logs = await prisma.model_usage_log.findMany({
       orderBy: { timestamp: "desc" },
       take: 50,
       include: {
@@ -13,20 +13,20 @@ export async function GET() {
       }
     });
 
-    const activeAgentsCount = await prisma.agent.count({ where: { status: "active" } });
-    const idleAgentsCount = await prisma.agent.count({ where: { status: "idle" } });
+    const activeAgentsCount = await prisma.agents.count({ where: { status: "active" } });
+    const idleAgentsCount = await prisma.agents.count({ where: { status: "idle" } });
     
-    const totalSessions = await prisma.modelUsageLog.count();
+    const totalSessions = await prisma.model_usage_log.count();
 
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const recentLogs = await prisma.modelUsageLog.findMany({
+    const recentLogs = await prisma.model_usage_log.findMany({
       where: { timestamp: { gte: yesterday } }
     });
 
     const tokensUsed24h = recentLogs.reduce((sum, log) => sum + log.tokens, 0);
     const totalCost24h = recentLogs.reduce((sum, log) => sum + log.cost, 0);
 
-    const aggregateCost = await prisma.modelUsageLog.aggregate({ _sum: { cost: true } });
+    const aggregateCost = await prisma.model_usage_log.aggregate({ _sum: { cost: true } });
     const avgCostPerTask = totalSessions > 0 && aggregateCost._sum.cost ? aggregateCost._sum.cost / totalSessions : 0;
     
     const totalAgents = activeAgentsCount + idleAgentsCount;

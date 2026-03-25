@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const agents = await prisma.agent.findMany({
+    const agents = await prisma.agents.findMany({
       include: {
         agent_model_config: {
           include: {

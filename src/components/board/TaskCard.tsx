@@ -4,7 +4,7 @@ import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Task } from './types';
-import { Eye, CheckSquare, MessageSquare, Paperclip, Target, FolderKanban } from 'lucide-react';
+import { Eye, CheckSquare, MessageSquare, Paperclip, Target, FolderKanban, Calendar } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
@@ -50,10 +50,10 @@ export function TaskCard({ task, onClick, onStatusChange }: TaskCardProps) {
   const checklistTotal = task.checklists?.reduce((acc, c) => acc + c.items.length, 0) || 0;
   const checklistDone = task.checklists?.reduce((acc, c) => acc + c.items.filter(i => i.is_completed).length, 0) || 0;
 
-  const hasIndicators = task.description || checklistTotal > 0 || (task.comments?.length > 0) || (task.attachments?.length > 0);
+  const hasIndicators = task.description || task.due_date || checklistTotal > 0 || (task.comments?.length > 0) || (task.attachments?.length > 0);
 
   const coverImage = task.attachments?.find(a => /\.(jpg|jpeg|png|gif|webp)$/i.test(a.file_name));
-  const coverImageUrl = coverImage ? `/api/uploads/${task.id}/${encodeURIComponent(coverImage.file_path.split(/[/\\]/).pop() || '')}` : null;
+  const coverImageUrl = coverImage ? `/api/fs/raw?storagePath=${encodeURIComponent(coverImage.file_path)}` : null;
 
   if (isDragging) {
     return (
@@ -75,73 +75,88 @@ export function TaskCard({ task, onClick, onStatusChange }: TaskCardProps) {
       className="relative bg-[#0f0f11] border border-white/[0.04] hover:border-white/10 hover:bg-white/[0.02] rounded-xl shadow-2xl cursor-pointer active:cursor-grabbing transition-all group flex flex-col overflow-hidden"
     >
       {coverImageUrl && (
-        <div className="w-full h-32 bg-zinc-900 overflow-hidden shrink-0 border-b border-white/[0.04]">
+        <div className="relative w-full h-32 bg-zinc-900 overflow-hidden shrink-0 border-b border-white/[0.04]">
            <img src={coverImageUrl} alt="Cover" className="w-full h-full object-cover" />
+           {task.project && (
+             <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded bg-indigo-500/90 backdrop-blur-sm border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest shadow-xl max-w-[140px] z-10" title={`Project: ${task.project.name}`}>
+               <FolderKanban size={10} className="shrink-0" />
+               <span className="truncate">{task.project.name}</span>
+             </div>
+           )}
         </div>
       )}
 
-      {/* Project Badge */}
-      {task.project && (
-        <div 
-          className="absolute top-2.5 right-2.5 flex items-center gap-1.5 px-2 py-1 rounded bg-indigo-500/80 backdrop-blur-md border border-indigo-400/30 text-white text-[10px] font-bold uppercase tracking-widest z-20 shadow-lg"
-          title={`Project: ${task.project.name}`}
-        >
-          <FolderKanban size={10} className="opacity-80" />
-          <span className="truncate max-w-[120px]">{task.project.name}</span>
-        </div>
-      )}
+      <div className={`p-3.5 relative flex-1 flex flex-col ${coverImageUrl ? 'pt-3' : ''}`}>
+        
+        {/* Top Section: Title (Left) + Badges (Right) */}
+        <div className="flex items-start justify-between gap-3 mb-2">
+          
+          {/* Title Area */}
+          <div className="flex items-start gap-2.5 flex-1 min-w-0">
+            <button
+              onClick={handleToggleComplete}
+              className={`focus:outline-none w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
+                isCompleted
+                  ? 'bg-emerald-500 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
+                  : 'border-zinc-600 hover:border-indigo-500 bg-transparent'
+              }`}
+            >
+              {isCompleted && (
+                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+            <h4 className={`text-sm font-medium leading-relaxed transition-colors break-words ${
+              isCompleted
+                ? 'text-zinc-500 line-through'
+                : 'text-white group-hover:text-indigo-300'
+            }`}>
+              {task.title}
+            </h4>
+          </div>
 
-      <div className={`p-3.5 pr-8 relative flex-1 ${coverImageUrl ? 'pt-3' : ''}`}>
-        {/* Objective Phase Badge */}
-        {task.phase && (
-          <div 
-            className={`absolute ${task.project && !coverImageUrl ? 'top-11' : 'top-3.5'} right-3.5 text-amber-500 hover:text-amber-400 transition-colors z-10`}
-            title={`${task.phase.objective.title}: ${task.phase.title}`}
-          >
-            <Target size={14} />
+          {/* Badges Area (Right side) */}
+          <div className="flex flex-col items-end gap-1.5 shrink-0 max-w-[140px]">
+            {/* Objective Phase Badge */}
+            {task.phase && (
+              <div 
+                className="flex items-center gap-1 px-2 py-1 rounded bg-amber-500/20 border border-amber-500/30 text-amber-500 text-[10px] font-bold uppercase tracking-widest text-right"
+                title={`${task.phase.objective.title}: ${task.phase.title}`}
+              >
+                <Target size={10} className="shrink-0" />
+                <span className="truncate">{task.phase.title}</span>
+              </div>
+            )}
+
+            {/* Project Badge */}
+            {!coverImageUrl && task.project && (
+              <div 
+                className="flex items-center gap-1.5 px-2 py-1 rounded bg-indigo-500/80 border border-indigo-400/30 text-white text-[10px] font-bold uppercase tracking-widest text-right shrink-0"
+                title={`Project: ${task.project.name}`}
+              >
+                <FolderKanban size={10} className="shrink-0 opacity-80" />
+                <span className="truncate">{task.project.name}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Labels Row */}
+        {task.labels && task.labels.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-2 pl-7">
+            {task.labels.map((tl) => (
+              <span
+                key={tl.label.id}
+                className="px-2 py-1 rounded border border-black/10 text-[10px] font-bold uppercase tracking-wider text-black flex items-center"
+                style={{ backgroundColor: tl.label.color }}
+                title={tl.label.name}
+              >
+                 {tl.label.name}
+              </span>
+            ))}
           </div>
         )}
-
-      {/* Labels */}
-      {task.labels && task.labels.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-3">
-          {task.labels.map((tl) => (
-            <span
-              key={tl.label.id}
-              className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider text-black"
-              style={{ backgroundColor: tl.label.color }}
-              title={tl.label.name}
-            >
-               {tl.label.name}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* Title */}
-      <div className="flex items-start gap-2.5 mb-1">
-        <button
-          onClick={handleToggleComplete}
-          className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all ${
-            isCompleted
-              ? 'bg-emerald-500 border-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
-              : 'border-zinc-600 hover:border-indigo-500 bg-transparent'
-          }`}
-        >
-          {isCompleted && (
-            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          )}
-        </button>
-        <h4 className={`text-sm font-medium leading-relaxed transition-colors ${
-          isCompleted
-            ? 'text-zinc-500 line-through'
-            : 'text-white group-hover:text-indigo-300'
-        }`}>
-          {task.title}
-        </h4>
-      </div>
 
       {/* Bottom Row: Indicators + Avatars */}
       {hasIndicators && (
@@ -151,6 +166,13 @@ export function TaskCard({ task, onClick, onStatusChange }: TaskCardProps) {
             {task.description && (
               <div className="flex items-center gap-1" title="Has description">
                 <Eye className="w-3.5 h-3.5" />
+              </div>
+            )}
+            
+            {task.due_date && (
+              <div className={`flex items-center gap-1.5 font-mono ${new Date(task.due_date) < new Date() ? 'text-rose-400 font-medium' : 'text-zinc-400'}`} title={`Due: ${new Date(task.due_date).toLocaleDateString()}`}>
+                <Calendar className="w-3.5 h-3.5" />
+                <span>{new Date(task.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
               </div>
             )}
             

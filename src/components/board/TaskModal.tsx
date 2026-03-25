@@ -96,6 +96,8 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
   const [dueTime, setDueTime] = useState('12:00 AM');
   const [hasStartDate, setHasStartDate] = useState(!!task.start_date);
   const [hasDueDate, setHasDueDate] = useState(!!task.due_date);
+  const [hiddenChecklists, setHiddenChecklists] = useState<Record<string, boolean>>({});
+  const [deletingAttachmentId, setDeletingAttachmentId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -122,7 +124,10 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
     const fetchProjects = async () => {
       try {
         const res = await fetch('/api/projects');
-        if (res.ok) setProjects(await res.json());
+        if (res.ok) {
+          const json = await res.json();
+          setProjects(Array.isArray(json) ? json : (json.data || []));
+        }
       } catch (err) { console.error(err); }
     };
     fetchObjectives();
@@ -167,6 +172,23 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
         setCommentContent('');
       }
     } catch(err) { console.error(err) }
+  };
+
+  const handleDeleteAttachment = (attachmentId: string) => {
+    setDeletingAttachmentId(attachmentId);
+  };
+
+  const confirmDeleteAttachment = async () => {
+    if (!deletingAttachmentId) return;
+    try {
+      const res = await fetch(`/api/tasks/${task.id}/attachments/${deletingAttachmentId}`, { method: 'DELETE' });
+      if (res.ok) {
+        handleLocalUpdateTask({
+          attachments: task.attachments?.filter((a: any) => a.id !== deletingAttachmentId)
+        });
+      }
+      setDeletingAttachmentId(null);
+    } catch (err) { console.error(err); }
   };
 
   const handleDeleteComment = async (commentId: string) => {
@@ -308,7 +330,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
       await fetch(`/api/tasks/${task.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phase_id: phaseId })
+        body: JSON.stringify({ metadata: { ...task.metadata, phase_id: phaseId } })
       });
       
       let phaseObj = undefined;
@@ -362,9 +384,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
 
   const selectCalendarDay = (day: number) => {
     const dateStr = `${calendarMonth + 1}/${day}/${calendarYear}`;
-    if (hasDueDate) {
-      setDueDate(dateStr);
-    } else if (hasStartDate) {
+    if (hasStartDate) {
       setStartDate(dateStr);
     } else {
       setHasDueDate(true);
@@ -665,7 +685,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                       <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Start date</p>
                       <div className="flex items-center gap-2">
                         <input type="checkbox" checked={hasStartDate} onChange={e => setHasStartDate(e.target.checked)}
-                          className="w-4 h-4 rounded border-2 border-zinc-600 bg-transparent checked:bg-indigo-500 checked:border-indigo-500 appearance-none cursor-pointer" />
+                          className="w-4 h-4 rounded border-zinc-600 accent-indigo-500 cursor-pointer outline-none" />
                         <input type="text" placeholder="M/D/YYYY" value={startDate} onChange={e => setStartDate(e.target.value)}
                           disabled={!hasStartDate}
                           className="flex-1 bg-[#050505] border border-white/[0.06] rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 disabled:opacity-40" />
@@ -675,7 +695,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                       <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">Due date</p>
                       <div className="flex items-center gap-2">
                         <input type="checkbox" checked={hasDueDate} onChange={e => setHasDueDate(e.target.checked)}
-                          className="w-4 h-4 rounded border-2 border-zinc-600 bg-transparent checked:bg-indigo-500 checked:border-indigo-500 appearance-none cursor-pointer" />
+                          className="w-4 h-4 rounded border-zinc-600 accent-indigo-500 cursor-pointer outline-none" />
                         <input type="text" placeholder="M/D/YYYY" value={dueDate} onChange={e => setDueDate(e.target.value)}
                           disabled={!hasDueDate}
                           className="flex-1 bg-[#050505] border border-white/[0.06] rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-indigo-500/50 disabled:opacity-40" />
@@ -761,7 +781,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                               await fetch(`/api/tasks/${task.id}`, {
                                 method: 'PATCH',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ assigned_to: newAssigned })
+                                body: JSON.stringify({ metadata: { ...task.metadata, assigned_to: newAssigned } })
                               });
                               handleLocalUpdateTask({ assigned_to: newAssigned });
                               setActivePopover(null);
@@ -860,7 +880,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                   </div>
                   <div className="p-3 max-h-72 overflow-y-auto custom-scrollbar">
                     {/* Show current assignment */}
-                    {(task as any).phase_id && !selectedObjectiveId && (
+                    {(task.metadata as any)?.phase_id || (task as any).phase_id && !selectedObjectiveId && (
                       <div className="mb-3 p-3 rounded-lg bg-amber-500/[0.05] border border-amber-500/20">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -903,7 +923,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                         return phases.length > 0 ? phases.map((phase: any) => (
                           <button key={phase.id} onClick={() => handleAssignPhase(phase.id)}
                             className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors text-left mb-1 ${
-                              (task as any).phase_id === phase.id
+                              (task.metadata as any)?.phase_id || (task as any).phase_id === phase.id
                                 ? 'bg-amber-500/[0.08] border border-amber-500/20'
                                 : 'hover:bg-white/[0.04]'
                             }`}>
@@ -915,7 +935,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                               <p className="text-sm font-medium text-white">{phase.title}</p>
                               <span className="text-[10px] text-zinc-500 font-mono">{phase.task_count || 0} tasks · {phase.progress || 0}%</span>
                             </div>
-                            {(task as any).phase_id === phase.id && (
+                            {(task.metadata as any)?.phase_id || (task as any).phase_id === phase.id && (
                               <CheckSquare size={14} className="text-amber-400 shrink-0" />
                             )}
                           </button>
@@ -963,77 +983,107 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
               )}
             </div>
 
-            {/* Labels */}
-            {task.labels && task.labels.length > 0 && (
-              <div className="mb-8">
-                <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Labels</h4>
-                <div className="flex flex-wrap gap-2 items-center">
-                  {task.labels.map(tl => (
-                    <span key={tl.label.id} className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider text-black" style={{ backgroundColor: tl.label.color }}>
-                      {tl.label.name}
-                    </span>
-                  ))}
-                  <button onClick={() => togglePopover('labels')} className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.06] flex items-center justify-center text-zinc-500 hover:text-white transition-colors">
-                    <Plus size={14} />
-                  </button>
+            {/* Properties Row */}
+            <div className="flex flex-wrap items-start gap-x-10 gap-y-8 mb-8">
+              {/* Dates */}
+              {(task.start_date || task.due_date) && (
+                <div>
+                  <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Dates</h4>
+                  <div className="flex items-center gap-3">
+                    {task.start_date && (
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Start</span>
+                        <span className="text-sm font-medium text-white bg-white/[0.04] px-3 py-1.5 rounded-lg border border-white/[0.06]">{new Date(task.start_date).toLocaleDateString()}</span>
+                      </div>
+                    )}
+                    {task.start_date && task.due_date && <span className="text-zinc-600 mt-4">-</span>}
+                    {task.due_date && (
+                      <div className="flex flex-col">
+                        <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold mb-1">Due</span>
+                        <span className={`text-sm font-medium ${new Date(task.due_date) < new Date() ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' : 'text-white bg-white/[0.04] border-white/[0.06]'} px-3 py-1.5 rounded-lg border`}>
+                          {new Date(task.due_date).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
+                    <button onClick={() => togglePopover('dates')} className="mt-5 w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.06] flex items-center justify-center text-zinc-500 hover:text-white transition-colors">
+                      <Plus size={14} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Objective / Phase Assignment */}
-            {(task as any).phase_id && (() => {
-              let phaseName = '';
-              let objTitle = '';
-              for (const obj of objectives) {
-                const p = (obj.phases || []).find((ph: any) => ph.id === (task as any).phase_id);
-                if (p) { phaseName = p.title; objTitle = obj.title; break; }
-              }
-              return phaseName ? (
-                <div className="mb-8">
-                  <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Objective</h4>
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-500/[0.04] border border-amber-500/15">
-                    <Target size={16} className="text-amber-400 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-xs text-zinc-500 truncate">{objTitle}</p>
-                      <p className="text-sm font-medium text-amber-400 truncate">{phaseName}</p>
+              {/* Labels */}
+              {task.labels && task.labels.length > 0 && (
+                <div>
+                  <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Labels</h4>
+                  <div className="flex flex-wrap gap-2 items-center">
+                    {task.labels.map(tl => (
+                      <span key={tl.label.id} className="px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider text-black" style={{ backgroundColor: tl.label.color }}>
+                        {tl.label.name}
+                      </span>
+                    ))}
+                    <button onClick={() => togglePopover('labels')} className="w-8 h-8 rounded-lg bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.06] flex items-center justify-center text-zinc-500 hover:text-white transition-colors">
+                      <Plus size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Objective / Phase Assignment */}
+              {((task.metadata as any)?.phase_id || (task as any).phase_id) && (() => {
+                let phaseName = '';
+                let objTitle = '';
+                for (const obj of objectives) {
+                  const p = (obj.phases || []).find((ph: any) => ph.id === ((task.metadata as any)?.phase_id || (task as any).phase_id));
+                  if (p) { phaseName = p.title; objTitle = obj.title; break; }
+                }
+                return phaseName ? (
+                  <div>
+                    <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Objective</h4>
+                    <div className="inline-flex items-center gap-3 p-2.5 pr-4 rounded-xl bg-amber-500/[0.04] border border-amber-500/15 max-w-full">
+                      <Target size={16} className="text-amber-400 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs text-zinc-500 truncate">{objTitle}</p>
+                        <p className="text-sm font-medium text-amber-400 truncate">{phaseName}</p>
+                      </div>
+                      <button onClick={() => handleAssignPhase(null)} className="ml-2 text-zinc-600 hover:text-rose-400 transition-colors shrink-0"><X size={14} /></button>
                     </div>
-                    <button onClick={() => handleAssignPhase(null)} className="ml-auto text-zinc-600 hover:text-rose-400 transition-colors shrink-0"><X size={14} /></button>
                   </div>
-                </div>
-              ) : null;
-            })()}
+                ) : null;
+              })()}
 
-            {/* Project Assignment */}
-            {task.project_id && (() => {
-              const proj = projects.find(p => p.id === task.project_id);
-              return proj ? (
-                <div className="mb-8">
-                  <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Project</h4>
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/[0.04] border border-indigo-500/15">
-                    <FolderKanban size={16} className="text-indigo-400 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-indigo-400 truncate">{proj.name}</p>
+              {/* Project Assignment */}
+              {task.project_id && (() => {
+                const proj = projects.find(p => p.id === task.project_id);
+                return proj ? (
+                  <div>
+                    <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Project</h4>
+                    <div className="inline-flex items-center gap-3 p-2.5 pr-4 rounded-xl bg-indigo-500/[0.04] border border-indigo-500/15 max-w-full">
+                      <FolderKanban size={16} className="text-indigo-400 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-indigo-400 truncate">{proj.name}</p>
+                      </div>
+                      <button onClick={() => handleAssignProject(null)} className="ml-2 text-zinc-600 hover:text-rose-400 transition-colors shrink-0"><X size={14} /></button>
                     </div>
-                    <button onClick={() => handleAssignProject(null)} className="ml-auto text-zinc-600 hover:text-rose-400 transition-colors shrink-0"><X size={14} /></button>
                   </div>
-                </div>
-              ) : null;
-            })()}
+                ) : null;
+              })()}
 
-            {/* Members */}
-            {task.assigned_to && (
-              <div className="mb-8">
-                <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Members</h4>
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center border-2 border-[#0a0a0b] text-sm font-bold text-white" title={task.assigned_to}>
-                    {task.assigned_to.substring(0, 2).toUpperCase()}
+              {/* Members */}
+              {task.assigned_to && (
+                <div>
+                  <h4 className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Members</h4>
+                  <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center border-2 border-[#0a0a0b] text-sm font-bold text-white shrink-0" title={task.assigned_to}>
+                      {task.assigned_to.substring(0, 2).toUpperCase()}
+                    </div>
+                    <button onClick={() => togglePopover('members')} className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.06] flex items-center justify-center text-zinc-500 hover:text-white transition-colors shrink-0">
+                      <Plus size={14} />
+                    </button>
                   </div>
-                  <button onClick={() => togglePopover('members')} className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.07] border border-white/[0.06] flex items-center justify-center text-zinc-500 hover:text-white transition-colors">
-                    <Plus size={14} />
-                  </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Description */}
             <div className="mb-8">
@@ -1047,7 +1097,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                 )}
               </div>
               {isEditingDesc || !task.description ? (
-                <div className="ml-8">
+                <div className="">
                   <div className="flex items-center gap-0.5 px-2 py-1.5 bg-[#050505] border border-white/[0.06] border-b-0 rounded-t-xl">
                     <button className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/[0.06] rounded transition-colors flex items-center gap-1">
                       <Type size={13} /><ChevronDown size={10} />
@@ -1081,7 +1131,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                   </div>
                 </div>
               ) : (
-                <div className="ml-8 text-zinc-300 text-sm leading-relaxed cursor-pointer hover:bg-white/[0.02] p-4 rounded-xl whitespace-pre-wrap border border-white/[0.03] hover:border-white/[0.06] transition-all" onClick={() => setIsEditingDesc(true)}>
+                <div className="text-zinc-300 text-sm leading-relaxed cursor-pointer hover:bg-white/[0.02] p-4 rounded-xl whitespace-pre-wrap border border-white/[0.03] hover:border-white/[0.06] transition-all" onClick={() => setIsEditingDesc(true)}>
                   {task.description}
                 </div>
               )}
@@ -1097,13 +1147,12 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                   </div>
                   <button className="text-[10px] font-bold uppercase tracking-wider bg-white/[0.05] px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">Add</button>
                 </div>
-                <div className="ml-8">
+                <div className="">
                   <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Files</p>
                   <div className="space-y-3">
                     {task.attachments.map((att: any) => {
                       const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(att.file_name);
-                      const safeFileName = att.file_path.split(/[/\\]/).pop() || '';
-                      const fileUrl = `/api/uploads/${task.id}/${encodeURIComponent(safeFileName)}`;
+                      const fileUrl = `/api/fs/raw?storagePath=${encodeURIComponent(att.file_path)}`;
 
                       return (
                       <div key={att.id} className="flex flex-col gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-colors group">
@@ -1124,7 +1173,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                           </div>
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onClick={() => window.open(fileUrl, '_blank')} className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/[0.04] rounded-lg transition-colors"><ExternalLink size={14} /></button>
-                            <button className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/[0.04] rounded-lg transition-colors"><MoreHorizontal size={14} /></button>
+                            <button onClick={() => handleDeleteAttachment(att.id)} className="p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-white/[0.04] rounded-lg transition-colors"><Trash2 size={14} /></button>
                           </div>
                         </div>
                       </div>
@@ -1147,11 +1196,13 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                       <h3 className="text-base font-bold text-white tracking-tight">{cl.title}</h3>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button className="text-[10px] font-bold uppercase tracking-wider bg-white/[0.05] px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">Hide checked items</button>
+                      <button onClick={() => setHiddenChecklists(prev => ({ ...prev, [cl.id]: !prev[cl.id] }))} className="text-[10px] font-bold uppercase tracking-wider bg-white/[0.05] px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors border border-transparent hover:border-white/10">
+                        {hiddenChecklists[cl.id] ? 'Show checked items' : 'Hide checked items'}
+                      </button>
                       <button onClick={() => handleDeleteChecklist(cl.id)} className="text-[10px] font-bold uppercase tracking-wider bg-white/[0.05] px-3 py-1.5 rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors border border-transparent hover:border-rose-500/10">Delete</button>
                     </div>
                   </div>
-                  <div className="ml-8 space-y-3">
+                  <div className="space-y-3">
                     <div className="flex items-center gap-4 mb-4">
                        <span className="text-[11px] font-bold text-zinc-500 w-10 text-right font-mono">{percent}%</span>
                        <div className="h-2 flex-1 bg-[#050505] rounded-full overflow-hidden border border-white/[0.04]">
@@ -1159,7 +1210,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                        </div>
                     </div>
                     <div className="space-y-1">
-                      {cl.items.map(item => (
+                      {cl.items.filter((i: any) => !(hiddenChecklists[cl.id] && i.is_completed)).map((item: any) => (
                         <div key={item.id} className="flex items-start gap-3 hover:bg-white/[0.02] p-2.5 -ml-2.5 rounded-lg group transition-colors cursor-pointer" onClick={() => handleToggleChecklistItem(cl.id, item.id, !item.is_completed)}>
                           <div className="mt-0.5 relative flex items-center justify-center w-5 h-5 shrink-0">
                              <input type="checkbox" checked={item.is_completed}
@@ -1224,7 +1275,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar">
-              {task.comments?.map((c: any) => (
+              {[...(task.comments || [])].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((c: any) => (
                 <div key={c.id} className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-xs font-bold text-white shrink-0">
                     {c.author.substring(0, 2).toUpperCase()}
@@ -1232,7 +1283,13 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
                       <span className="font-bold text-sm text-white">{c.author}</span>
-                      <span className="text-[11px] text-indigo-400 hover:underline cursor-pointer">{new Date(c.created_at).toLocaleString()}</span>
+                      <span className="text-[11px] text-indigo-400 hover:underline cursor-pointer">
+                        {(() => {
+                          const date = new Date(c.created_at);
+                          const diff = Date.now() - date.getTime();
+                          return diff < 5 * 60 * 1000 ? 'Now' : date.toLocaleString();
+                        })()}
+                      </span>
                     </div>
                     {editingCommentId === c.id ? (
                       <div>
@@ -1278,6 +1335,22 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
           </div>
         </div>
       </div>
+
+      {deletingAttachmentId && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-[#0a0a0b] border border-white/10 rounded-2xl shadow-2xl p-6 flex flex-col items-center text-center relative overflow-hidden" onClick={e => e.stopPropagation()}>
+             <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-4 shrink-0">
+               <Trash2 size={24} className="text-rose-400" />
+             </div>
+             <h3 className="text-lg font-bold text-white mb-2">Delete Attachment</h3>
+             <p className="text-sm text-zinc-400 mb-6">Are you sure you want to delete this attachment? This action cannot be undone.</p>
+             <div className="flex w-full gap-3">
+               <button onClick={() => setDeletingAttachmentId(null)} className="flex-1 py-2.5 rounded-xl font-bold text-sm text-white bg-white/[0.04] hover:bg-white/[0.08] transition-colors focus:outline-none border border-transparent hover:border-white/10">Cancel</button>
+               <button onClick={confirmDeleteAttachment} className="flex-1 py-2.5 rounded-xl font-bold text-sm text-white bg-rose-600 hover:bg-rose-500 transition-colors shadow-[0_0_15px_rgba(225,29,72,0.3)] focus:outline-none">Delete</button>
+             </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

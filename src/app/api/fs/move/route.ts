@@ -1,24 +1,32 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import { getSafeFsPath, ROOT_WORKSPACE_PATH } from '../fs-utils';
+import { supabaseAdmin, BUCKET_NAME } from '@/lib/supabase-storage';
 
 export async function POST(request: Request) {
   try {
-    const { sourcePath, destinationPath } = await request.json();
+    const { sourcePath, destinationPath, workspace = 'business' } = await request.json();
 
     if (!sourcePath || !destinationPath) {
       return NextResponse.json({ error: 'sourcePath and destinationPath are required' }, { status: 400 });
     }
 
-    const absoluteSource = getSafeFsPath(sourcePath);
-    const absoluteDestination = getSafeFsPath(destinationPath);
-
-    // Prevent moving the root workspace
-    if (absoluteSource === ROOT_WORKSPACE_PATH) {
+    if (sourcePath === '/' || sourcePath === '') {
       return NextResponse.json({ error: 'Cannot move root workspace' }, { status: 403 });
     }
 
-    await fs.rename(absoluteSource, absoluteDestination);
+    const cleanSource = sourcePath.startsWith('/') ? sourcePath.slice(1) : sourcePath;
+    const cleanDest = destinationPath.startsWith('/') ? destinationPath.slice(1) : destinationPath;
+    
+    const storageSource = `${workspace}/${cleanSource}`.replace(/\/+/g, '/');
+    const storageDest = `${workspace}/${cleanDest}`.replace(/\/+/g, '/');
+
+    const { error } = await supabaseAdmin.storage
+      .from(BUCKET_NAME)
+      .move(storageSource, storageDest);
+
+    if (error) {
+       console.error('Storage move error:', error);
+       throw error;
+    }
 
     return NextResponse.json({ success: true, message: 'Moved successfully' });
   } catch (error: any) {

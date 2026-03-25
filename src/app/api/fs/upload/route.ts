@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
-import fs from 'fs/promises';
-import { getSafeFsPath } from '../fs-utils';
+import { supabaseAdmin, BUCKET_NAME, ensureBucket } from '@/lib/supabase-storage';
 import path from 'path';
 
 export async function POST(request: Request) {
@@ -15,23 +14,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing file or targetPath' }, { status: 400 });
     }
 
-    const absoluteDir = getSafeFsPath(targetPath, workspace);
-    
-    // Ensure the directory exists
-    try {
-      await fs.access(absoluteDir);
-    } catch {
-      await fs.mkdir(absoluteDir, { recursive: true });
-    }
+    await ensureBucket();
 
-    const absolutePath = path.join(absoluteDir, file.name);
+    // Remove leading slash if present and build a clean path with the workspace as the root partition
+    const cleanTargetPath = targetPath.startsWith('/') ? targetPath.slice(1) : targetPath;
+    const safeStoragePath = `${workspace}/${cleanTargetPath}/${file.name}`.replace(/\/+/g, '/');
 
-    // Read the file data
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    // Write file
-    await fs.writeFile(absolutePath, buffer);
+    const { data: uploadData, error } = await supabaseAdmin.storage
+      .from(BUCKET_NAME)
+      .upload(safeStoragePath, buffer, {
+        contentType: file.type,
+        upsert: true
+      });
+
+    if (error) {
+      console.error('Supabase Storage Upload Error:', error);
+      throw error;
+    }
 
     return NextResponse.json({ success: true, path: path.join(targetPath, file.name).replace(/\\/g, '/') });
   } catch (error: any) {

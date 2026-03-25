@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
-import fs from 'fs/promises';
+import { supabaseAdmin, BUCKET_NAME, ensureBucket } from '@/lib/supabase-storage';
 import path from 'path';
-import { getSafeFsPath, ensureDirectory, getWorkspaceRoot } from '../fs-utils';
 
 export async function GET(request: Request) {
   try {
@@ -10,52 +9,43 @@ export async function GET(request: Request) {
     const targetPath = searchParams.get('path') || '/';
     const workspace = searchParams.get('workspace') || 'business';
 
-    const absolutePath = getSafeFsPath(targetPath, workspace);
-    
-    // Ensure root exists on first load
-    const root = getWorkspaceRoot(workspace);
-    await ensureDirectory(root);
+    await ensureBucket();
 
-    try {
-      const stats = await fs.stat(absolutePath);
-      if (!stats.isDirectory()) {
-        return NextResponse.json({ error: 'Path is not a directory' }, { status: 400 });
-      }
-    } catch (e: any) {
-       if (e.code === 'ENOENT') {
-          return NextResponse.json({ error: 'Directory not found' }, { status: 404 });
-       }
-       throw e;
+    // Clean paths
+    const cleanPath = targetPath.startsWith('/') ? targetPath.slice(1) : targetPath;
+    const prefix = cleanPath ? `${workspace}/${cleanPath}/`.replace(/\/+/g, '/') : `${workspace}/`;
+
+    const { data: listData, error } = await supabaseAdmin.storage
+      .from(BUCKET_NAME)
+      .list(prefix, {
+        limit: 1000,
+        offset: 0,
+        sortBy: { column: 'name', order: 'asc' },
+      });
+
+    if (error) {
+       console.error("Storage list error:", error);
+       return NextResponse.json({ error: 'Directory not found or access denied' }, { status: 404 });
     }
 
-    const dirents = await fs.readdir(absolutePath, { withFileTypes: true });
-
-    const items = await Promise.all(
-      dirents.map(async (dirent) => {
-        const itemPath = path.join(absolutePath, dirent.name);
-        const stats = await fs.stat(itemPath);
+    const items = listData
+      .filter((file) => file.name !== '.emptyFolderPlaceholder') // Filter out placeholders
+      .map((file) => {
+        const isFolder = !file.metadata; // In Supabase, folders don't have metadata blocks in list view
+        const itemPath = path.join(targetPath, file.name).replace(/\\/g, '/').replace('//', '/');
         
-        let childrenCount = 0;
-        if (dirent.isDirectory()) {
-            try {
-               const cd = await fs.readdir(itemPath);
-               childrenCount = cd.length;
-            } catch(e) {}
-        }
-
         return {
           id: Buffer.from(itemPath).toString('base64'),
-          name: dirent.name,
-          type: dirent.isDirectory() ? 'folder' : 'file',
-          size: stats.size, // in bytes
-          items: dirent.isDirectory() ? childrenCount : 0,
-          modified_at: stats.mtime.toISOString(),
-          path: path.join(targetPath, dirent.name).replace(/\\/g, '/').replace('//', '/')
+          name: file.name,
+          type: isFolder ? 'folder' : 'file',
+          size: file.metadata?.size || 0,
+          items: 0, // Children counts are not queried in 1 pass for Storage
+          modified_at: file.metadata?.mimetype ? file.created_at : new Date().toISOString(),
+          path: itemPath
         };
-      })
-    );
+      });
 
-    // Sort folders first, then files alphabetically
+    // Sort folders first
     items.sort((a, b) => {
       if (a.type === 'folder' && b.type === 'file') return -1;
       if (a.type === 'file' && b.type === 'folder') return 1;
@@ -64,6 +54,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ items });
   } catch (error: any) {
+    console.error('List Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

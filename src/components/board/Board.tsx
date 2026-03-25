@@ -106,7 +106,7 @@ export function Board({ initialLists, projectId, taskProjectId, onTaskClick, act
         : overList.tasks.length;
 
       const newLists = [...prevLists];
-      const activeTask = { ...activeList.tasks[activeTaskIdx], list_id: overListId as string };
+      const activeTask = { ...activeList.tasks[activeTaskIdx], status: overListId as string };
 
       newLists[activeListIdx] = {
         ...activeList,
@@ -212,29 +212,16 @@ export function Board({ initialLists, projectId, taskProjectId, onTaskClick, act
 
   const handleAddList = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newListName.trim()) return;
-
-    try {
-      const res = await fetch(`/api/lists?workspace=${activeWorkspace}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ project_id: projectId, name: newListName.trim() })
-      });
-      if (res.ok) {
-        const list = await res.json();
-        setLists([...lists, { ...list, tasks: [] }]);
-        setNewListName('');
-        setIsAddingList(false);
-      }
-    } catch(err) { console.error('Error adding list', err) }
+    // Disabled in Supabase (statuses are ENUMs)
   };
 
   const handleAddTask = async (listId: string, title: string) => {
     try {
+      const validStatus = listId.replace('-', '_');
       const res = await fetch(`/api/tasks?workspace=${activeWorkspace}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ list_id: listId, project_id: taskProjectId || projectId, title })
+        body: JSON.stringify({ status: validStatus, project_id: taskProjectId || projectId, title })
       });
       if (res.ok) {
         const task = await res.json();
@@ -277,40 +264,6 @@ export function Board({ initialLists, projectId, taskProjectId, onTaskClick, act
             ))}
           </SortableContext>
 
-          {/* Add List Button */}
-          <div className="w-80 shrink-0 h-fit">
-            {isAddingList ? (
-              <form onSubmit={handleAddList} className="bg-[#050505] rounded-2xl p-4 shadow-2xl border border-white/[0.04]">
-                <input
-                  autoFocus
-                  className="w-full bg-[#0f0f11] text-sm px-3 py-2 rounded-lg text-white border border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 placeholder:text-zinc-600 mb-3 shadow-inner"
-                  placeholder="Enter list title..."
-                  value={newListName}
-                  onChange={e => setNewListName(e.target.value)}
-                />
-                <div className="flex items-center gap-2">
-                  <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-bold tracking-wider uppercase text-[11px] transition-colors shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                    Add List
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => setIsAddingList(false)}
-                    className="p-1.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-lg transition-colors ml-auto"
-                  >
-                    <Plus className="w-5 h-5 rotate-45" />
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <button 
-                onClick={() => setIsAddingList(true)}
-                className="w-full flex items-center gap-3 bg-[#0a0a0b]/50 hover:bg-[#0a0a0b] text-zinc-400 font-bold tracking-wider uppercase text-[11px] px-4 py-4 rounded-2xl transition-colors border-2 border-dashed border-white/[0.05] hover:border-white/10 hover:text-white"
-              >
-                <Plus className="w-4 h-4" />
-                Add another list
-              </button>
-            )}
-          </div>
         </div>
 
         <DragOverlay>

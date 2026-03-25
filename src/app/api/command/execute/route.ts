@@ -17,9 +17,9 @@ export async function POST(req: Request) {
     let warnings: string[] = [];
     let mutations: any[] = [];
 
-    const tasks = await prisma.task.findMany();
-    const agents = await prisma.agent.findMany();
-    const projects = await prisma.project.findMany();
+    const tasks = await prisma.tasks.findMany();
+    const agents = await prisma.agents.findMany();
+    const projects = await prisma.projects.findMany();
 
     // Command: "Assign all high priority tasks to Dev Agent"
     if (cmd.includes('assign') && (cmd.includes('high priority') || cmd.includes('critical'))) {
@@ -29,13 +29,14 @@ export async function POST(req: Request) {
       let assignedCount = 0;
       tasks.forEach((t: any) => {
         if ((t.priority === 'high' || t.priority === 'critical') && t.status === 'pending') {
-          mutations.push(prisma.task.update({ where: { id: t.id }, data: { assigned_agent: agentTarget, status: 'in-progress' } }));
+          mutations.push(prisma.tasks.update({ where: { id: t.id }, data: { assigned_agent_id: agentTarget, status: 'in_progress' } }));
           assignedCount++;
         }
       });
       
       if (assignedCount > 0) {
         actions_executed.push(`Assigned ${assignedCount} high-priority tasks to ${agentTarget}.`);
+        /*
         mutations.push(prisma.agentMemory.create({
           data: {
             id: 'mem_' + generateId(),
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
             created_at: new Date().toISOString()
           }
         }));
+        */
       } else {
         warnings.push('No unassigned high-priority tasks found.');
       }
@@ -54,8 +56,8 @@ export async function POST(req: Request) {
     else if (cmd.includes('start') && (cmd.includes('sprint') || cmd.includes('project'))) {
       const targetProj = projects.find((p: any) => cmd.includes(p.name.toLowerCase()));
       if (targetProj) {
-        if (targetProj.status !== 'BUILD') {
-          mutations.push(prisma.project.update({ where: { id: targetProj.id }, data: { status: 'BUILD' } }));
+        if (targetProj.status !== 'building') {
+          mutations.push(prisma.projects.update({ where: { id: targetProj.id }, data: { status: 'building' } }));
           actions_executed.push(`Started development sprint for project: ${targetProj.name}.`);
         } else {
           warnings.push(`Project ${targetProj.name} is already in development.`);
@@ -79,7 +81,7 @@ export async function POST(req: Request) {
         let assignedAgentId = null;
         let finalStatus = 'pending';
         
-        if (defaultProject && defaultProject.auto_assign) {
+        if (defaultProject) {
            const activeAgents = agents.filter((a: any) => a.status === 'active' || a.status === 'idle');
            if (activeAgents.length > 0) {
              // Find least loaded agent (simplistic logic: randomly select, or ideally check who has fewest tasks)
@@ -93,42 +95,47 @@ export async function POST(req: Request) {
              if (leastLoaded) {
                 assignedAgent = leastLoaded.name;
                 assignedAgentId = leastLoaded.id;
-                finalStatus = 'in-progress';
+                finalStatus = 'in_progress';
              }
            }
         }
 
-        mutations.push(prisma.task.create({
+        mutations.push(prisma.tasks.create({
           data: {
             id: taskId,
             title: title,
-            status: finalStatus,
+            status: finalStatus as any,
             priority: 'normal',
+            workspace_id: defaultProject.workspace_id,
             project_id: projectId,
-            assigned_agent: assignedAgent,
-            dependencies: "[]",
+            assigned_agent_id: assignedAgentId,
+            dependency_ids: [],
             created_at: new Date().toISOString()
           }
         }));
 
         if (projectId) {
-           mutations.push(prisma.projectActivity.create({
+           mutations.push(prisma.telemetry_events.create({
              data: {
                project_id: projectId,
+               workspace_id: defaultProject.workspace_id,
+               event_type: 'system_log',
                message: `Task created: "${title}"`
              }
            }));
 
            if (assignedAgent !== 'Unassigned') {
-             mutations.push(prisma.projectActivity.create({
+             mutations.push(prisma.telemetry_events.create({
                data: {
                  project_id: projectId,
+                 workspace_id: defaultProject.workspace_id,
+                 event_type: 'system_log',
                  message: `Agent ${assignedAgent} assigned to task "${title}" automatically.`
                }
              }));
-             mutations.push(prisma.agent.update({
+             mutations.push(prisma.agents.update({
                where: { id: assignedAgentId },
-               data: { current_task: title, status: 'active' }
+               data: { current_task_id: taskId, status: 'active' }
              }));
            }
         }
@@ -143,7 +150,7 @@ export async function POST(req: Request) {
     else if (cmd.includes('halt') || cmd.includes('stop all')) {
       agents.forEach((a: any) => {
         if (a.status === 'active') {
-          mutations.push(prisma.agent.update({ where: { id: a.id }, data: { status: 'idle', current_task: '' } }));
+          mutations.push(prisma.agents.update({ where: { id: a.id }, data: { status: 'idle', current_task_id: '' } }));
         }
       });
       actions_executed.push('Halted all active agent execution streams.');

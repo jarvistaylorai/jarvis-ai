@@ -1,26 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { prisma } from '@/lib/services/database';
 
 export async function GET() {
   try {
-    const agentsDir = path.join(process.cwd(), 'agents');
+    const dbAgents = await prisma.agents.findMany({
+      where: {
+        NOT: {
+          handle: { startsWith: 'deleted-' }
+        }
+      },
+      select: { handle: true },
+      distinct: ['handle']
+    });
     
-    // Create agents dir if it doesn't exist
-    try {
-      await fs.access(agentsDir);
-    } catch {
-      await fs.mkdir(agentsDir, { recursive: true });
-    }
-
-    const entries = await fs.readdir(agentsDir, { withFileTypes: true });
-    const agents = entries
-      .filter(entry => entry.isDirectory())
-      .map(entry => entry.name);
+    // Only return defined handles
+    const agents = dbAgents.map(a => a.handle).filter(Boolean);
 
     return NextResponse.json({ agents });
   } catch (error) {
-    console.error('Error reading agents directory:', error);
+    console.error('Error reading agents from db:', error);
     return NextResponse.json({ error: 'Failed to read agents' }, { status: 500 });
   }
 }
@@ -28,20 +26,18 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const { agentId } = await request.json();
-    if (!agentId || typeof agentId !== 'string' || agentId.includes('..') || agentId.length > 50) {
+    if (!agentId || typeof agentId !== 'string' || agentId.length > 50) {
       return NextResponse.json({ error: 'Invalid agent ID' }, { status: 400 });
     }
 
-    const agentDir = path.join(process.cwd(), 'agents', agentId);
-    
-    try {
-      await fs.access(agentDir);
-      return NextResponse.json({ error: 'Agent already exists' }, { status: 400 });
-    } catch {
-      // Directory doesn't exist, which is what we want
-    }
+    // Find the agent in DB using the handle
+    const agent = await prisma.agents.findFirst({
+      where: { handle: agentId }
+    });
 
-    await fs.mkdir(agentDir, { recursive: true });
+    if (!agent) {
+      return NextResponse.json({ error: 'Agent not found in database. Create the agent first.' }, { status: 404 });
+    }
 
     const coreFiles = [
       'IDENTITY.md',
@@ -53,18 +49,32 @@ export async function POST(request: NextRequest) {
       'TOOLS.md'
     ];
 
-    // Scaffold baseline files
+    // Scaffold baseline files directly in Postgres
     for (const file of coreFiles) {
       let content = `# ${file.replace('.md', '')}\n\n`;
       if (file === 'IDENTITY.md') {
-         content += `Name: ${agentId.charAt(0).toUpperCase() + agentId.slice(1)}\nRole: AI Agent\n`;
+         content += `Name: ${agent.name}\nRole: ${agent.role || 'AI Agent'}\n`;
       }
-      await fs.writeFile(path.join(agentDir, file), content, 'utf-8');
+      
+      await prisma.agent_context_files.upsert({
+        where: {
+          agent_id_file_name: {
+            agent_id: agent.id,
+            file_name: file
+          }
+        },
+        update: {}, // Don't override if already exists
+        create: {
+          agent_id: agent.id,
+          file_name: file,
+          content: content
+        }
+      });
     }
 
     return NextResponse.json({ success: true, agentId });
   } catch (error) {
-    console.error('Error creating agent:', error);
-    return NextResponse.json({ error: 'Failed to create agent' }, { status: 500 });
+    console.error('Error creating agent context files:', error);
+    return NextResponse.json({ error: 'Failed to create agent context files' }, { status: 500 });
   }
 }

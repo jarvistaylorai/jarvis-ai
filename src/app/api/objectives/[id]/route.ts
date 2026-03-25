@@ -58,19 +58,14 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const objective = await prisma.objective.findUnique({
+    const objective = await prisma.objectives.findUnique({
       where: { id },
       include: {
-        project: { select: { id: true, name: true } },
-        phases: {
-          orderBy: { position: 'asc' },
+        projects: { select: { id: true, name: true } },
+        tasks: {
           include: {
-            tasks: {
-              include: {
-                labels: { include: { label: true } },
-                checklists: { include: { items: true } },
-              }
-            }
+            task_labels: { include: { labels: true } },
+            task_checklists: { include: { task_checklist_items: true } },
           }
         }
       }
@@ -80,7 +75,20 @@ export async function GET(
       return NextResponse.json({ error: 'Objective not found' }, { status: 404 });
     }
 
-    const phasesWithMetrics = objective.phases.map(phase => {
+    if (!objective) {
+      return NextResponse.json({ error: 'Objective not found' }, { status: 404 });
+    }
+
+    const mockPhase = {
+      id: 'default-phase',
+      title: objective.current_phase || 'Default Phase',
+      position: 0,
+      target_date: null,
+      created_at: objective.created_at,
+      tasks: objective.tasks || []
+    };
+
+    const phasesWithMetrics = [mockPhase].map(phase => {
       const metrics = computePhaseMetrics(phase.tasks);
       return {
         id: phase.id,
@@ -103,7 +111,7 @@ export async function GET(
       priority: objective.priority,
       target_date: objective.target_date,
       created_at: objective.created_at,
-      project: objective.project,
+      project: objective.projects,
       progress: objMetrics.progress,
       status: objMetrics.status,
       last_activity_at: objMetrics.last_activity_at,
@@ -133,7 +141,7 @@ export async function PATCH(
     if (body.target_date !== undefined) data.target_date = body.target_date ? new Date(body.target_date) : null;
     if (body.status !== undefined) data.status = body.status;
 
-    const objective = await prisma.objective.update({
+    const objective = await prisma.objectives.update({
       where: { id },
       data
     });
@@ -151,7 +159,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.objective.delete({ where: { id } });
+    await prisma.objectives.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error('API Error [DELETE /api/objectives/:id]:', error);

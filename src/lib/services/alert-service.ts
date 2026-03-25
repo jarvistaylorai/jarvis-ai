@@ -1,6 +1,7 @@
-import type { Alert, AlertSeverity, AlertStatus, PaginatedResult } from '@contracts';
+import {  Alert, AlertSeverity, AlertStatus, PaginatedResult  } from '@contracts';
 import { prisma } from './database';
 import { eventBus } from './event-bus';
+import { getWorkspaceId } from '../workspace-utils';
 
 export type ListAlertsParams = {
   workspaceId: string;
@@ -41,13 +42,13 @@ function normalizeStatus(value: string): AlertStatus {
 function mapAlert(record: any): Alert {
   return {
     id: record.id,
-    workspace_id: record.workspace,
-    source_type: record.type,
+    workspace_id: record.workspace_id,
+    source_type: record.source_type,
     source_id: record.source_id ?? undefined,
     message: record.message,
     severity: normalizeSeverity(record.severity),
     status: normalizeStatus(record.status),
-    acknowledged_by_agent_id: record.acknowledged_by ?? undefined,
+    acknowledged_by_agent_id: record.acknowledged_by_agent_id ?? undefined,
     acknowledged_at: record.acknowledged_at?.toISOString?.() || undefined,
     resolved_at: record.resolved_at?.toISOString?.() || undefined,
     context: record.context ? JSON.parse(record.context) : undefined,
@@ -57,8 +58,9 @@ function mapAlert(record: any): Alert {
 }
 
 export async function listAlerts({ workspaceId, limit = 25, cursor, status }: ListAlertsParams): Promise<PaginatedResult<Alert>> {
-  const alerts = await prisma.alert.findMany({
-    where: { workspace: workspaceId, ...(status ? { status } : {}) },
+  const mappedWorkspaceId = getWorkspaceId(workspaceId);
+  const alerts = await prisma.alerts.findMany({
+    where: { workspace_id: mappedWorkspaceId, ...(status ? { status } : {}) },
     orderBy: { updated_at: 'desc' },
     take: limit,
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
@@ -71,10 +73,11 @@ export async function listAlerts({ workspaceId, limit = 25, cursor, status }: Li
 }
 
 export async function createAlert(input: CreateAlertInput): Promise<Alert> {
-  const record = await prisma.alert.create({
+  const mappedWorkspaceId = getWorkspaceId(input.workspaceId);
+  const record = await prisma.alerts.create({
     data: {
-      workspace: input.workspaceId,
-      type: input.sourceType,
+      workspace_id: mappedWorkspaceId,
+      source_type: input.sourceType,
       message: input.message,
       severity: input.severity,
       status: input.status || AlertStatus.ACTIVE,

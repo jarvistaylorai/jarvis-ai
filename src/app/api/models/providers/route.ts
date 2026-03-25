@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const providers = await prisma.providerSettings.findMany();
+    const providers = await prisma.provider_settings.findMany();
     return NextResponse.json(providers);
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch providers" }, { status: 500 });
@@ -15,7 +15,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const provider = await prisma.providerSettings.upsert({
+    const provider = await prisma.provider_settings.upsert({
       where: { provider: data.provider },
       update: {
         api_key: data.api_key,

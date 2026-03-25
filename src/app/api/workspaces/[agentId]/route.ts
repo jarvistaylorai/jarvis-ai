@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { prisma } from '@/lib/services/database';
 
 export async function GET(
   request: NextRequest,
@@ -9,17 +8,21 @@ export async function GET(
   try {
     const { agentId } = await params;
     
-    if (!agentId || agentId.includes('..')) {
+    if (!agentId) {
       return NextResponse.json({ error: 'Invalid agent ID' }, { status: 400 });
     }
 
-    const agentDir = path.join(process.cwd(), 'agents', agentId);
-    
-    try {
-      await fs.access(agentDir);
-    } catch {
+    const agent = await prisma.agents.findFirst({
+      where: { handle: agentId }
+    });
+
+    if (!agent) {
       return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
     }
+
+    const contextFiles = await prisma.agent_context_files.findMany({
+      where: { agent_id: agent.id }
+    });
 
     const coreFiles = [
       'IDENTITY.md',
@@ -33,13 +36,14 @@ export async function GET(
 
     const filesContent: Record<string, string> = {};
 
+    // Get from DB
+    for (const fileRecord of contextFiles) {
+      filesContent[fileRecord.file_name] = fileRecord.content;
+    }
+
+    // Default missing core files to empty strings
     for (const file of coreFiles) {
-      const filePath = path.join(agentDir, file);
-      try {
-        const content = await fs.readFile(filePath, 'utf-8');
-        filesContent[file] = content;
-      } catch (err) {
-        // If file doesn't exist, we just skip or provide empty content
+      if (!(file in filesContent)) {
         filesContent[file] = '';
       }
     }
@@ -58,13 +62,13 @@ export async function PUT(
   try {
     const { agentId } = await params;
     
-    if (!agentId || agentId.includes('..')) {
+    if (!agentId) {
       return NextResponse.json({ error: 'Invalid agent ID' }, { status: 400 });
     }
 
     const { file, content } = await request.json();
 
-    if (!file || typeof file !== 'string' || file.includes('..') || !file.endsWith('.md')) {
+    if (!file || typeof file !== 'string' || !file.endsWith('.md')) {
       return NextResponse.json({ error: 'Invalid file parameter' }, { status: 400 });
     }
 
@@ -72,13 +76,30 @@ export async function PUT(
        return NextResponse.json({ error: 'Invalid content parameter' }, { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), 'agents', agentId, file);
-    
-    // Ensure the directory exists
-    await fs.mkdir(path.dirname(filePath), { recursive: true });
-    
-    // Write new content
-    await fs.writeFile(filePath, content, 'utf-8');
+    const agent = await prisma.agents.findFirst({
+      where: { handle: agentId }
+    });
+
+    if (!agent) {
+      return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
+    }
+
+    await prisma.agent_context_files.upsert({
+      where: {
+        agent_id_file_name: {
+          agent_id: agent.id,
+          file_name: file
+        }
+      },
+      update: {
+        content: content
+      },
+      create: {
+        agent_id: agent.id,
+        file_name: file,
+        content: content
+      }
+    });
 
     return NextResponse.json({ success: true, message: `File ${file} updated successfully` });
   } catch (error) {

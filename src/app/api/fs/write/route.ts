@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-import { getSafeFsPath, ensureDirectory } from '../fs-utils';
+import { supabaseAdmin, BUCKET_NAME } from '@/lib/supabase-storage';
 
 export async function POST(request: Request) {
   try {
@@ -11,17 +9,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'targetPath is required' }, { status: 400 });
     }
 
-    const absolutePath = getSafeFsPath(targetPath, workspace);
+    const cleanPath = targetPath.startsWith('/') ? targetPath.slice(1) : targetPath;
+    const storagePath = `${workspace}/${cleanPath}`.replace(/\/+/g, '/');
 
     if (isFolder) {
-      await ensureDirectory(absolutePath);
+      // In Supabase, folders are implicit. We create an empty hidden file to represent an empty directory.
+      const folderPlaceholderPath = `${storagePath}/.emptyFolderPlaceholder`.replace(/\/+/g, '/');
+      await supabaseAdmin.storage.from(BUCKET_NAME).upload(
+        folderPlaceholderPath,
+        Buffer.from(''),
+        { upsert: true }
+      );
       return NextResponse.json({ success: true, message: 'Folder created successfully' });
     }
 
-    // Ensure parent directory exists for file
-    await ensureDirectory(path.dirname(absolutePath));
+    const { error } = await supabaseAdmin.storage.from(BUCKET_NAME).upload(
+      storagePath,
+      Buffer.from(content || '', 'utf-8'),
+      { contentType: 'text/plain', upsert: true }
+    );
 
-    await fs.writeFile(absolutePath, content || '', 'utf-8');
+    if (error) {
+       console.error("Storage Write Error:", error);
+       throw error;
+    }
 
     return NextResponse.json({ success: true, message: 'File written successfully' });
   } catch (error: any) {

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useProjects } from '@/hooks/useMissionControl';
 import { useRouter } from 'next/navigation';
 import { 
   FolderKanban, Activity, MoreVertical, Play, Pause, Plus, Zap, 
@@ -20,9 +21,10 @@ const Badge = ({ children, colorClass }: any) => (
   </span>
 );
 
-export const ProjectsView = ({ projects: initialProjects = [], activeWorkspace = 'business' }: { projects?: any[], activeWorkspace?: string }) => {
+export const ProjectsView = ({ activeWorkspace = 'business' }: { activeWorkspace?: string }) => {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
-  const [projects, setProjects] = useState<any[]>(initialProjects || []);
+  const { data: projectsData, isLoading, refetch } = useProjects(activeWorkspace);
+  const projects = projectsData?.data || [];
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,22 +42,7 @@ export const ProjectsView = ({ projects: initialProjects = [], activeWorkspace =
     deadline: ""
   });
 
-  const fetchProjects = async () => {
-    try {
-      const res = await fetch(`/api/projects?workspace=${activeWorkspace}`);
-      if (res.ok) {
-        const data = await res.json();
-        setProjects(data);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
-  useEffect(() => {
-    fetchProjects();
-    // Removed aggressive polling to fix rendering glitches
-  }, [activeWorkspace]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +61,7 @@ export const ProjectsView = ({ projects: initialProjects = [], activeWorkspace =
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify({ template: form.template })
         });
-        await fetchProjects();
+        await refetch();
         setIsDrawerOpen(false);
         setForm({
           name: "", description: "", type: "product", template: "Default", 
@@ -105,7 +92,7 @@ export const ProjectsView = ({ projects: initialProjects = [], activeWorkspace =
             await fetch(`/api/tasks?workspace=${activeWorkspace}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, project_id: projectId }) });
          }
        }
-       fetchProjects();
+       refetch();
     } catch(err) {
        console.error(err);
     }
@@ -130,13 +117,17 @@ export const ProjectsView = ({ projects: initialProjects = [], activeWorkspace =
     return 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20';
   };
 
+  if (isLoading) {
+    return <div className="p-8 text-zinc-500 animate-pulse uppercase tracking-widest text-xs font-bold flex items-center justify-center h-64">Loading Execution Containers...</div>;
+  }
+
   if (selectedProjectId) {
     return <ProjectFocusView 
       projectId={selectedProjectId} 
       activeWorkspace={activeWorkspace}
       onBack={() => {
         setSelectedProjectId(null);
-        fetchProjects();
+        refetch();
       }} 
     />;
   }

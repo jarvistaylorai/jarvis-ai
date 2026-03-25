@@ -3,181 +3,330 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-model Agent {
-  id             String   @id @default(cuid())
-  workspace      String   @default("business")
-  name           String
-  role           String
-  description    String?
-  capabilities   String   @default("[]") // JSON array of capability tags
-  status         String   @default("idle") // "active" | "idle" | "error"
-  load           String   @default("normal") // "low" | "normal" | "high"
-  layer          String   @default("core") // "core", "infrastructure", "input", "processing", "output"
-  current_task   String?
-  current_project_id String?
-  current_channel String?
-  metadata      String?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @default(now()) @updatedAt
-  last_active_at DateTime @default(now())
-  
-  agent_model_config AgentModelConfig?
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model agents {
+  id                                        String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace_id                              String             @db.Uuid
+  name                                      String
+  handle                                    String
+  kind                                      agent_kind         @default(autonomous)
+  status                                    agent_status       @default(idle)
+  role                                      String
+  capability_tags                           String[]           @default([])
+  assigned_workspace_ids                    String[]           @default([]) @db.Uuid
+  utilization_percent                       Int?               @default(0)
+  tasks_completed_24h                       Int?               @default(0)
+  current_task_id                           String?            @db.Uuid
+  current_project_id                        String?            @db.Uuid
+  current_channel                           String?
+  last_heartbeat_at                         DateTime?          @db.Timestamptz(6)
+  error_state                               String?
+  metadata                                  Json?              @default("{}")
+  created_at                                DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at                                DateTime           @default(now()) @db.Timestamptz(6)
+  alerts                                    alerts[]
+  objectives                                objectives[]
+  projects                                  projects[]
+  tasks_tasks_assigned_agent_idToagents     tasks[]            @relation("tasks_assigned_agent_idToagents")
+  tasks_tasks_requested_by_agent_idToagents tasks[]            @relation("tasks_requested_by_agent_idToagents")
+  telemetry_events                          telemetry_events[]
+  agent_model_config                        agent_model_config?
+  agent_context_files                       agent_context_files[]
+
+  @@index([workspace_id, status], map: "idx_agents_workspace")
 }
 
-model Project {
-  id                 String   @id @default(cuid())
-  workspace          String   @default("business")
-  name               String
-  description        String?
-  status             String   @default("IDEA")
-  priority           String   @default("MEDIUM")
-  progress           Int      @default(0)
-  health             String   @default("HEALTHY")
-  automation_enabled Boolean  @default(false)
-  auto_assign        Boolean  @default(true)
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
-  type               String?
-  system_config      String?
-
-  tasks              Task[]
-  project_activity   ProjectActivity[]
-  objectives         Objective[]
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model alerts {
+  id                       String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace_id             String         @db.Uuid
+  source_type              String
+  source_id                String?        @db.Uuid
+  message                  String
+  severity                 alert_severity @default(info)
+  status                   alert_status   @default(active)
+  acknowledged_by_agent_id String?        @db.Uuid
+  acknowledged_at          DateTime?      @db.Timestamptz(6)
+  resolved_at              DateTime?      @db.Timestamptz(6)
+  context                  Json?          @default("{}")
+  created_at               DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime       @default(now()) @db.Timestamptz(6)
+  agents                   agents?        @relation(fields: [acknowledged_by_agent_id], references: [id], onUpdate: NoAction)
 }
 
-model Task {
-  id             String   @id @default(cuid())
-  workspace      String   @default("business")
-  title          String
-  description    String?
-  status         String   // "pending" | "in-progress" | "completed" | "blocked"
-  priority       String   // "normal" | "high" | "critical"
-  task_type      String   @default("action")
-  project_id     String?
-  project        Project? @relation(fields: [project_id], references: [id])
-  parent_task_id String?
-  list_id        String?
-  list           TaskList? @relation(fields: [list_id], references: [id])
-  phase_id       String?
-  phase          Phase?   @relation(fields: [phase_id], references: [id], onDelete: SetNull)
-  assigned_agent String?
-  assigned_to    String?
-  position       Int      @default(0)
-  dependencies   String   @default("[]")  // JSON string
-  auto_execute  Boolean  @default(false)
-  metadata      String?
-  created_at     String   // legacy string format
-  updated_at     DateTime @default(now()) @updatedAt
-
-  labels         TaskLabelAssignment[]
-  checklists     TaskChecklist[]
-  comments       TaskComment[]
-  attachments    TaskAttachment[]
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model objectives {
+  id                  String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace_id        String             @db.Uuid
+  project_id          String?            @db.Uuid
+  parent_objective_id String?            @db.Uuid
+  title               String
+  description         String?
+  status              objective_status   @default(not_started)
+  priority            objective_priority @default(medium)
+  progress_percent    Int                @default(0)
+  owner_agent_id      String?            @db.Uuid
+  target_date         DateTime?          @db.Timestamptz(6)
+  current_phase       String?
+  key_results         Json?              @default("[]")
+  metadata            Json?              @default("{}")
+  created_at          DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime           @default(now()) @db.Timestamptz(6)
+  agents              agents?            @relation(fields: [owner_agent_id], references: [id], onUpdate: NoAction)
+  objectives          objectives?        @relation("objectivesToobjectives", fields: [parent_objective_id], references: [id], onUpdate: NoAction)
+  other_objectives    objectives[]       @relation("objectivesToobjectives")
+  projects            projects?          @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tasks               tasks[]
 }
 
-model TaskList {
-  id         String   @id @default(cuid())
-  workspace  String   @default("business")
-  project_id String
-  name       String
-  position   Int      @default(0)
-  created_at DateTime @default(now())
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model projects {
+  id               String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace_id     String             @db.Uuid
+  name             String
+  description      String?
+  status           project_status     @default(planned)
+  priority         objective_priority @default(medium)
+  owner_agent_id   String?            @db.Uuid
+  health_score     Int                @default(100)
+  progress_percent Int                @default(0)
+  start_date       DateTime?          @default(now()) @db.Timestamptz(6)
+  due_date         DateTime?          @db.Timestamptz(6)
+  active_sprint    String?
+  tags             String[]           @default([])
+  metadata         Json?              @default("{}")
+  created_at       DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime           @default(now()) @db.Timestamptz(6)
+  objectives       objectives[]
+  agents           agents?            @relation(fields: [owner_agent_id], references: [id], onUpdate: NoAction)
+  tasks            tasks[]
+  telemetry_events telemetry_events[]
 
-  tasks      Task[]
+  @@index([workspace_id, status, priority], map: "idx_projects_workspace")
 }
 
-model TaskLabel {
-  id         String   @id @default(cuid())
-  workspace  String   @default("business")
-  project_id String
-  name       String
-  color      String
-  position   Int      @default(0)
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model tasks {
+  id                                         String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace_id                               String             @db.Uuid
+  project_id                                 String?            @db.Uuid
+  parent_task_id                             String?            @db.Uuid
+  objective_id                               String?            @db.Uuid
+  title                                      String
+  description                                String?
+  status                                     task_status        @default(pending)
+  priority                                   task_priority      @default(normal)
+  type                                       task_type          @default(action)
+  assigned_agent_id                          String?            @db.Uuid
+  requested_by_agent_id                      String?            @db.Uuid
+  due_at                                     DateTime?          @db.Timestamptz(6)
+  started_at                                 DateTime?          @db.Timestamptz(6)
+  completed_at                               DateTime?          @db.Timestamptz(6)
+  blocked_reason                             String?
+  dependency_ids                             String[]           @default([]) @db.Uuid
+  tags                                       String[]           @default([])
+  auto_execute                               Boolean            @default(false)
+  history_cursor                             String?
+  metadata                                   Json?              @default("{}")
+  created_at                                 DateTime           @default(now()) @db.Timestamptz(6)
+  updated_at                                 DateTime           @default(now()) @db.Timestamptz(6)
+  agents_tasks_assigned_agent_idToagents     agents?            @relation("tasks_assigned_agent_idToagents", fields: [assigned_agent_id], references: [id], onUpdate: NoAction)
+  objectives                                 objectives?        @relation(fields: [objective_id], references: [id], onUpdate: NoAction)
+  tasks                                      tasks?             @relation("tasksTotasks", fields: [parent_task_id], references: [id], onUpdate: NoAction)
+  other_tasks                                tasks[]            @relation("tasksTotasks")
+  projects                                   projects?          @relation(fields: [project_id], references: [id], onUpdate: NoAction)
+  agents_tasks_requested_by_agent_idToagents agents?            @relation("tasks_requested_by_agent_idToagents", fields: [requested_by_agent_id], references: [id], onUpdate: NoAction)
+  telemetry_events                           telemetry_events[]
+  task_comments                              task_comments[]
+  task_checklists                            task_checklists[]
+  task_labels                                task_labels[]
+  task_attachments                           task_attachments[]
 
-  tasks      TaskLabelAssignment[]
+  @@index([workspace_id, status], map: "idx_tasks_workspace_status")
 }
 
-model TaskLabelAssignment {
-  id       String    @id @default(cuid())
-  task_id  String
-  task     Task      @relation(fields: [task_id], references: [id], onDelete: Cascade)
-  label_id String
-  label    TaskLabel @relation(fields: [label_id], references: [id], onDelete: Cascade)
-
-  @@unique([task_id, label_id])
-}
-
-model TaskChecklist {
-  id      String @id @default(cuid())
-  task_id String
-  task    Task   @relation(fields: [task_id], references: [id], onDelete: Cascade)
-  title   String
-
-  items   TaskChecklistItem[]
-}
-
-model TaskChecklistItem {
-  id           String        @id @default(cuid())
-  checklist_id String
-  checklist    TaskChecklist @relation(fields: [checklist_id], references: [id], onDelete: Cascade)
-  content      String
-  is_completed Boolean       @default(false)
-  position     Int           @default(0)
-}
-
-model TaskComment {
-  id         String   @id @default(cuid())
-  task_id    String
-  task       Task     @relation(fields: [task_id], references: [id], onDelete: Cascade)
-  author     String
-  content    String
-  created_at DateTime @default(now())
-}
-
-model TaskAttachment {
-  id         String   @id @default(cuid())
-  task_id    String
-  task       Task     @relation(fields: [task_id], references: [id], onDelete: Cascade)
-  file_path  String
-  file_name  String
-  created_at DateTime @default(now())
-}
-
-model ProjectActivity {
-  id         String   @id @default(cuid())
-  project_id String
-  project    Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
-  message    String
-  created_at DateTime @default(now())
-}
-
-model Activity {
-  id             String   @id @default(cuid())
-  workspace      String   @default("business")
-  agent_id       String
-  task_id        String?
-  project_id     String?
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model telemetry_events {
+  id             String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace_id   String             @db.Uuid
+  agent_id       String?            @db.Uuid
+  task_id        String?            @db.Uuid
+  project_id     String?            @db.Uuid
+  category       telemetry_category @default(event)
+  severity       telemetry_severity @default(info)
+  event_type     String
   message        String
-  status         String   // "success" | "running"
-  category       String   @default("event")
-  severity       String   @default("info")
-  payload        String?
+  payload        Json?              @default("{}")
   latency_ms     Int?
   tokens_input   Int?
   tokens_output  Int?
-  cost_usd       Float?
+  cost_usd       Decimal?           @db.Decimal(10, 6)
   correlation_id String?
-  timestamp      String
-  created_at     DateTime @default(now())
-  updated_at     DateTime @default(now()) @updatedAt
+  created_at     DateTime           @default(now()) @db.Timestamptz(6)
+  agents         agents?            @relation(fields: [agent_id], references: [id], onUpdate: NoAction)
+  projects       projects?          @relation(fields: [project_id], references: [id], onUpdate: NoAction)
+  tasks          tasks?             @relation(fields: [task_id], references: [id], onUpdate: NoAction)
+
+  @@index([agent_id, created_at(sort: Desc)], map: "idx_telemetry_agent_time")
+  @@index([workspace_id, created_at(sort: Desc)], map: "idx_telemetry_workspace_time")
 }
 
-model SystemState {
-  id                String @id @default("global") // Can use dynamic ids representing the workspace
+enum agent_kind {
+  human
+  autonomous
+  service
+}
+
+enum agent_status {
+  idle
+  active
+  error
+  offline
+}
+
+enum alert_severity {
+  info
+  warning
+  critical
+}
+
+enum alert_status {
+  active
+  acknowledged
+  resolved
+}
+
+enum objective_priority {
+  mission_critical
+  high
+  medium
+  low
+}
+
+enum objective_status {
+  not_started
+  in_progress
+  blocked
+  completed
+}
+
+enum project_status {
+  planned
+  building
+  testing
+  launched
+  paused
+}
+
+enum task_priority {
+  low
+  normal
+  high
+  critical
+}
+
+enum task_status {
+  ideas
+  pending
+  in_progress
+  under_review
+  completed
+  blocked
+}
+
+enum task_type {
+  action
+  approval
+  research
+  maintenance
+}
+
+enum telemetry_category {
+  heartbeat
+  log
+  metric
+  event
+  error
+}
+
+enum telemetry_severity {
+  info
+  warning
+  critical
+}
+
+model task_comments {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  task_id    String   @db.Uuid
+  content    String
+  author     String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  tasks      tasks    @relation(fields: [task_id], references: [id], onDelete: Cascade)
+
+  @@index([task_id, created_at(sort: Desc)])
+}
+
+model task_checklists {
+  id                   String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  task_id              String                 @db.Uuid
+  title                String                 @default("Checklist")
+  created_at           DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime               @default(now()) @db.Timestamptz(6)
+  tasks                tasks                  @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  task_checklist_items task_checklist_items[]
+
+  @@index([task_id, created_at])
+}
+
+model task_checklist_items {
+  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  checklist_id    String          @db.Uuid
+  content         String
+  is_completed    Boolean         @default(false)
+  position        Int             @default(0)
+  created_at      DateTime        @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime        @default(now()) @db.Timestamptz(6)
+  task_checklists task_checklists @relation(fields: [checklist_id], references: [id], onDelete: Cascade)
+
+  @@index([checklist_id, position])
+}
+
+model labels {
+  id           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace_id String        @db.Uuid
+  project_id   String        @default("global")
+  name         String
+  color        String        @default("#4ade80")
+  position     Int           @default(0)
+  created_at   DateTime      @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime      @default(now()) @db.Timestamptz(6)
+  task_labels  task_labels[]
+
+  @@index([workspace_id, project_id, position])
+}
+
+model task_labels {
+  task_id    String   @db.Uuid
+  label_id   String   @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  tasks      tasks    @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  labels     labels   @relation(fields: [label_id], references: [id], onDelete: Cascade)
+
+  @@id([task_id, label_id])
+}
+
+model systemState {
+  id                String @id @default("global")
   workspace         String @default("business")
   status            String // "NORMAL" | "OVERLOADED" | "BLOCKED" | "IDLE"
   active_agents     Int    @default(0)
@@ -186,119 +335,40 @@ model SystemState {
   last_evaluated_at String
 }
 
-model Objective {
-  id          String    @id @default(cuid())
-  workspace   String    @default("business")
-  project_id  String?
-  project     Project?  @relation(fields: [project_id], references: [id])
-  title       String
-  description String?
-  status      String    @default("ACTIVE") // "ACTIVE" | "IN_PROGRESS" | "COMPLETED"
-  priority    String    @default("MEDIUM") // "HIGH" | "MEDIUM" | "LOW"
-  progress    Int       @default(0)
-  target_date DateTime?
-  created_at  DateTime  @default(now())
-
-  phases      Phase[]
-}
-
-model Phase {
-  id           String    @id @default(cuid())
-  workspace    String    @default("business")
-  objective_id String
-  objective    Objective @relation(fields: [objective_id], references: [id], onDelete: Cascade)
-  title        String
-  position     Int
-  status       String    @default("NOT_STARTED") // "NOT_STARTED" | "IN_PROGRESS" | "COMPLETED"
-  progress     Int       @default(0)
-  target_date  DateTime?
-  created_at   DateTime  @default(now())
-
-  tasks        Task[]
-}
-
-model Alert {
-  id                  String   @id @default(cuid())
-  workspace           String   @default("business")
-  type                String   // "BLOCKED_TASK" | "SYSTEM_OVERLOAD" | etc.
-  message             String
-  severity            String   // "CRITICAL" | "HIGH" | "MEDIUM" | "LOW"
-  status              String   // "ACTIVE" | "RESOLVED"
-  created_at          String
-  acknowledged_by     String?
-  acknowledged_at     DateTime?
-  resolved_at         DateTime?
-  context             String?
-  updated_at          DateTime @default(now()) @updatedAt
-}
-
-model AgentMemory {
-  id          String   @id @default(cuid())
-  workspace   String   @default("business")
-  agent_id    String
-  memory_type String   // "TASK_CONTEXT" | "ERROR" | "LEARNING"
-  content     String
-  created_at  String
-}
-
-model AutomationRule {
-  id        String  @id @default(cuid())
-  workspace String  @default("business")
-  trigger   String
-  condition String?
-  action    String
-  enabled   Boolean @default(true)
-}
-
-model FactoryTask {
-  id             String   @id @default(cuid())
-  workspace      String   @default("business")
-  title          String
-  description    String
-  stage          String   @default("ideation") // "ideation" | "planning" | "building" | "qa" | "deployment"
-  status         String   @default("active")   // "active" | "blocked" | "completed"
-  project        String
-  type           String                        // "feature" | "fix" | "system" | "research"
-  assigned_agent String?
-  progress       Int      @default(0)
-  updated_at     DateTime @default(now()) @updatedAt
-  created_at     DateTime @default(now())
-}
-
-model Model {
-  id           String   @id @default(cuid())
+model model {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name         String
   provider     String
   cost_per_1k  Float
   capabilities String   @default("[]") // JSON
   status       String   @default("active") // "active" | "fallback" | "disabled"
   
-  configs_as_primary  AgentModelConfig[] @relation("PrimaryModel")
-  configs_as_fallback AgentModelConfig[] @relation("FallbackModel")
-  usage_logs          ModelUsageLog[]
+  configs_as_primary  agent_model_config[] @relation("PrimaryModel")
+  configs_as_fallback agent_model_config[] @relation("FallbackModel")
+  usage_logs          model_usage_log[]
 }
 
-model AgentModelConfig {
-  id              String   @id @default(cuid())
-  agent_id        String   @unique
-  agent           Agent    @relation(fields: [agent_id], references: [id], onDelete: Cascade)
+model agent_model_config {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  agent_id        String   @unique @db.Uuid
+  agent           agents   @relation(fields: [agent_id], references: [id], onDelete: Cascade)
   
-  primary_model_id   String
-  primary_model      Model    @relation("PrimaryModel", fields: [primary_model_id], references: [id])
+  primary_model_id   String @db.Uuid
+  primary_model      model  @relation("PrimaryModel", fields: [primary_model_id], references: [id])
   
-  fallback_model_id  String?
-  fallback_model     Model?   @relation("FallbackModel", fields: [fallback_model_id], references: [id])
+  fallback_model_id  String? @db.Uuid
+  fallback_model     model?  @relation("FallbackModel", fields: [fallback_model_id], references: [id])
   
   max_tokens      Int      @default(8192)
   max_cost        Float    @default(5.0)
   mode            String   @default("balanced") // "fast" | "intelligence" | "balanced"
 }
 
-model ModelUsageLog {
-  id          String   @id @default(cuid())
-  model_id    String
-  model       Model    @relation(fields: [model_id], references: [id], onDelete: Cascade)
-  agent_id    String?
+model model_usage_log {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  model_id    String   @db.Uuid
+  model       model    @relation(fields: [model_id], references: [id], onDelete: Cascade)
+  agent_id    String?  @db.Uuid
   tokens      Int
   cost        Float
   task        String?
@@ -306,39 +376,61 @@ model ModelUsageLog {
   timestamp   DateTime @default(now())
 }
 
-model ModelRoutingRule {
-  id          String   @id @default(cuid())
+model model_routing_rule {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   task_type   String   
-  model_id    String
+  model_id    String   @db.Uuid
   priority    Int      @default(0)
 }
 
-model ProviderSettings {
-  id          String   @id @default(cuid())
+model provider_settings {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   provider    String   @unique
   api_key     String?
   status      String   @default("disconnected")
 }
 
-model SpendLog {
-  id               String   @id @default(cuid())
+model spendLog {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   workspace        String   @default("business")
-  agent_id         String
+  agent_id         String   @db.Uuid
   model            String
   provider         String
   tokens_input     Int      @default(0)
   tokens_output    Int      @default(0)
   tokens_total     Int
   cost             Float
-  task_id          String?
-  project_id       String?
+  task_id          String?  @db.Uuid
+  project_id       String?  @db.Uuid
   created_at       DateTime @default(now())
 }
 
-model SpendLimit {
+model spendLimit {
   id                 String   @id @default("global")
   global_daily_limit Float    @default(50.0)
   per_agent_limit    Float    @default(10.0)
   per_task_limit     Float    @default(2.0)
   per_model_limit    Float    @default(20.0)
+}
+
+model task_attachments {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  task_id    String   @db.Uuid
+  task       tasks    @relation(fields: [task_id], references: [id], onDelete: Cascade)
+  file_path  String
+  file_name  String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model agent_context_files {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  agent_id   String   @db.Uuid
+  file_name  String
+  content    String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  agents     agents   @relation(fields: [agent_id], references: [id], onDelete: Cascade)
+
+  @@unique([agent_id, file_name])
+  @@index([agent_id, file_name])
 }

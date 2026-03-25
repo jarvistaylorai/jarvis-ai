@@ -5,8 +5,13 @@ import { Board } from '@/components/board/Board';
 import { TaskModal } from '@/components/board/TaskModal';
 import { ListData, Task, Label } from '@/components/board/types';
 import { CheckSquare, Plus, Filter, ChevronDown, Check } from 'lucide-react';
+import { useTasks, useProjects } from '@/hooks/useMissionControl';
 
-export const TasksView = ({ tasks = [], projects = [], globalLists = [], activeWorkspace = 'business' }: { tasks?: any[], projects?: any[], globalLists?: any[], activeWorkspace?: string }) => {
+export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWorkspace = 'business' }: { tasks?: any[], projects?: any[], globalLists?: any[], activeWorkspace?: string }) => {
+  const { data: tasksData, isLoading: tasksLoading } = useTasks(activeWorkspace);
+  const { data: projectsData } = useProjects(activeWorkspace);
+  const tasks = tasksData?.data || _t || [];
+  const projects = projectsData?.data || _p || [];
   const [projectIdFilter, setProjectIdFilter] = useState<string>('all');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -54,10 +59,19 @@ export const TasksView = ({ tasks = [], projects = [], globalLists = [], activeW
     });
   }, [tasks, projectIdFilter, projects]);
 
+  const DEFAULT_BOARD_COLUMNS = [
+    { id: 'ideas', name: 'Ideas' },
+    { id: 'pending', name: 'To-Do' },
+    { id: 'in_progress', name: 'Doing' },
+    { id: 'under_review', name: 'Under Review' },
+    { id: 'completed', name: 'Done' }
+  ];
+
   const boardLists: ListData[] = useMemo(() => {
-    return globalLists.map((gl: any) => ({
+    const lists = globalLists && globalLists.length > 0 ? globalLists : DEFAULT_BOARD_COLUMNS;
+    return lists.map((gl: any) => ({
       ...gl,
-      tasks: filteredTasks.filter((t: any) => t.list_id === gl.id).sort((a: any, b: any) => (a.position||0) - (b.position||0))
+      tasks: filteredTasks.filter((t: any) => t.status === gl.id || t.status === gl.id.replace('_', '-')).sort((a: any, b: any) => (a.position||0) - (b.position||0))
     }));
   }, [globalLists, filteredTasks]);
 
@@ -70,11 +84,11 @@ export const TasksView = ({ tasks = [], projects = [], globalLists = [], activeW
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    filteredTasks.forEach((t: any) => {
-      if (t.status === 'in_progress' || t.status === 'in-progress') inProgress++;
-      if (t.status === 'completed') completed++;
-      if (new Date(t.created_at) > oneWeekAgo) thisWeek++;
-    });
+      filteredTasks.forEach((t: any) => {
+        if (t.status === 'in_progress' || t.status === 'in-progress' || t.status === 'under_review') inProgress++;
+        if (t.status === 'completed' || t.status === 'done') completed++;
+        if (new Date(t.created_at) > oneWeekAgo) thisWeek++;
+      });
 
     const completion = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -177,7 +191,7 @@ export const TasksView = ({ tasks = [], projects = [], globalLists = [], activeW
              </div>
              <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-medium text-indigo-400">{stats.inProgress}</span>
-                <span className="text-[11px] text-zinc-500 font-medium">In progress</span>
+                <span className="text-[11px] text-zinc-500 font-medium">Doing</span>
              </div>
              <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-medium text-white">{stats.total}</span>
@@ -210,7 +224,7 @@ export const TasksView = ({ tasks = [], projects = [], globalLists = [], activeW
           onUpdateTask={handleUpdateTask}
           projectLabels={labels}
           onLabelsChange={setLabels}
-          listName={globalLists.find((l: any) => l.id === selectedTask.list_id)?.name || 'Unknown'}
+          listName={DEFAULT_BOARD_COLUMNS.find((l: any) => l.id === selectedTask.status || l.id === selectedTask.status?.replace('_', '-'))?.name || 'Unknown'}
         />
       )}
     </div>

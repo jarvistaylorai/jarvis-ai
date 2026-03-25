@@ -5,11 +5,12 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const config = await prisma.agentModelConfig.findUnique({
-      where: { agent_id: params.id },
+      where: { agent_id: id },
       include: {
         primary_model: true,
         fallback_model: true
@@ -28,13 +29,14 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const data = await request.json();
     
     const config = await prisma.agentModelConfig.upsert({
-      where: { agent_id: params.id },
+      where: { agent_id: id },
       update: {
         primary_model_id: data.primary_model_id,
         fallback_model_id: data.fallback_model_id,
@@ -43,7 +45,7 @@ export async function PUT(
         mode: data.mode
       },
       create: {
-        agent_id: params.id,
+        agent_id: id,
         primary_model_id: data.primary_model_id,
         fallback_model_id: data.fallback_model_id,
         max_tokens: data.max_tokens,

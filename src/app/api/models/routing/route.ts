@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const rules = await prisma.modelRoutingRule.findMany({
+    const rules = await prisma.model_routing_rule.findMany({
       orderBy: { priority: "desc" }
     });
     return NextResponse.json(rules);
@@ -17,7 +17,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const rule = await prisma.modelRoutingRule.create({
+    const rule = await prisma.model_routing_rule.create({
       data: {
         task_type: data.task_type,
         model_id: data.model_id,

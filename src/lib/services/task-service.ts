@@ -1,15 +1,18 @@
 import type { Prisma } from '@prisma/client';
 import { prisma } from './database';
 import { eventBus } from './event-bus';
-import type { Task, TaskPriority, TaskStatus, TaskType, PaginatedResult } from '@contracts';
+import {  Task, TaskPriority, TaskStatus, TaskType, PaginatedResult  } from '@contracts';
+import { getWorkspaceId } from '../workspace-utils';
 
 const taskInclude = {
-  labels: { include: { label: true } },
-  project: { select: { id: true, name: true } },
-  phase: { select: { id: true, objective_id: true } }
-} satisfies Prisma.TaskInclude;
+  objectives: { select: { id: true } },
+  task_comments: { orderBy: { created_at: 'asc' } as const },
+  task_checklists: { include: { task_checklist_items: { orderBy: { position: 'asc' } as const } }, orderBy: { created_at: 'asc' } as const },
+  task_labels: { include: { labels: true } },
+  task_attachments: { orderBy: { created_at: 'asc' } as const }
+};
 
-type TaskRecord = Prisma.TaskGetPayload<{ include: typeof taskInclude }>;
+type TaskRecord = Prisma.tasksGetPayload<{ include: typeof taskInclude }>;
 
 export type ListTasksParams = {
   workspaceId: string;
@@ -42,7 +45,7 @@ export type CreateTaskInput = {
 
 export type UpdateTaskInput = Partial<CreateTaskInput>;
 
-const DEFAULT_WORKSPACE = 'business';
+// Replaced by workspace-utils
 
 const validTaskStatuses = new Set(Object.values(TaskStatus));
 const validTaskPriorities = new Set(Object.values(TaskPriority));
@@ -89,14 +92,14 @@ function mergeMetadata(record: TaskRecord) {
 
 function mapTask(record: TaskRecord): Task {
   const metadata = mergeMetadata(record);
-  const dependencyIds = safeParse<string[]>(record.dependencies, []);
-  const labelTags = (record.labels || []).map((l) => l.label.name);
+  const dependencyIds = safeParse<string[]>(record.dependency_ids, []);
+  const labelTags = (record.task_labels || []).map((l: any) => l.labels?.name).filter(Boolean);
   const metadataTags = Array.isArray(metadata.tags) ? metadata.tags : [];
   const uniqueTags = Array.from(new Set([...(metadataTags as string[]), ...labelTags]));
 
   return {
     id: record.id,
-    workspace_id: record.workspace,
+    workspace_id: record.workspace_id,
     project_id: record.project_id ?? undefined,
     parent_task_id: record.parent_task_id ?? undefined,
     objective_id: record.phase?.objective_id ?? metadata.objective_id,
@@ -104,28 +107,34 @@ function mapTask(record: TaskRecord): Task {
     description: record.description ?? undefined,
     status: coerceStatus(record.status),
     priority: coercePriority(record.priority),
-    type: metadata.type ? coerceType(metadata.type) : coerceType(record.task_type),
-    assigned_agent_id: record.assigned_agent ?? undefined,
+    type: metadata.type ? coerceType(metadata.type) : coerceType(record.type),
+    assigned_agent_id: record.assigned_agent_id ?? undefined,
+    assigned_to: metadata.assigned_to,
     requested_by_agent_id: metadata.requested_by_agent_id,
-    due_at: metadata.due_at,
-    started_at: metadata.started_at,
-    completed_at: metadata.completed_at,
+    due_date: metadata.due_at || record.due_at,
+    start_date: metadata.started_at || record.started_at,
+    completed_at: metadata.completed_at || record.completed_at,
     blocked_reason: metadata.blocked_reason,
     dependency_ids: dependencyIds,
     tags: uniqueTags,
     auto_execute: record.auto_execute,
     history_cursor: metadata.history_cursor,
     metadata,
+    comments: record.task_comments || [],
+    attachments: record.task_attachments || [],
+    checklists: (record.task_checklists || []).map((c: any) => ({ ...c, items: c.task_checklist_items || [] })),
+    labels: (record.task_labels || []).map((tl: any) => ({ label: tl.labels })),
     created_at: record.created_at ? new Date(record.created_at).toISOString() : record.updated_at.toISOString(),
     updated_at: record.updated_at.toISOString()
-  };
+  } as unknown as Task;
 }
 
 export async function listTasks(params: ListTasksParams): Promise<PaginatedResult<Task>> {
-  const { workspaceId = DEFAULT_WORKSPACE, limit = 25, cursor, status } = params;
-  const tasks = await prisma.task.findMany({
+  const { workspaceId, limit = 25, cursor, status } = params;
+  const mappedWorkspaceId = getWorkspaceId(workspaceId);
+  const tasksList = await prisma.tasks.findMany({
     where: {
-      workspace: workspaceId,
+      workspace_id: mappedWorkspaceId,
       ...(status ? { status } : {})
     },
     include: taskInclude,
@@ -134,15 +143,15 @@ export async function listTasks(params: ListTasksParams): Promise<PaginatedResul
     ...(cursor ? { skip: 1, cursor: { id: cursor } } : {})
   });
 
-  const nextCursor = tasks.length === limit ? tasks[tasks.length - 1].id : undefined;
+  const nextCursor = tasksList.length === limit ? tasksList[tasksList.length - 1].id : undefined;
   return {
-    data: tasks.map(mapTask),
+    data: tasksList.map(mapTask),
     next_cursor: nextCursor
   };
 }
 
 export async function createTask(input: CreateTaskInput): Promise<Task> {
-  const workspace = input.workspaceId || DEFAULT_WORKSPACE;
+  const mappedWorkspaceId = getWorkspaceId(input.workspaceId);
   const metadata = {
     ...input.metadata,
     tags: input.tags || input.metadata?.tags || [],
@@ -154,19 +163,18 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
     objective_id: input.objectiveId ?? input.metadata?.objective_id
   };
 
-  const record = await prisma.task.create({
+  const record = await prisma.tasks.create({
     data: {
-      workspace,
+      workspace_id: mappedWorkspaceId,
       title: input.title,
       description: input.description || null,
       status: input.status || TaskStatus.PENDING,
       priority: input.priority || TaskPriority.NORMAL,
-      task_type: input.type || TaskType.ACTION,
+      type: input.type || TaskType.ACTION,
       project_id: input.projectId || null,
       parent_task_id: input.parentTaskId || null,
-      assigned_agent: input.assignedAgentId || null,
-      assigned_to: input.assignedAgentId || null,
-      dependencies: JSON.stringify(input.dependencyIds || []),
+      assigned_agent_id: input.assignedAgentId || null,
+      dependency_ids: input.dependencyIds || [],
       auto_execute: input.autoExecute ?? false,
       metadata: JSON.stringify(metadata),
       created_at: new Date().toISOString()
@@ -180,7 +188,7 @@ export async function createTask(input: CreateTaskInput): Promise<Task> {
 }
 
 export async function updateTask(id: string, input: UpdateTaskInput): Promise<Task> {
-  const existing = await prisma.task.findUnique({ where: { id }, include: taskInclude });
+  const existing = await prisma.tasks.findUnique({ where: { id }, include: taskInclude });
   if (!existing) {
     throw new Error('Task not found');
   }
@@ -197,18 +205,18 @@ export async function updateTask(id: string, input: UpdateTaskInput): Promise<Ta
     ...(input.objectiveId ? { objective_id: input.objectiveId } : {})
   };
 
-  const updated = await prisma.task.update({
+  const updated = await prisma.tasks.update({
     where: { id },
     data: {
       ...(input.title ? { title: input.title } : {}),
       ...(input.description !== undefined ? { description: input.description } : {}),
       ...(input.status ? { status: input.status } : {}),
       ...(input.priority ? { priority: input.priority } : {}),
-      ...(input.type ? { task_type: input.type } : {}),
+      ...(input.type ? { type: input.type } : {}),
       ...(input.projectId !== undefined ? { project_id: input.projectId } : {}),
       ...(input.parentTaskId !== undefined ? { parent_task_id: input.parentTaskId } : {}),
-      ...(input.assignedAgentId !== undefined ? { assigned_agent: input.assignedAgentId, assigned_to: input.assignedAgentId } : {}),
-      ...(input.dependencyIds ? { dependencies: JSON.stringify(input.dependencyIds) } : {}),
+      ...(input.assignedAgentId !== undefined ? { assigned_agent_id: input.assignedAgentId } : {}),
+      ...(input.dependencyIds ? { dependency_ids: input.dependencyIds } : {}),
       ...(input.autoExecute !== undefined ? { auto_execute: input.autoExecute } : {}),
       metadata: JSON.stringify(metadata)
     },

@@ -45,8 +45,8 @@ export async function GET(request: Request) {
       automation_rules,
       global_lists
     ] = await Promise.all([
-      prisma.agent.findMany({ where: { workspace } }),
-      prisma.task.findMany({
+      prisma.agents.findMany({ where: { workspace } }),
+      prisma.tasks.findMany({
         where: { workspace },
         include: {
           project: true,
@@ -57,10 +57,10 @@ export async function GET(request: Request) {
           phase: { select: { id: true, title: true, objective: { select: { id: true, title: true } } } }
         }
       }),
-      prisma.activity.findMany({ where: { workspace }, orderBy: { timestamp: 'desc' }, take: 50 }),
-      prisma.project.findMany({ where: { workspace } }),
+      prisma.telemetry_events.findMany({ where: { workspace }, orderBy: { timestamp: 'desc' }, take: 50 }),
+      prisma.projects.findMany({ where: { workspace } }),
       prisma.systemState.findMany({ where: { workspace } }),
-      prisma.objective.findMany({
+      prisma.objectives.findMany({
         where: { workspace },
         include: {
           project: { select: { id: true, name: true } },
@@ -70,8 +70,8 @@ export async function GET(request: Request) {
           }
         }
       }),
-      prisma.phase.findMany({ where: { workspace }, include: { tasks: true } }),
-      prisma.alert.findMany({ where: { workspace } }),
+      prisma.phases.findMany({ where: { workspace }, include: { tasks: true } }),
+      prisma.alerts.findMany({ where: { workspace } }),
       prisma.agentMemory.findMany({ where: { workspace } }),
       prisma.automationRule.findMany({ where: { workspace } }),
       prisma.taskList.findMany({ where: { workspace, project_id: 'global' }, orderBy: { position: 'asc' } })

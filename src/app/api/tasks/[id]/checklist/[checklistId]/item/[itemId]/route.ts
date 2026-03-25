@@ -11,7 +11,7 @@ export async function PATCH(
     const { itemId } = await params;
     const body = await request.json();
 
-    const item = await prisma.taskChecklistItem.update({
+    const item = await prisma.task_checklist_items.update({
       where: { id: itemId },
       data: body,
     });
@@ -30,7 +30,7 @@ export async function DELETE(
   try {
     const { itemId } = await params;
 
-    await prisma.taskChecklistItem.delete({
+    await prisma.task_checklist_items.delete({
       where: { id: itemId },
     });
 

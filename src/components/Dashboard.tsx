@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useDashboard, useLiveMissionControl } from '@/hooks/useMissionControl';
 import { 
   Activity, AlertTriangle, CheckCircle, Database, Layers,
   ShieldAlert, Cpu, Settings, LayoutDashboard, Users, 
@@ -98,42 +99,28 @@ export const Dashboard = () => {
     window.addEventListener('hashchange', handleHash);
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
-  const [data, setData] = useState<any>({
+  // React Query & SSE Hook setup
+  useLiveMissionControl(activeWorkspace);
+  const { data: dashboardData, isLoading, isError } = useDashboard(activeWorkspace);
+
+  // Fallback defaults to match legacy structures while loading
+  const data = dashboardData || {
     agents: [], tasks: [], activity: [], projects: [], messages: [],
     system_state: { status: 'NORMAL', active_agents: 0, pending_tasks: 0, blocked_tasks: 0 },
     objectives: [], phases: [], alerts: [], agent_memory: [], automation_rules: [], global_lists: []
-  });
-
-  const fetchState = async () => {
-    try {
-      const res = await fetch(`/api/system?workspace=${activeWorkspace}`);
-      const json = await res.json();
-      
-      const calculatedProjects = (json.projects || []).map((proj: any) => {
-        const projectTasks = (json.tasks || []).filter((t: any) => t.project_id === proj.id);
-        if (projectTasks.length === 0) return { ...proj, progress: 0 };
-        const completedTasks = projectTasks.filter((t: any) => t.status === 'completed').length;
-        const progress = Math.round((completedTasks / projectTasks.length) * 100);
-        return { ...proj, progress };
-      });
-
-      setData({ ...json, projects: calculatedProjects });
-    } catch (err) {}
   };
 
+  // Re-map telemetry to activity to preserve sub-component compat
+  if (dashboardData?.telemetry?.events) {
+    data.activity = dashboardData.telemetry.events;
+  }
+  
   useEffect(() => {
-    fetchState();
-    const interval = setInterval(fetchState, 2000);
-
-    // Autonomous Engine Loop
+    // Engine loop can stay but we rely on SSE for live updates
     const engineInterval = setInterval(async () => {
       try { await fetch(`/api/engine?workspace=${activeWorkspace}`, { method: 'POST' }); } catch (e) {}
     }, 5000);
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(engineInterval);
-    };
+    return () => clearInterval(engineInterval);
   }, [activeWorkspace]);
 
   const activeAgents = (data.agents || []).filter((a: any) => a.status === 'active').length;
@@ -244,6 +231,16 @@ export const Dashboard = () => {
       {/* MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col h-screen overflow-y-auto relative">
         
+        {/* LOADER */}
+        {isLoading && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#050505]/80 backdrop-blur-sm">
+            <div className="flex flex-col items-center gap-4">
+              <span className="w-8 h-8 rounded-full border-4 border-white/10 border-t-indigo-500 animate-spin"></span>
+              <span className="text-[10px] text-zinc-500 uppercase tracking-widest font-bold animate-pulse">Initializing Mission Control...</span>
+            </div>
+          </div>
+        )}
+
         {/* HEADER */}
         <header className="h-20 border-b border-white/[0.04] bg-[#050505]/80 backdrop-blur-xl sticky top-0 z-10 px-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">

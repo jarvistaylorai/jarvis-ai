@@ -10,7 +10,7 @@ export async function GET(
   try {
     const { id: projectId } = await params;
 
-    const project = await prisma.project.findUnique({
+    const project = await prisma.projects.findUnique({
       where: { id: projectId },
     });
 
@@ -18,49 +18,27 @@ export async function GET(
       return NextResponse.json({ error: 'Project not found' }, { status: 404 });
     }
 
-    let lists = await prisma.taskList.findMany({
+    const rawTasks = await prisma.tasks.findMany({
       where: { project_id: projectId },
-      orderBy: { position: 'asc' },
+      orderBy: { created_at: 'asc' },
       include: {
-        tasks: {
-          orderBy: { position: 'asc' },
-          include: {
-            labels: { include: { label: true } },
-            checklists: { include: { items: { orderBy: { position: 'asc' } } } },
-            comments: { orderBy: { created_at: 'asc' } },
-            attachments: true
-          }
-        }
+        task_labels: { include: { labels: true } },
+        task_checklists: { include: { task_checklist_items: { orderBy: { position: 'asc' } } } },
+        task_comments: { orderBy: { created_at: 'asc' } },
+        task_attachments: true
       }
     });
 
-    if (lists.length === 0) {
-      const defaultColumns = ['Ideas', 'To-Do', 'Doing', 'Under Review', 'Done'];
-      await prisma.$transaction(
-        defaultColumns.map((name, index) => 
-          prisma.taskList.create({
-            data: { project_id: projectId, name, position: (index + 1) * 1024 }
-          })
-        )
-      );
-      lists = await prisma.taskList.findMany({
-        where: { project_id: projectId },
-        orderBy: { position: 'asc' },
-        include: {
-          tasks: {
-            orderBy: { position: 'asc' },
-            include: {
-              labels: { include: { label: true } },
-              checklists: { include: { items: { orderBy: { position: 'asc' } } } },
-              comments: { orderBy: { created_at: 'asc' } },
-              attachments: true
-            }
-          }
-        }
-      });
-    }
+    const lists = [
+      { id: 'list_ideas', name: 'Ideas', position: 0, tasks: rawTasks.filter(t => t.status === 'ideas') },
+      { id: 'list_pending', name: 'Pending', position: 1, tasks: rawTasks.filter(t => t.status === 'pending') },
+      { id: 'list_in_progress', name: 'In Progress', position: 2, tasks: rawTasks.filter(t => t.status === 'in_progress') },
+      { id: 'list_under_review', name: 'Under Review', position: 3, tasks: rawTasks.filter(t => t.status === 'under_review') },
+      { id: 'list_completed', name: 'Completed', position: 4, tasks: rawTasks.filter(t => t.status === 'completed') },
+      { id: 'list_blocked', name: 'Blocked', position: 5, tasks: rawTasks.filter(t => t.status === 'blocked') }
+    ];
 
-    const labels = await prisma.taskLabel.findMany({
+    const labels = await prisma.labels.findMany({
       where: { project_id: projectId }
     });
 

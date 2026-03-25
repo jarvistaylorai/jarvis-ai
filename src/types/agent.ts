@@ -1,6 +1,8 @@
 export type Agent = {
   id: string;
   name: string;
+  kind?: string;
+  handle?: string;
   role: string;
   description: string;
   capabilities: string[];

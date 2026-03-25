@@ -16,12 +16,12 @@ export async function POST(
     }
 
     // Get current max position
-    const maxPos = await prisma.taskChecklistItem.aggregate({
+    const maxPos = await prisma.task_checklist_items.aggregate({
       where: { checklist_id: checklistId },
       _max: { position: true },
     });
 
-    const item = await prisma.taskChecklistItem.create({
+    const item = await prisma.task_checklist_items.create({
       data: {
         checklist_id: checklistId,
         content,

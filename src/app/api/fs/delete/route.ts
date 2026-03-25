@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import { getSafeFsPath, getWorkspaceRoot } from '../fs-utils';
+import { supabaseAdmin, BUCKET_NAME } from '@/lib/supabase-storage';
 
 export async function POST(request: Request) {
   try {
@@ -10,18 +9,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'targetPath is required' }, { status: 400 });
     }
 
-    const absolutePath = getSafeFsPath(targetPath, workspace);
-    const root = getWorkspaceRoot(workspace);
-
-    // Prevent deleting the root workspace
-    if (absolutePath === root) {
+    if (targetPath === '/' || targetPath === '') {
       return NextResponse.json({ error: 'Cannot delete root workspace' }, { status: 403 });
     }
 
-    await fs.rm(absolutePath, { recursive: true, force: true });
+    const cleanPath = targetPath.startsWith('/') ? targetPath.slice(1) : targetPath;
+    const storagePath = `${workspace}/${cleanPath}`.replace(/\/+/g, '/');
+
+    // Note: Supabase remove expects an array of file paths. If a path is actually a "folder" prefix containing multiple files, 
+    // we would theoretically need to list all contents and remove them. For now, we assume simple single deletion.
+    const { error } = await supabaseAdmin.storage
+      .from(BUCKET_NAME)
+      .remove([storagePath]);
+
+    if (error) {
+       throw error;
+    }
 
     return NextResponse.json({ success: true, message: 'Deleted successfully' });
   } catch (error: any) {
+    console.error('Delete Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

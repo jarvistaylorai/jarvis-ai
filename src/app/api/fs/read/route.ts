@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
-import fs from 'fs/promises';
-import { getSafeFsPath } from '../fs-utils';
+import { supabaseAdmin, BUCKET_NAME } from '@/lib/supabase-storage';
 
 export async function GET(request: Request) {
   try {
@@ -13,21 +12,19 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Path parameter is required' }, { status: 400 });
     }
 
-    const absolutePath = getSafeFsPath(targetPath, workspace);
+    const cleanPath = targetPath.startsWith('/') ? targetPath.slice(1) : targetPath;
+    const storagePath = `${workspace}/${cleanPath}`.replace(/\/+/g, '/');
 
-    try {
-      const stats = await fs.stat(absolutePath);
-      if (!stats.isFile()) {
-        return NextResponse.json({ error: 'Path is not a file' }, { status: 400 });
-      }
-    } catch (e: any) {
-       if (e.code === 'ENOENT') {
-          return NextResponse.json({ error: 'File not found' }, { status: 404 });
-       }
-       throw e;
+    const { data, error } = await supabaseAdmin.storage
+        .from(BUCKET_NAME)
+        .download(storagePath);
+
+    if (error) {
+      console.error('Storage text read error:', error);
+      return NextResponse.json({ error: 'File not found or access denied' }, { status: 404 });
     }
 
-    const content = await fs.readFile(absolutePath, 'utf-8');
+    const content = await data.text();
 
     return NextResponse.json({ content });
   } catch (error: any) {

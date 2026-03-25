@@ -15,15 +15,15 @@ export async function POST(
       return NextResponse.json({ error: 'Missing title' }, { status: 400 });
     }
 
-    const checklist = await prisma.taskChecklist.create({
+    const checklist = await prisma.task_checklists.create({
       data: {
         task_id: taskId,
         title
       },
-      include: { items: true }
+      include: { task_checklist_items: true }
     });
 
-    return NextResponse.json(checklist);
+    return NextResponse.json({ ...checklist, items: checklist.task_checklist_items });
   } catch (error) {
     console.error('Error creating checklist:', error);
     return NextResponse.json({ error: 'Failed to create checklist' }, { status: 500 });

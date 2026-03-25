@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import fs from 'fs';
+import { supabaseAdmin, BUCKET_NAME, ensureBucket } from '@/lib/supabase-storage';
 import path from 'path';
-import os from 'os';
 
 const prisma = new PrismaClient();
 
@@ -20,32 +19,38 @@ export async function POST(
     }
 
     // Ensure the task exists
-    const task = await prisma.task.findUnique({ where: { id: taskId } });
+    const task = await prisma.tasks.findUnique({ where: { id: taskId } });
     if (!task) {
       return NextResponse.json({ error: 'Task not found' }, { status: 404 });
     }
 
-    const homeDir = os.homedir();
-    const uploadsDir = path.join(homeDir, 'jarvis/uploads', taskId);
+    await ensureBucket();
 
-    // Create directory if it doesn't exist
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-
+    // Create a path inside the storage bucket isolating files by workspace/task
+    const workspace = task.workspace_id || 'default';
     const safeFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const filePath = path.join(uploadsDir, safeFileName);
-    
-    // Convert File to Buffer and write
+    const storagePath = `${workspace}/tasks/${taskId}/${safeFileName}`;
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    fs.writeFileSync(filePath, buffer);
 
-    const attachment = await prisma.taskAttachment.create({
+    const { error: uploadError } = await supabaseAdmin.storage
+      .from(BUCKET_NAME)
+      .upload(storagePath, buffer, {
+        contentType: file.type,
+        upsert: true
+      });
+
+    if (uploadError) {
+      console.error("Supabase Storage error:", uploadError);
+      throw uploadError;
+    }
+
+    const attachment = await prisma.task_attachments.create({
       data: {
         task_id: taskId,
         file_name: file.name,
-        file_path: filePath
+        file_path: storagePath
       }
     });
 

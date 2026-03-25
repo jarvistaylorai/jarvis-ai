@@ -1,0 +1,106 @@
+{
+  "version": "1.0",
+  "description": "Emergency context budget configuration",
+  "models": {
+    "kimi-k2.5": {
+      "totalBudget": 100000,
+      "warningThreshold": 0.8,
+      "criticalThreshold": 0.95,
+      "layers": {
+        "system": 1000,
+        "task": 2000,
+        "recentChat": 3000,
+        "retrievedMemory": 2000,
+        "toolResults": 2000,
+        "historicalSummary": 1500,
+        "fileExcerpts": 2500
+      },
+      "degradation": {
+        "at90": "reduceRecentChat",
+        "at95": "compressSummary",
+        "at98": "reduceMemory",
+        "at99": "dropFiles"
+      }
+    },
+    "claude-3.7-sonnet": {
+      "totalBudget": 180000,
+      "warningThreshold": 0.85,
+      "criticalThreshold": 0.95,
+      "layers": {
+        "system": 1000,
+        "task": 4000,
+        "recentChat": 5000,
+        "retrievedMemory": 5000,
+        "toolResults": 4000,
+        "historicalSummary": 3000,
+        "fileExcerpts": 5000
+      }
+    },
+    "claude-3.7-opus": {
+      "totalBudget": 180000,
+      "warningThreshold": 0.85,
+      "criticalThreshold": 0.95,
+      "layers": {
+        "system": 1000,
+        "task": 4000,
+        "recentChat": 5000,
+        "retrievedMemory": 5000,
+        "toolResults": 4000,
+        "historicalSummary": 3000,
+        "fileExcerpts": 5000
+      }
+    },
+    "gemini-1.5-pro": {
+      "totalBudget": 800000,
+      "warningThreshold": 0.75,
+      "criticalThreshold": 0.9,
+      "layers": {
+        "system": 1000,
+        "task": 10000,
+        "recentChat": 10000,
+        "retrievedMemory": 10000,
+        "toolResults": 10000,
+        "historicalSummary": 5000,
+        "fileExcerpts": 20000
+      }
+    }
+  },
+  "conversationPruning": {
+    "maxMessages": 10,
+    "keepSystem": true,
+    "summarizeThreshold": 20
+  },
+  "toolOutputSummarization": {
+    "defaultMaxTokens": 500,
+    "byTool": {
+      "read": {
+        "maxTokens": 800,
+        "strategy": "relevantSections"
+      },
+      "exec": {
+        "maxTokens": 400,
+        "strategy": "exitCodeAndErrors"
+      },
+      "web_fetch": {
+        "maxTokens": 600,
+        "strategy": "extractContent"
+      },
+      "web_search": {
+        "maxTokens": 500,
+        "strategy": "listResults"
+      }
+    }
+  },
+  "fileLoading": {
+    "maxFileSizeKb": 500,
+    "maxTotalFiles": 5,
+    "maxExcerptTokens": 2000,
+    "autoInject": false,
+    "requireExplicitRequest": true
+  },
+  "heartbeat": {
+    "readIntervalMinutes": 5,
+    "maxSizeTokens": 500,
+    "summarizeIfLarger": true
+  }
+}

@@ -10,7 +10,7 @@ export async function DELETE(
   try {
     const { checklistId } = await params;
 
-    await prisma.taskChecklist.delete({
+    await prisma.task_checklists.delete({
       where: { id: checklistId },
     });
 
