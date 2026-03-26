@@ -1,7 +1,7 @@
 import React from 'react';
 import { Bell, AlertOctagon, AlertTriangle, Info, CheckCircle } from 'lucide-react';
 import { useAlerts } from '@/hooks/useMissionControl';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>

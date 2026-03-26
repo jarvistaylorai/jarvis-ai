@@ -24,7 +24,7 @@ import { FactoryPipeline } from './factory/FactoryPipeline';
 import { KnowledgeView } from './KnowledgeView';
 import { SpendIntelligenceView } from './spend/SpendIntelligenceView';
 import { WorkspacesView } from './workspaces/WorkspacesView';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>

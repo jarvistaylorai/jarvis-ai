@@ -8,7 +8,7 @@ import { ModelRoutingRules } from './ModelRoutingRules';
 import { ActiveSessions } from './ActiveSessions';
 import { ProviderSettings } from './ProviderSettings';
 import { CostControls } from './CostControls';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 export const AgentSettingsView = ({ agents = [], activeWorkspace = 'business' }: { agents?: unknown[], activeWorkspace?: string }) => {
   const [models, setModels] = useState<any[]>([]);

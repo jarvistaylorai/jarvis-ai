@@ -37,7 +37,7 @@ import { recordRoutingEvent, recordRateLimiterEvent, recordAvoidableSpendEvent }
 import { globalRateLimiter } from '@/lib/llm/rateLimiter';
 import type { Provider } from '@/lib/llm/types';
 import type { PriorityLevel } from '@/lib/llm/providerLimits';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const prisma = new PrismaClient();
 

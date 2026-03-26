@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
   ArrowLeft, Activity, Play, Pause, Plus, Zap, AlertTriangle, 
   CheckCircle, Clock, Users, TerminalSquare, ShieldAlert
 } from 'lucide-react';

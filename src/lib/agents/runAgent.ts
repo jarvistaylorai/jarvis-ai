@@ -12,7 +12,7 @@ import { render as renderTemplate } from "@/lib/messaging/templates"
 import { MessageClass } from "@/lib/messaging/constants"
 import { applyBurstSmoothing } from "@/lib/llm/burstSmoother"
 import { recordDigestSavings } from "@/lib/services/telemetry-service"
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const agentLocks = new Set<string>()
 

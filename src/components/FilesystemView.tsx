@@ -34,7 +34,7 @@ function formatDate(isoStr: string) {
   return `${days}d ago`;
 }
 
-export const FilesystemView = ({ activeWorkspace = \'business\' }: { activeWorkspace?: string }) => {
+export const FilesystemView = ({ activeWorkspace = 'business' }: { activeWorkspace?: string }) => {
   const [currentPath, setCurrentPath] = useState('/');
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

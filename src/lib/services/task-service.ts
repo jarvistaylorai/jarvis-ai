@@ -3,7 +3,7 @@ import { prisma } from './database';
 import { eventBus } from './event-bus';
 import {  Task, TaskPriority, TaskStatus, TaskType, PaginatedResult  } from '@contracts';
 import { getWorkspaceId } from '../workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const taskInclude = {
   objectives: { select: { id: true } },

@@ -7,7 +7,7 @@ import type { ProviderPressure, RateLimiterMetricsSnapshot } from '../llm/rateLi
 import type { DuplicateStatus } from '../llm/promptCache';
 import type { MessageClassId } from '../messaging/messageClasses';
 import { resolveVerbosityThreshold } from '../messaging/verbosityThresholds';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const DIGEST_TOKEN_RATE_USD = Number(process.env.DIGEST_TOKEN_RATE_USD ?? 0.000002);
 const VERBOSITY_ALERT_COOLDOWN_MS = Number(

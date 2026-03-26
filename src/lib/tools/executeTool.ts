@@ -2,7 +2,7 @@ import fs from "fs/promises"
 import path from "path"
 import { exec } from "child_process"
 import { getSystemState, updateSystemState } from "../system/state"
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const WORKSPACE_BASE = "/Users/jarvis/.openclaw/workspace/jarvis"
 

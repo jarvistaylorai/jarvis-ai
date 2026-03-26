@@ -2,7 +2,7 @@ import {  PaginatedResult, Agent, AgentStatus, AgentKind  } from '@contracts';
 import { prisma } from './database';
 import { eventBus } from './event-bus';
 import { getWorkspaceId } from '../workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 export type CreateAgentInput = {
   workspaceId: string;

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getSystemState } from '@/lib/system/state';
-import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
 
 const prisma = new PrismaClient();
 

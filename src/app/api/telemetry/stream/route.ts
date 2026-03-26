@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { eventBus } from '@/lib/services/event-bus';
 import { getTelemetrySummary } from '@/lib/services/telemetry-service';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 export const runtime = 'nodejs';
 

@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { CheckSquare, MessageSquare, Paperclip, Filter, Search } from 'lucide-react';
 import Link from 'next/link';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 interface GlobalTaskListProps {
   initialTasks: unknown[];

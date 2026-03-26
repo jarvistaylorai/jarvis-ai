@@ -7,7 +7,7 @@ import { ListData, Task, Label } from '@/components/board/types';
 import { CheckSquare, Plus, Filter, ChevronDown, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTasks, useProjects } from '@/hooks/useMissionControl';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWorkspace = 'business' }: { tasks?: unknown[], projects?: unknown[], globalLists?: unknown[], activeWorkspace?: string }) => {
   const queryClient = useQueryClient();

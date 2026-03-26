@@ -9,7 +9,7 @@ import { BudgetControls } from './BudgetControls';
 import { Forecasting } from './Forecasting';
 import { Download, Bell, Settings } from 'lucide-react';
 
-export const SpendIntelligenceView = ({ activeWorkspace = \'business\' }: { activeWorkspace?: string }) => {
+export const SpendIntelligenceView = ({ activeWorkspace = 'business' }: { activeWorkspace?: string }) => {
   const [overview, setOverview] = useState<any>(null);
   const [agentStats, setAgentStats] = useState<any[]>([]);
   const [modelStats, setModelStats] = useState<any[]>([]);

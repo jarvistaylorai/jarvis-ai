@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getWorkspaceId } from '@/lib/workspace-utils';
 import { v4 as uuidv4 } from 'uuid';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const prisma = new PrismaClient();
 

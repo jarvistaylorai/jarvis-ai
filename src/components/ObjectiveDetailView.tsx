@@ -6,7 +6,7 @@ import {
   CheckCircle, Circle, Clock, Layers, Edit3, GripVertical, X, ExternalLink
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
 
 const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-5 ${className}`}>

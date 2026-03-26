@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 const DEFAULT_WORKSPACE_ROOT = path.resolve(process.cwd(), '..', '..');
 const STATE_ROOT = process.env.OPENCLAW_STATE_ROOT || DEFAULT_WORKSPACE_ROOT;

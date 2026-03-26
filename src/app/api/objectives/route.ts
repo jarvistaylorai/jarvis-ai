@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/services/database';
 import { getWorkspaceId } from '@/lib/workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
 
 export const dynamic = 'force-dynamic';
 

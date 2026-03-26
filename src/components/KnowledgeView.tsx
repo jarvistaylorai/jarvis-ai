@@ -6,7 +6,7 @@ import { KnowledgeSidebar } from '@/components/knowledge/KnowledgeSidebar';
 import { DocViewer } from '@/components/knowledge/DocViewer';
 import { DocEditor } from '@/components/knowledge/DocEditor';
 
-export function KnowledgeView({ activeWorkspace = \'business\' }: { activeWorkspace?: string }) {
+export function KnowledgeView({ activeWorkspace = 'business' }: { activeWorkspace?: string }) {
   const [docs, setDocs] = useState<Document[]>([]);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);

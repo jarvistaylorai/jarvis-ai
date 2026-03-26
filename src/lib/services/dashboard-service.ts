@@ -5,7 +5,7 @@ import { listAlerts } from './alert-service';
 import { getTelemetrySummary } from './telemetry-service';
 import { prisma } from './database';
 import { getWorkspaceId } from '../workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 export async function getDashboardSnapshot(workspaceId: string) {
   const mappedWorkspaceId = getWorkspaceId(workspaceId);

@@ -2,7 +2,7 @@ import {  Alert, AlertSeverity, AlertStatus, PaginatedResult  } from '@contracts
 import { prisma } from './database';
 import { eventBus } from './event-bus';
 import { getWorkspaceId } from '../workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 export type ListAlertsParams = {
   workspaceId: string;

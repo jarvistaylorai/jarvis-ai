@@ -1,5 +1,5 @@
 import React from 'react';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
 
 export const CostBreakdownTable = ({ logs }: { logs: unknown[] }) => {
   return (

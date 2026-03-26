@@ -15,7 +15,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@/types/contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
 
 function SortableLabel({ label, taskLabelIds, onToggle, onClickExternal }: { label: Label, taskLabelIds: Set<string>, onToggle: (l: Label) => void, onClickExternal: (e: React.MouseEvent) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: label.id });
