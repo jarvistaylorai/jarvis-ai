@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Save, FileText, Code, FileJson, Activity, Loader2 } from 'lucide-react';
 
@@ -48,7 +49,7 @@ export const FileEditorModal: React.FC<FileEditorModalProps> = ({ isOpen, onClos
       }
       const data = await res.json();
       setContent(data.content);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message);
     } finally {
       setLoading(false);
@@ -77,7 +78,7 @@ export const FileEditorModal: React.FC<FileEditorModalProps> = ({ isOpen, onClos
       }
       onSaved();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError(err.message);
     } finally {
       setSaving(false);
@@ -141,7 +142,7 @@ export const FileEditorModal: React.FC<FileEditorModalProps> = ({ isOpen, onClos
             </div>
           ) : isImage ? (
             <div className="w-full h-full p-4 flex items-center justify-center bg-black/40">
-              <img src={`/api/fs/raw?path=${encodeURIComponent(filePath)}`} alt={fileName} className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" />
+              <Image src={`/api/fs/raw?path=${encodeURIComponent(filePath)}`} alt={fileName} className="max-w-full max-h-full object-contain rounded-xl shadow-2xl" fill unoptimized />
             </div>
           ) : isVideo ? (
              <div className="w-full h-full p-4 flex items-center justify-center bg-black/40">

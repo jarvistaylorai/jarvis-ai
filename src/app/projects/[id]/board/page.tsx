@@ -81,7 +81,6 @@ export default async function ProjectBoardPage({ params }: { params: Promise<{ i
       <Board 
         initialLists={lists as unknown as ListData[]} 
         projectId={projectId} 
-        onTaskClick={() => {}} // Board.tsx will handle opening modals internally if we refactor, but wait, TaskModal isn't integrated yet.
       />
     </div>
   );

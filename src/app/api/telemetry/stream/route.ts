@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { eventBus } from '@/lib/services/event-bus';
 import { getTelemetrySummary } from '@/lib/services/telemetry-service';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 export const runtime = 'nodejs';
 
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
           if (unsubscribe) unsubscribe();
         };
 
-        const send = (event: any) => {
+        const send = (event: TelemetryEvent) => {
           const payloadWorkspace = (event.payload?.workspace_id || event.payload?.workspace) ?? workspaceId;
           if (payloadWorkspace !== workspaceId) return;
           try {
@@ -63,7 +64,7 @@ export async function GET(request: Request) {
         Connection: 'keep-alive'
       }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [GET /api/telemetry/stream]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

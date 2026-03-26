@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { X, Play, Pause, AlertCircle, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
 import { ExecutionDetailModal } from "./ExecutionDetailModal";
 
-export function RoutineDetailPanel({ routine, onClose, onRefresh }: any) {
+export function RoutineDetailPanel({ routine, onClose, onRefresh }: { routine: any, onClose: any, onRefresh: any }) {
   const [executions, setExecutions] = useState<any[]>([]);
   const [loadingExecs, setLoadingExecs] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
@@ -25,7 +25,7 @@ export function RoutineDetailPanel({ routine, onClose, onRefresh }: any) {
     fetchExecutions();
     const iv = setInterval(fetchExecutions, 3000);
     return () => clearInterval(iv);
-  }, [routine.id]);
+  }, [routine.id, fetchExecutions]);
 
   const handleRun = async () => {
     setIsRunning(true);
@@ -116,7 +116,7 @@ export function RoutineDetailPanel({ routine, onClose, onRefresh }: any) {
                <div className="text-sm text-neutral-500 text-center py-4 bg-neutral-950 border border-neutral-800 rounded-lg">No executions yet.</div>
             ) : (
               <div className="space-y-2">
-                {executions.reverse().slice(0, 10).map((ex: any) => (
+                {executions.reverse().slice(0, 10).map((ex: Record<string, any>) => (
                   <div 
                     key={ex.id} 
                     onClick={() => setSelectedExecution(ex)}

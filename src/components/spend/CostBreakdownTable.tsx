@@ -1,6 +1,7 @@
 import React from 'react';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
-export const CostBreakdownTable = ({ logs }: { logs: any[] }) => {
+export const CostBreakdownTable = ({ logs }: { logs: unknown[] }) => {
   return (
     <div className="bg-[#0f0f11] border border-white/[0.04] p-6 rounded-2xl h-full flex flex-col">
       <div className="mb-6">

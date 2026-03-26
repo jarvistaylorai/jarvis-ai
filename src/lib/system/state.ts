@@ -1,5 +1,6 @@
 import fs from "fs/promises"
 import path from "path"
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const DEFAULT_BASE = path.join(process.env.HOME ?? "", ".openclaw", "workspace", "jarvis", "system")
 const STATE_BASE = process.env.JARVIS_STATE_DIR || DEFAULT_BASE
@@ -20,18 +21,18 @@ const FILE_MAP = {
 } as const
 
 export type JarvisState = {
-  agents: any[]
-  tasks: any[]
-  activity: any[]
-  projects: any[]
-  objectives: any[]
-  objective_links: any[]
-  alerts: any[]
-  automation_rules: any[]
-  agent_memory: any[]
-  messages: any[]
-  system_state: any | null
-  global_lists: any[]
+  agents: unknown[]
+  tasks: unknown[]
+  activity: unknown[]
+  projects: Project[]
+  objectives: unknown[]
+  objective_links: unknown[]
+  alerts: Alert[]
+  automation_rules: unknown[]
+  agent_memory: unknown[]
+  messages: unknown[]
+  system_state: Record<string, any> | null
+  global_lists: unknown[]
 }
 
 async function ensureBaseDir() {
@@ -42,7 +43,7 @@ async function readJson<T>(file: string, fallback: T): Promise<T> {
   try {
     const data = await fs.readFile(path.join(STATE_BASE, file), "utf-8")
     return JSON.parse(data) as T
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error?.code === "ENOENT") return fallback
     console.error(`Error reading ${file}:`, error)
     return fallback
@@ -76,7 +77,7 @@ export async function writeSystemSnapshot(partial: Partial<JarvisState>) {
   }
 }
 
-export async function updateSystemState(file: string, data: any) {
+export async function updateSystemState(file: string, data: unknown) {
   await ensureBaseDir()
   const target = path.join(STATE_BASE, file)
   await fs.writeFile(target, JSON.stringify(data, null, 2))

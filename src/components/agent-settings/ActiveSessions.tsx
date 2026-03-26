@@ -1,7 +1,8 @@
 import React from 'react';
 import { Activity, XCircle } from 'lucide-react';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
-export const ActiveSessions = ({ sessions, onUpdate }: { sessions: any[], onUpdate: () => void }) => {
+export const ActiveSessions = ({ sessions, onUpdate }: { sessions: unknown[], onUpdate: () => void }) => {
   return (
     <div className="bg-[#0f0f12] border border-white/[0.05] rounded-2xl p-6 shadow-2xl relative">
       <div className="flex justify-between items-center mb-6">

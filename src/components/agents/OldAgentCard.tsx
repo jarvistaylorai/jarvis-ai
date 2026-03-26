@@ -4,13 +4,13 @@ import React from 'react';
 import { Activity, Terminal } from 'lucide-react';
 import { Agent } from '@/types/agent';
 
-const Card = ({ children, className = '' }: any) => (
+const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>
     {children}
   </div>
 );
 
-const Badge = ({ children, colorClass }: any) => (
+const Badge = ({ children, colorClass }: { children?: React.ReactNode; colorClass?: string }) => (
   <span className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-md ${colorClass}`}>
     {children}
   </span>

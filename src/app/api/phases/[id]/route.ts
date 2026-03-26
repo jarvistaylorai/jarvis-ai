@@ -11,7 +11,7 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
-    const data: any = {};
+    const data: unknown = {};
     if (body.title !== undefined) data.title = body.title;
     if (body.target_date !== undefined) data.target_date = body.target_date ? new Date(body.target_date) : null;
     if (body.position !== undefined) data.position = body.position;
@@ -22,7 +22,7 @@ export async function PATCH(
     });
 
     return NextResponse.json(phase);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [PATCH /api/phases/:id]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -43,7 +43,7 @@ export async function DELETE(
 
     await prisma.phase.delete({ where: { id } });
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [DELETE /api/phases/:id]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

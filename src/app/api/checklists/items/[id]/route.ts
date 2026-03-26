@@ -11,7 +11,7 @@ export async function PATCH(
     const { id: itemId } = await params;
     const updates = await request.json();
 
-    const item = await prisma.taskChecklistItem.update({
+    const item = await prisma.task_checklist_items.update({
       where: { id: itemId },
       data: updates
     });

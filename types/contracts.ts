@@ -21,8 +21,10 @@ export enum AgentKind {
 }
 
 export enum TaskStatus {
+  IDEAS = 'ideas',
   PENDING = 'pending',
   IN_PROGRESS = 'in_progress',
+  UNDER_REVIEW = 'under_review',
   BLOCKED = 'blocked',
   COMPLETED = 'completed'
 }

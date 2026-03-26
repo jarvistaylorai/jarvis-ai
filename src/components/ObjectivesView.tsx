@@ -3,14 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Plus, X, Calendar, ChevronRight, Layers, Clock } from 'lucide-react';
 import { ObjectiveDetailView } from './ObjectiveDetailView';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
-const Card = ({ children, className = '', onClick }: any) => (
+const Card = ({ children, className = "", onClick }: { children?: React.ReactNode; className?: string; onClick?: () => void }) => (
   <div onClick={onClick} className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 relative cursor-pointer ${className}`}>
     {children}
   </div>
 );
 
-const Badge = ({ children, colorClass }: any) => (
+const Badge = ({ children, colorClass }: { children?: React.ReactNode; colorClass?: string }) => (
   <span className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-lg ${colorClass}`}>
     {children}
   </span>
@@ -20,6 +21,9 @@ const priorityColors: Record<string, string> = {
   HIGH: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
   MEDIUM: 'bg-amber-500/10 text-amber-500 border border-amber-500/20',
   LOW: 'bg-zinc-800 text-zinc-400 border border-zinc-700',
+  high: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
+  medium: 'bg-amber-500/10 text-amber-500 border border-amber-500/20',
+  low: 'bg-zinc-800 text-zinc-400 border border-zinc-700',
 };
 
 const statusColors: Record<string, string> = {
@@ -28,7 +32,7 @@ const statusColors: Record<string, string> = {
   COMPLETED: 'bg-zinc-800 text-zinc-400 border border-zinc-700',
 };
 
-export const ObjectivesView = ({ objectives: initialObjectives = [], projects = [], activeWorkspace = 'business' }: any) => {
+export const ObjectivesView = ({ objectives: initialObjectives = [], projects = [], activeWorkspace = \'business\' }: { objectives?: unknown[], projects?: unknown[], activeWorkspace?: string }) => {
   const [objectives, setObjectives] = useState<any[]>(initialObjectives || []);
   const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -128,10 +132,10 @@ export const ObjectivesView = ({ objectives: initialObjectives = [], projects = 
 
       {/* OBJECTIVES GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {objectives.map((obj: any) => {
-          const completedPhases = obj.phases?.filter((p: any) => p.status === 'COMPLETED').length || 0;
+        {objectives.map((obj: Objective) => {
+          const completedPhases = obj.phases?.filter((p: Project) => p.status === 'COMPLETED').length || 0;
           const totalPhases = obj.phases?.length || obj.phase_count || 0;
-          const isHighPriority = obj.priority === 'HIGH';
+          const isHighPriority = obj.priority?.toUpperCase() === 'HIGH';
           
           return (
           <Card
@@ -170,21 +174,11 @@ export const ObjectivesView = ({ objectives: initialObjectives = [], projects = 
                 {obj.progress}<span className="text-sm text-zinc-500 ml-0.5">%</span>
               </span>
             </div>
-            <div className="w-full flex h-2.5 rounded-full overflow-hidden border border-white/5 relative z-10 mb-2 gap-[1px] bg-black">
-              {obj.phases?.length > 0 ? (
-                obj.phases.map((phase: any, i: number) => (
-                  <div
-                    key={phase.id || i}
-                    style={{ flex: 1 }}
-                    className={phase.status === 'COMPLETED' ? "bg-emerald-500" : phase.status === 'IN_PROGRESS' ? "bg-amber-400" : "bg-zinc-800"}
-                  />
-                ))
-              ) : (
-                <div
-                  className="h-full bg-gradient-to-r from-amber-600 to-amber-400 rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(245,158,11,0.4)]"
-                  style={{ width: `${obj.progress}%` }}
-                />
-              )}
+            <div className="w-full bg-black h-2.5 rounded-full overflow-hidden border border-white/5 relative z-10 mb-2 shadow-inner">
+              <div
+                className={`h-full relative transition-all duration-500 ${obj.progress > 0 ? 'bg-gradient-to-r from-amber-600 to-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.4)]' : 'bg-transparent'}`}
+                style={{ width: `${obj.progress || 0}%` }}
+              />
             </div>
             <div className="text-xs text-zinc-500 mt-1 mb-5 relative z-10 flex justify-between">
               <span>{obj.progress}% complete • {completedPhases}/{totalPhases} phases</span>
@@ -286,7 +280,7 @@ export const ObjectivesView = ({ objectives: initialObjectives = [], projects = 
                   className="w-full bg-[#050505] border border-white/[0.08] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500/50 transition-colors appearance-none shadow-inner"
                 >
                   <option value="">No project linked</option>
-                  {(projects || []).map((p: any) => (
+                  {(projects || []).map((p: Project) => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>

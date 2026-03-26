@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const workspaceId = searchParams.get('workspace') || 'business';
     const snapshot = await getDashboardSnapshot(workspaceId);
     return NextResponse.json(snapshot);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [GET /api/dashboard]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

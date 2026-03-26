@@ -2,17 +2,19 @@ import { NextResponse } from 'next/server';
 import { listTasks, createTask } from '@/lib/services/task-service';
 import { TaskPriority, TaskStatus, TaskType } from '@contracts';
 
+export const revalidate = 60;
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const workspaceId = searchParams.get('workspace') || 'business';
-    const limit = parseInt(searchParams.get('limit') || '25', 10);
+    const limit = parseInt(searchParams.get('limit') || '5000', 10);
     const cursor = searchParams.get('cursor') || undefined;
     const status = searchParams.get('status') as TaskStatus | null;
 
     const result = await listTasks({
       workspaceId,
-      limit: Number.isNaN(limit) ? 25 : Math.min(limit, 100),
+      limit: Number.isNaN(limit) ? 5000 : limit,
       cursor,
       status: status && Object.values(TaskStatus).includes(status) ? status : undefined
     });
@@ -21,7 +23,7 @@ export async function GET(request: Request) {
       data: result.data,
       next_cursor: result.next_cursor
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [GET /api/tasks]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -57,7 +59,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(task, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [POST /api/tasks]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

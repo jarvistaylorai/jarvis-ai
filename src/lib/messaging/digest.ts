@@ -11,6 +11,7 @@ export interface DigestEntry {
   timestamp: number;
   messageClass: MessageClassId;
   content: string;
+  tokenEstimate: number;
   context?: Record<string, unknown>;
   flushed: boolean;
 }
@@ -27,6 +28,10 @@ export interface DigestResult {
   tokenEstimate: number;
   entryCount: number;
   bucketKey: string;
+  messageClass: MessageClassId;
+  context?: Record<string, unknown>;
+  avoidedTokens: number;
+  baseTokens: number;
 }
 
 export type DigestStrategy = 'immediate' | 'time_window' | 'count_threshold' | 'smart';
@@ -93,7 +98,11 @@ class DigestCollector {
       this.buckets.set(key, bucket);
     }
 
-    const fullEntry: DigestEntry = { ...entry, flushed: false };
+    const fullEntry: DigestEntry = {
+      ...entry,
+      tokenEstimate: Math.ceil(entry.content.length / 4),
+      flushed: false,
+    };
     bucket.entries.push(fullEntry);
     bucket.lastUpdated = now;
 
@@ -153,6 +162,7 @@ class DigestCollector {
   private compileBucket(bucket: DigestBucket): DigestResult {
     const entries = bucket.entries;
     const messageClass = entries[0].messageClass;
+    const baseTokens = entries.reduce((sum, entry) => sum + entry.tokenEstimate, 0);
 
     // Collapse similar entries
     const grouped = this.groupSimilarEntries(entries);
@@ -167,11 +177,17 @@ class DigestCollector {
       content = grouped.map((g) => this.renderGroup(g, messageClass)).join(' | ');
     }
 
+    const collapsedTokens = Math.ceil(content.length / 4);
+
     return {
       content,
-      tokenEstimate: Math.ceil(content.length / 4),
+      tokenEstimate: collapsedTokens,
       entryCount: entries.length,
       bucketKey: bucket.key,
+      messageClass,
+      context: entries[entries.length - 1]?.context,
+      avoidedTokens: Math.max(0, baseTokens - collapsedTokens),
+      baseTokens,
     };
   }
 

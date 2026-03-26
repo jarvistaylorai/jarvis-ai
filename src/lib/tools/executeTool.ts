@@ -2,6 +2,7 @@ import fs from "fs/promises"
 import path from "path"
 import { exec } from "child_process"
 import { getSystemState, updateSystemState } from "../system/state"
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const WORKSPACE_BASE = "/Users/jarvis/.openclaw/workspace/jarvis"
 
@@ -18,7 +19,7 @@ async function readFile({ path: filePath }: { path: string }) {
     const fullPath = path.join(WORKSPACE_BASE, filePath)
     const data = await fs.readFile(fullPath, "utf-8")
     return data
-  } catch (error: any) {
+  } catch (error: unknown) {
     return `Error reading file: ${error.message}`
   }
 }
@@ -28,7 +29,7 @@ async function listDirectory({ path: dirPath }: { path: string }) {
     const fullPath = path.join(WORKSPACE_BASE, dirPath || "")
     const files = await fs.readdir(fullPath)
     return JSON.stringify(files)
-  } catch (error: any) {
+  } catch (error: unknown) {
     return `Error listing directory: ${error.message}`
   }
 }
@@ -53,7 +54,7 @@ async function createTask({ title, description }: { title: string; description?:
 async function updateTask({ id, status, steps }: { id: string; status?: string; steps?: string[] }) {
   const state = await getSystemState()
   const tasks = state.tasks || []
-  const taskIndex = tasks.findIndex((t: any) => t.id === id)
+  const taskIndex = tasks.findIndex((t: Task) => t.id === id)
   
   if (taskIndex === -1) return `Task ${id} not found`
   
@@ -69,10 +70,10 @@ async function assignTask({ taskId, agentId }: { taskId: string; agentId: string
   const tasks = state.tasks || []
   const agents = state.agents || []
   
-  const taskIndex = tasks.findIndex((t: any) => t.id === taskId)
+  const taskIndex = tasks.findIndex((t: Task) => t.id === taskId)
   if (taskIndex === -1) return `Task ${taskId} not found`
   
-  const agentIndex = agents.findIndex((a: any) => a.id === agentId)
+  const agentIndex = agents.findIndex((a: Agent) => a.id === agentId)
   if (agentIndex === -1) return `Agent ${agentId} not found`
   
   tasks[taskIndex].assigned_agent = agentId
@@ -93,7 +94,7 @@ export function runCommand(command: string): Promise<string> {
   })
 }
 
-export async function executeToolCall(call: any, agent: any) {
+export async function executeToolCall(call: Record<string, any>, agent: Agent) {
   const { name, arguments: argsString } = call.function
   const args = JSON.parse(argsString)
   
@@ -118,7 +119,7 @@ export async function executeToolCall(call: any, agent: any) {
       default:
         return `Unknown tool ${name}`
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return `Error executing tool: ${error.message}`
   }
 }

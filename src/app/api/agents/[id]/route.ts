@@ -18,7 +18,7 @@ export async function PATCH(
       metadata: body.metadata
     });
     return NextResponse.json(agent);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [PATCH /api/agents/:id]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

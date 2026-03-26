@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { getSystemState } from "./state"
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const DEFAULT_BOARD_COLUMNS = ["Ideas", "To-Do", "Doing", "Under Review", "Done"]
 
@@ -29,7 +30,7 @@ export async function ensureGlobalLists(prisma: PrismaClient, workspace: string)
 
 export async function syncJarvisFilesystemToDatabase(prisma: PrismaClient, workspace = "business") {
   const snapshot = await getSystemState()
-  const transactions: any[] = []
+  const transactions: unknown[] = []
 
   const globalLists = await ensureGlobalLists(prisma, workspace)
   const defaultListId = globalLists[0]?.id
@@ -145,7 +146,7 @@ export async function syncJarvisFilesystemToDatabase(prisma: PrismaClient, works
 
   for (const objective of snapshot.objectives || []) {
     if (!objective?.id || !objective?.title) continue
-    const matchedLink = objectiveLinks.find((link: any) => link.objective_id === objective.id && link.entity_type === "project")
+    const matchedLink = objectiveLinks.find((link: Record<string, unknown>) => link.objective_id === objective.id && link.entity_type === "project")
     transactions.push(
       prisma.objectives.upsert({
         where: { id: objective.id },

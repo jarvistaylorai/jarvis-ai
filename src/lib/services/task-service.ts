@@ -3,6 +3,7 @@ import { prisma } from './database';
 import { eventBus } from './event-bus';
 import {  Task, TaskPriority, TaskStatus, TaskType, PaginatedResult  } from '@contracts';
 import { getWorkspaceId } from '../workspace-utils';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const taskInclude = {
   objectives: { select: { id: true } },
@@ -93,7 +94,7 @@ function mergeMetadata(record: TaskRecord) {
 function mapTask(record: TaskRecord): Task {
   const metadata = mergeMetadata(record);
   const dependencyIds = safeParse<string[]>(record.dependency_ids, []);
-  const labelTags = (record.task_labels || []).map((l: any) => l.labels?.name).filter(Boolean);
+  const labelTags = (record.task_labels || []).map((l: Record<string, unknown>) => l.labels?.name).filter(Boolean);
   const metadataTags = Array.isArray(metadata.tags) ? metadata.tags : [];
   const uniqueTags = Array.from(new Set([...(metadataTags as string[]), ...labelTags]));
 
@@ -122,8 +123,8 @@ function mapTask(record: TaskRecord): Task {
     metadata,
     comments: record.task_comments || [],
     attachments: record.task_attachments || [],
-    checklists: (record.task_checklists || []).map((c: any) => ({ ...c, items: c.task_checklist_items || [] })),
-    labels: (record.task_labels || []).map((tl: any) => ({ label: tl.labels })),
+    checklists: (record.task_checklists || []).map((c: Task) => ({ ...c, items: c.task_checklist_items || [] })),
+    labels: (record.task_labels || []).map((tl: Record<string, unknown>) => ({ label: tl.labels })),
     created_at: record.created_at ? new Date(record.created_at).toISOString() : record.updated_at.toISOString(),
     updated_at: record.updated_at.toISOString()
   } as unknown as Task;

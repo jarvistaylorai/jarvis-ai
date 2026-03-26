@@ -1,6 +1,18 @@
 import {  PaginatedResult, TelemetryEvent, TelemetryCategory, TelemetrySeverity  } from '@contracts';
 import { prisma } from './database';
 import { getWorkspaceId } from '../workspace-utils';
+import type { Provider } from '../llm/types';
+import type { PriorityLevel } from '../llm/providerLimits';
+import type { ProviderPressure, RateLimiterMetricsSnapshot } from '../llm/rateLimiter';
+import type { DuplicateStatus } from '../llm/promptCache';
+import type { MessageClassId } from '../messaging/messageClasses';
+import { resolveVerbosityThreshold } from '../messaging/verbosityThresholds';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+
+const DIGEST_TOKEN_RATE_USD = Number(process.env.DIGEST_TOKEN_RATE_USD ?? 0.000002);
+const VERBOSITY_ALERT_COOLDOWN_MS = Number(
+  process.env.VERBOSITY_ALERT_COOLDOWN_MS ?? 60 * 60 * 1000
+);
 
 export type ListTelemetryParams = {
   workspaceId: string;
@@ -33,7 +45,7 @@ export type CreateTelemetryInput = {
   costUsd?: number;
 };
 
-function mapTelemetry(record: any): TelemetryEvent {
+function mapTelemetry(record: Record<string, unknown>): TelemetryEvent {
   return {
     id: record.id,
     workspace_id: record.workspace_id,
@@ -109,4 +121,289 @@ export async function recordTelemetry(input: CreateTelemetryInput): Promise<Tele
     } as any
   });
   return mapTelemetry(record);
+}
+
+export async function recordRoutingEvent(params: {
+  workspaceId: string;
+  agentId?: string;
+  decision: string;
+  tier: string;
+  estimatedSavingsUsd?: number;
+  rationale: string;
+  escalateReasons?: string[];
+  complexity: number;
+  confidence: number;
+}): Promise<void> {
+  await recordTelemetry({
+    workspaceId: params.workspaceId,
+    agentId: params.agentId,
+    category: TelemetryCategory.METRIC,
+    severity: TelemetrySeverity.INFO,
+    eventType: 'routing.gate',
+    message: `Routing gate decided ${params.decision}`,
+    payload: {
+      decision: params.decision,
+      tier: params.tier,
+      estimatedSavingsUsd: params.estimatedSavingsUsd,
+      rationale: params.rationale,
+      escalateReasons: params.escalateReasons,
+      complexity: params.complexity,
+      confidence: params.confidence,
+    },
+  });
+}
+
+export async function recordRateLimiterEvent(params: {
+  workspaceId: string;
+  agentId?: string;
+  taskId?: string;
+  provider: Provider;
+  model: string;
+  priority: PriorityLevel;
+  pressure: ProviderPressure;
+  metrics: RateLimiterMetricsSnapshot;
+  latencyMs: number;
+}): Promise<void> {
+  const severity =
+    params.pressure.mode === 'emergency'
+      ? TelemetrySeverity.CRITICAL
+      : params.pressure.mode === 'protection'
+      ? TelemetrySeverity.WARNING
+      : TelemetrySeverity.INFO;
+
+  await recordTelemetry({
+    workspaceId: params.workspaceId,
+    agentId: params.agentId,
+    taskId: params.taskId,
+    category: TelemetryCategory.METRIC,
+    severity,
+    eventType: 'llm.rateLimiter',
+    message: `Rate limiter ${params.pressure.mode} (${params.pressure.modeSource}) for ${params.provider}`,
+    payload: {
+      provider: params.provider,
+      model: params.model,
+      priority: params.priority,
+      pressure: params.pressure,
+      metrics: params.metrics,
+      latencyMs: params.latencyMs,
+    },
+    latencyMs: params.latencyMs,
+  });
+}
+
+export async function recordAvoidableSpendEvent(params: {
+  workspaceId: string;
+  agentId?: string;
+  taskId?: string;
+  projectId?: string;
+  reason: 'replay' | 'downgrade' | 'verbosity' | 'truncation' | 'pressure' | 'digest' | 'template';
+  tokensAvoided?: number;
+  usdAvoided?: number;
+  promptHash?: string;
+  duplicateStatus?: DuplicateStatus;
+  downgradedFrom?: string;
+  downgradedTo?: string;
+  priority?: string | PriorityLevel;
+  messageClass?: string;
+  model?: string;
+  provider?: string;
+  pressureMode?: string;
+  outputTokens?: number;
+  outputLimit?: number;
+  truncatedTokens?: number;
+}): Promise<void> {
+  const severity = ['downgrade', 'digest', 'template'].includes(params.reason)
+    ? TelemetrySeverity.INFO
+    : TelemetrySeverity.WARNING;
+  await recordTelemetry({
+    workspaceId: params.workspaceId,
+    agentId: params.agentId,
+    taskId: params.taskId,
+    projectId: params.projectId,
+    category: TelemetryCategory.METRIC,
+    severity,
+    eventType: 'spend.avoidable',
+    message: `Avoidable spend (${params.reason})`,
+    payload: {
+      reason: params.reason,
+      tokensAvoided: params.tokensAvoided,
+      usdAvoided: params.usdAvoided,
+      promptHash: params.promptHash,
+      duplicateStatus: params.duplicateStatus,
+      downgradedFrom: params.downgradedFrom,
+      downgradedTo: params.downgradedTo,
+      priority: params.priority,
+      messageClass: params.messageClass,
+      model: params.model,
+      provider: params.provider,
+      pressureMode: params.pressureMode,
+      outputTokens: params.outputTokens,
+      outputLimit: params.outputLimit,
+      truncatedTokens: params.truncatedTokens,
+    },
+    tokensInput: params.tokensAvoided,
+    tokensOutput: params.outputTokens,
+    costUsd: params.usdAvoided,
+  });
+}
+
+export async function recordDigestSavings(params: {
+  workspaceId: string;
+  agentId: string;
+  taskId?: string;
+  projectId?: string;
+  messageClass: MessageClassId;
+  tokensAvoided: number;
+  entryCount: number;
+  context?: Record<string, unknown>;
+}): Promise<void> {
+  if (!params.agentId || params.tokensAvoided <= 0) return;
+  const usdAvoided = params.tokensAvoided * DIGEST_TOKEN_RATE_USD;
+
+  await prisma.spendLog.create({
+    data: {
+      workspace: params.workspaceId,
+      agent_id: params.agentId,
+      model: 'digest',
+      provider: 'internal',
+      tokens_input: 0,
+      tokens_output: 0,
+      tokens_total: 0,
+      cost: 0,
+      task_id: params.taskId || null,
+      project_id: params.projectId || null,
+      message_class: params.messageClass,
+      priority: 'P3',
+      duplicate_status: 'fresh',
+      downgraded_from: null,
+      avoided_tokens: params.tokensAvoided,
+      avoided_usd: usdAvoided,
+      avoided_reason: 'digest',
+      tokens_reused: 0,
+      tokens_truncated: 0,
+      verbosity_flag: false,
+      pressure_mode: 'internal',
+    },
+  });
+
+  await recordAvoidableSpendEvent({
+    workspaceId: params.workspaceId,
+    agentId: params.agentId,
+    taskId: params.taskId,
+    projectId: params.projectId,
+    reason: 'digest',
+    tokensAvoided: params.tokensAvoided,
+    usdAvoided,
+    messageClass: params.messageClass,
+  });
+}
+
+export async function recordVerbositySample(params: {
+  workspaceId: string;
+  messageClass?: MessageClassId;
+  tokens?: number;
+  outputLimit?: number;
+  agentId?: string;
+  taskId?: string;
+}): Promise<void> {
+  if (!params.messageClass || typeof params.tokens !== 'number') return;
+  const dayKey = new Date();
+  dayKey.setUTCHours(0, 0, 0, 0);
+
+  const existing = await prisma.messageClassStat.findUnique({
+    where: {
+      workspace_message_class_day: {
+        workspace: params.workspaceId,
+        message_class: params.messageClass,
+        day: dayKey,
+      },
+    },
+  });
+
+  let rollingAvg = params.tokens;
+  if (!existing) {
+    await prisma.messageClassStat.create({
+      data: {
+        workspace: params.workspaceId,
+        message_class: params.messageClass,
+        day: dayKey,
+        total_tokens: params.tokens,
+        sample_count: 1,
+        rolling_avg: params.tokens,
+        last_sample: new Date(),
+      },
+    });
+  } else {
+    rollingAvg = existing.rolling_avg === 0
+      ? params.tokens
+      : existing.rolling_avg * 0.8 + params.tokens * 0.2;
+
+    await prisma.messageClassStat.update({
+      where: { id: existing.id },
+      data: {
+        total_tokens: existing.total_tokens + params.tokens,
+        sample_count: existing.sample_count + 1,
+        rolling_avg,
+        last_sample: new Date(),
+      },
+    });
+  }
+
+  const thresholds = resolveVerbosityThreshold(params.messageClass, params.outputLimit);
+  let alertSeverity: 'warning' | 'critical' | null = null;
+  if (rollingAvg > thresholds.critical) alertSeverity = 'critical';
+  else if (rollingAvg > thresholds.warn) alertSeverity = 'warning';
+
+  if (!alertSeverity) return;
+
+  const statRecord = existing
+    ? await prisma.messageClassStat.findUnique({ where: { id: existing.id } })
+    : await prisma.messageClassStat.findFirst({
+        where: {
+          workspace: params.workspaceId,
+          message_class: params.messageClass,
+          day: dayKey,
+        },
+      });
+
+  const lastAlertTime = statRecord?.last_alert ? new Date(statRecord.last_alert).getTime() : 0;
+  const shouldAlert = !statRecord?.last_alert ||
+    Date.now() - lastAlertTime > VERBOSITY_ALERT_COOLDOWN_MS;
+
+  if (!shouldAlert || !statRecord) return;
+
+  await prisma.messageClassStat.update({
+    where: { id: statRecord.id },
+    data: { last_alert: new Date() },
+  });
+
+  await prisma.alerts.create({
+    data: {
+      workspace_id: params.workspaceId,
+      source_type: 'verbosity',
+      source_id: params.messageClass,
+      message: `Message class ${params.messageClass} averaging ${Math.round(rollingAvg)} tokens`,
+      severity: alertSeverity,
+      status: 'active',
+      context: {
+        rollingAvg,
+        thresholds,
+      } as any,
+    },
+  });
+
+  await recordTelemetry({
+    workspaceId: params.workspaceId,
+    agentId: params.agentId,
+    taskId: params.taskId,
+    category: TelemetryCategory.ALERT,
+    severity: alertSeverity === 'critical' ? TelemetrySeverity.CRITICAL : TelemetrySeverity.WARNING,
+    eventType: 'spend.verbosity.alert',
+    message: `Verbosity ${alertSeverity} for ${params.messageClass}`,
+    payload: {
+      messageClass: params.messageClass,
+      rollingAvg,
+      thresholds,
+    },
+  });
 }

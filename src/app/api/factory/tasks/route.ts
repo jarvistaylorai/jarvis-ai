@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const prisma = new PrismaClient();
 
@@ -10,7 +11,7 @@ export async function GET() {
       orderBy: { created_at: "desc" },
     });
     
-    const projected = tasks.map((t: any) => ({
+    const projected = tasks.map((t: Task) => ({
       id: t.id,
       title: t.title,
       description: t.description,

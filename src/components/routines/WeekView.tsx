@@ -2,7 +2,7 @@
 
 import { CheckCircle2, Clock, AlertCircle } from "lucide-react";
 
-export function WeekView({ routines, onClickRoutine }: any) {
+export function WeekView({ routines, onClickRoutine }: { routines: unknown[], onClickRoutine: any }) {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const currentDay = new Date().getDay();
 
@@ -15,7 +15,7 @@ export function WeekView({ routines, onClickRoutine }: any) {
               {day}
             </h3>
             <div className="flex-1 overflow-y-auto space-y-3 scrollbar-hide">
-              {routines.map((r: any) => (
+              {routines.map((r: Record<string, any>) => (
                 <div 
                   key={r.id + idx} 
                   onClick={() => onClickRoutine(r)}

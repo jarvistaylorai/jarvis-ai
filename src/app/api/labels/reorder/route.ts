@@ -14,7 +14,7 @@ export async function PATCH(request: Request) {
     // Use a transaction to perform all updates sequentially
     await prisma.$transaction(
       labelIds.map((id, index) =>
-        prisma.taskLabel.update({
+        prisma.labels.update({
           where: { id },
           data: { position: index }
         })

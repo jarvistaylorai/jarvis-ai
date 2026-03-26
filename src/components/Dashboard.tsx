@@ -1,3 +1,4 @@
+import Image from 'next/image';
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -20,23 +21,24 @@ import { AutomationsView } from './AutomationsView';
 import { RoutinesView } from './RoutinesView';
 import { CommandBar } from './CommandBar';
 import { FactoryPipeline } from './factory/FactoryPipeline';
-import { DocsView } from './DocsView';
+import { KnowledgeView } from './KnowledgeView';
 import { SpendIntelligenceView } from './spend/SpendIntelligenceView';
 import { WorkspacesView } from './workspaces/WorkspacesView';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
-const Card = ({ children, className = '' }: any) => (
+const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>
     {children}
   </div>
 );
 
-const Badge = ({ children, colorClass }: any) => (
+const Badge = ({ children, colorClass }: { children?: React.ReactNode; colorClass?: string }) => (
   <span className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-md ${colorClass}`}>
     {children}
   </span>
 );
 
-const NavItem = ({ icon: Icon, label, active, onClick, href }: any) => {
+const NavItem = ({ icon: Icon, label, active, onClick, href }: { icon: any; label: string; active?: boolean; onClick?: () => void; href?: string }) => {
   const content = (
     <>
       <Icon size={16} className={active ? 'text-indigo-400' : 'text-zinc-500'} />
@@ -57,7 +59,7 @@ const NavItem = ({ icon: Icon, label, active, onClick, href }: any) => {
 
 const VALID_VIEWS = [
   'dashboard', 'projects', 'agents', 'agent-settings', 'tasks', 'pipeline', 'objectives',
-  'alerts', 'routines', 'automations', 'telemetry', 'filesystem', 'settings', 'docs', 'spend', 'workspaces'
+  'alerts', 'routines', 'automations', 'telemetry', 'filesystem', 'settings', 'knowledge', 'spend', 'workspaces'
 ];
 
 const getInitialView = () => {
@@ -91,8 +93,9 @@ export const Dashboard = () => {
   useEffect(() => {
     const handleHash = () => {
       const hash = window.location.hash.replace('#', '');
-      if (VALID_VIEWS.includes(hash)) {
-        setActiveViewState(hash);
+      const view = hash.split('?')[0];
+      if (VALID_VIEWS.includes(view)) {
+        setActiveViewState(view);
       }
     };
     handleHash();
@@ -123,9 +126,9 @@ export const Dashboard = () => {
     return () => clearInterval(engineInterval);
   }, [activeWorkspace]);
 
-  const activeAgents = (data.agents || []).filter((a: any) => a.status === 'active').length;
-  const activeProjects = (data.projects || []).filter((p: any) => p.progress > 0 && p.progress < 100).length;
-  const pendingTasks = (data.tasks || []).filter((t: any) => t.status === 'pending').length;
+  const activeAgents = (data.agents || []).filter((a: Agent) => a.status === 'active').length;
+  const activeProjects = (data.projects || []).filter((p: Project) => p.progress > 0 && p.progress < 100).length;
+  const pendingTasks = (data.tasks || []).filter((t: Task) => t.status === 'pending').length;
   
   const systemState = data.system_state || { status: 'NORMAL' };
   const getStatusColor = (status: string) => {
@@ -136,7 +139,7 @@ export const Dashboard = () => {
     return 'text-zinc-400 bg-zinc-500/10 border-zinc-500/20';
   };
 
-  const activeAlerts = (data.alerts || []).filter((a: any) => a.status === 'ACTIVE');
+  const activeAlerts = (data.alerts || []).filter((a: Agent) => a.status === 'ACTIVE');
 
   return (
     <div className="flex h-screen bg-[#050505] text-zinc-300 font-sans tracking-tight overflow-hidden">
@@ -145,14 +148,14 @@ export const Dashboard = () => {
       <CommandBar 
         isOpen={commandOpen} 
         onClose={() => setCommandOpen(false)} 
-        onExecute={() => fetchState()} 
+        onExecute={() => {}} 
       />
 
       {/* SIDEBAR NAVIGATION */}
       <aside className="w-64 bg-[#0a0a0b] border-r border-white/[0.04] flex flex-col z-20 shrink-0">
         <div className="h-20 flex items-center px-5 border-b border-white/[0.04]">
           <div className="relative flex items-center justify-center shrink-0 w-12 h-12 ml-[2px] mr-3">
-            <img src="https://i.gifer.com/origin/43/434771e3bf841e79abb2d4da70d6b1e2.gif" alt="JARVIS" className="w-[90px] h-[90px] max-w-none object-cover mix-blend-screen relative z-10" />
+            <Image src="https://i.gifer.com/origin/43/434771e3bf841e79abb2d4da70d6b1e2.gif" alt="JARVIS" className="w-[90px] h-[90px] max-w-none object-cover mix-blend-screen relative z-10" width={90} height={90} unoptimized />
           </div>
           <div className="flex flex-col justify-center relative z-20 ml-[5px]">
             <h1 className="text-[17px] font-black text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-zinc-500 tracking-[0.2em] leading-none mb-[2px]">JARVIS</h1>
@@ -213,7 +216,8 @@ export const Dashboard = () => {
           
           <div className="text-[9px] font-bold text-zinc-600 uppercase tracking-[0.2em] px-4 mt-6 mb-2">Strategy & Command</div>
           <NavItem icon={Target} label="Objectives" active={activeView === 'objectives'} onClick={() => setActiveView('objectives')} />
-          <NavItem icon={BrainCircuit} label="Knowledge" active={activeView === 'docs'} onClick={() => setActiveView('docs')} />
+          <NavItem icon={BrainCircuit} label="Knowledge" active={activeView === 'knowledge'} onClick={() => setActiveView('knowledge')} />
+          
           <NavItem icon={Bell} label="Alerts" active={activeView === 'alerts'} onClick={() => setActiveView('alerts')} />
           <NavItem icon={Activity} label="Routines" active={activeView === 'routines'} onClick={() => setActiveView('routines')} />
           <NavItem icon={Zap} label="Automations" active={activeView === 'automations'} onClick={() => setActiveView('automations')} />
@@ -264,6 +268,11 @@ export const Dashboard = () => {
                SYS: {systemState.status}
             </div>
 
+            <div className={`px-3 py-1.5 rounded-full border text-[10px] font-bold tracking-widest flex items-center gap-2 ${data.meta?.memory?.count > 0 ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' : 'text-zinc-500 bg-zinc-500/10 border-zinc-500/20'}`}>
+               <BrainCircuit size={12} />
+               MEM: {data.meta?.memory?.count || 0} DOCS
+            </div>
+
             <div className="flex items-center gap-3 px-4 py-1.5 rounded-full bg-[#0f0f12] border border-white/5 shadow-inner">
                <div className="flex items-center gap-1.5">
                   <FolderKanban size={12} className="text-indigo-400" />
@@ -284,7 +293,7 @@ export const Dashboard = () => {
         </header>
 
         {/* CONTENT SWITCHER */}
-        <div className={`p-8 mx-auto w-full pb-20 ${['tasks', 'objectives', 'projects', 'docs'].includes(activeView) ? 'max-w-none' : 'max-w-[1600px]'}`}>
+        <div className={`p-8 mx-auto w-full pb-20 ${['tasks', 'objectives', 'projects', 'knowledge'].includes(activeView) ? 'max-w-none' : 'max-w-[1600px]'}`}>
           {activeView === 'dashboard' && (
             <div className="grid grid-cols-12 gap-6 animate-in fade-in duration-500">
               {/* TOP LEVEL METRICS */}
@@ -342,7 +351,7 @@ export const Dashboard = () => {
                     <button className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest hover:text-indigo-300" onClick={() => setActiveView('objectives')}>View All</button>
                   </div>
                   <div className="flex flex-col gap-4">
-                    {(data.objectives || []).slice(0, 2).map((obj: any) => (
+                    {(data.objectives || []).slice(0, 2).map((obj: Objective) => (
                       <Card key={obj.id} className="p-4 border-amber-500/10 cursor-pointer hover:border-amber-500/20 transition-colors" onClick={() => setActiveView('objectives')}>
                         <div className="flex justify-between items-center mb-3">
                           <h4 className="text-white font-medium text-sm flex items-center gap-2">
@@ -366,7 +375,7 @@ export const Dashboard = () => {
                     <h2 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-[0.15em]">Live Execution Roster</h2>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    {(data.agents || []).map((agent: any) => (
+                    {(data.agents || []).map((agent: Agent) => (
                       <Card key={agent.id} className="p-4 hover:bg-white/[0.02] transition-colors border border-white/[0.03]">
                         <div className="flex items-center gap-4">
                           <div className="relative">
@@ -399,7 +408,7 @@ export const Dashboard = () => {
                   <div className="flex flex-col gap-3">
                     {activeAlerts.length === 0 ? (
                        <div className="text-xs text-zinc-500 italic px-2 py-4 border border-white/5 border-dashed rounded-xl text-center">System Nominal.</div>
-                    ) : activeAlerts.slice(0, 4).map((alert: any) => (
+                    ) : activeAlerts.slice(0, 4).map((alert: Alert) => (
                       <div key={alert.id} className="p-3 rounded-xl border border-rose-500/20 bg-rose-500/[0.02] flex items-start gap-3">
                          <ShieldAlert size={14} className="text-rose-500 mt-0.5 shrink-0" />
                          <div className="flex-1">
@@ -416,7 +425,7 @@ export const Dashboard = () => {
                     <h2 className="text-[11px] font-semibold text-zinc-400 uppercase tracking-[0.15em]">Execution Queue</h2>
                   </div>
                   <div className="flex flex-col gap-3">
-                    {(data.tasks || []).map((task: any) => (
+                    {(data.tasks || []).map((task: Task) => (
                       <Card key={task.id} className={`p-4 relative overflow-hidden ${task.priority === 'critical' ? 'border-amber-500/30 bg-amber-500/[0.02]' : 'border-white/[0.03]'}`}>
                         <div className="flex items-start gap-3">
                           <div className="mt-0.5">
@@ -439,7 +448,7 @@ export const Dashboard = () => {
           )}
 
           {/* PHASE 3 VIEWS */}
-          {activeView === 'projects' && <ProjectsView projects={data.projects} activeWorkspace={activeWorkspace} />}
+          {activeView === 'projects' && <ProjectsView activeWorkspace={activeWorkspace} />}
           {activeView === 'agents' && <AgentsView agents={data.agents} activeWorkspace={activeWorkspace} />}
           {activeView === 'agent-settings' && <AgentSettingsView agents={data.agents} activeWorkspace={activeWorkspace} />}
           {activeView === 'tasks' && <TasksView tasks={data.tasks} projects={data.projects} globalLists={data.global_lists} activeWorkspace={activeWorkspace} />}
@@ -454,7 +463,7 @@ export const Dashboard = () => {
           {activeView === 'alerts' && <AlertsView alerts={data.alerts} activeWorkspace={activeWorkspace} />}
           {activeView === 'routines' && <RoutinesView activeWorkspace={activeWorkspace} />}
           {activeView === 'automations' && <AutomationsView rules={data.automation_rules} activeWorkspace={activeWorkspace} />}
-          {activeView === 'docs' && <DocsView activeWorkspace={activeWorkspace} />}
+          {activeView === 'knowledge' && <KnowledgeView activeWorkspace={activeWorkspace} />}
           {activeView === 'spend' && <SpendIntelligenceView activeWorkspace={activeWorkspace} />}
           {activeView === 'workspaces' && (
             <div className="absolute inset-0 top-20 z-40 bg-[#0a0a0a]">

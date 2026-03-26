@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, path: path.join(targetPath, file.name).replace(/\\/g, '/') });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Upload Error:', error);
     return NextResponse.json({ error: error.message || 'Failed to upload file' }, { status: 500 });
   }

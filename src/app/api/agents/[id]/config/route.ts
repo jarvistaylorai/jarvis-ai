@@ -9,7 +9,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const config = await prisma.agentModelConfig.findUnique({
+    const config = await prisma.agent_model_config.findUnique({
       where: { agent_id: id },
       include: {
         primary_model: true,
@@ -35,7 +35,7 @@ export async function PUT(
     const { id } = await params;
     const data = await request.json();
     
-    const config = await prisma.agentModelConfig.upsert({
+    const config = await prisma.agent_model_config.upsert({
       where: { agent_id: id },
       update: {
         primary_model_id: data.primary_model_id,

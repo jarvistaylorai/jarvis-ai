@@ -1,7 +1,7 @@
+import Image from 'next/image';
 import React from 'react';
-import { Cpu } from 'lucide-react';
 
-export const SpendByModelCards = ({ modelData }: { modelData: any[] }) => {
+export const SpendByModelCards = ({ modelData }: { modelData: unknown[] }) => {
   return (
     <div className="bg-[#0f0f11] border border-white/[0.04] p-6 rounded-2xl">
       <div className="mb-6 flex justify-between items-center">
@@ -15,14 +15,9 @@ export const SpendByModelCards = ({ modelData }: { modelData: any[] }) => {
         {(modelData || []).map((model, i) => (
           <div key={i} className="border border-white/5 bg-[#0a0a0b] p-4 rounded-xl hover:border-white/10 transition-colors">
             <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 bg-zinc-800 rounded bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/5">
-                  <Cpu size={14} className="text-indigo-400" />
-                </div>
-                <div>
-                   <h4 className="text-sm font-medium text-white">{model.model_name}</h4>
-                   <span className="text-[10px] text-zinc-500 uppercase tracking-widest">{model.provider}</span>
-                </div>
+              <div className="flex items-center gap-3">
+                <Image src="/logos/openai.svg" alt="OpenAI" className="h-6 brightness-0 invert opacity-90 object-contain" width={100} height={100} unoptimized />
+                <h4 className="text-xs font-bold uppercase tracking-widest text-zinc-500 bg-white/5 border border-white/5 px-2 py-0.5 rounded">{model.name || model.model_name}</h4>
               </div>
             </div>
             
@@ -46,6 +41,17 @@ export const SpendByModelCards = ({ modelData }: { modelData: any[] }) => {
             </div>
           </div>
         ))}
+        
+        <div className="border border-white/5 bg-[#0a0a0b] p-5 rounded-xl flex flex-col justify-between hover:border-white/10 transition-colors opacity-60">
+          <div className="flex justify-between items-start mb-4">
+             <div className="flex items-center gap-3">
+               <Image src="/logos/gemini.svg" alt="Gemini" className="h-5 brightness-0 invert opacity-90 object-contain" width={100} height={100} unoptimized />
+             </div>
+          </div>
+          <div className="flex justify-between items-end mb-2 pt-6">
+             <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest leading-relaxed">Not <br/>Synced Yet</span>
+          </div>
+        </div>
         
         {(!modelData || modelData.length === 0) && (
            <div className="col-span-3 py-8 text-center text-zinc-500 text-sm italic border border-dashed border-white/10 rounded-xl">

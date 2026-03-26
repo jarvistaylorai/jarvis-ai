@@ -2,6 +2,7 @@ import {  PaginatedResult, Agent, AgentStatus, AgentKind  } from '@contracts';
 import { prisma } from './database';
 import { eventBus } from './event-bus';
 import { getWorkspaceId } from '../workspace-utils';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 export type CreateAgentInput = {
   workspaceId: string;
@@ -51,7 +52,7 @@ function parseJson<T>(value: string | null | undefined, fallback: T): T {
   }
 }
 
-function mapAgent(record: any, completedMap: Map<string, number>): Agent {
+function mapAgent(record: Record<string, unknown>, completedMap: Map<string, number>): Agent {
   const capabilityTags = parseJson<string[]>(record.capability_tags, []);
   const metadata = parseJson<Record<string, any>>(record.metadata, {});
 

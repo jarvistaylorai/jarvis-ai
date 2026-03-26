@@ -11,7 +11,7 @@ interface DocsSidebarProps {
   onSearchChange: (query: string) => void;
 }
 
-export function DocsSidebar({
+export function KnowledgeSidebar({
   docs,
   selectedDocId,
   onSelectDoc,
@@ -19,15 +19,19 @@ export function DocsSidebar({
   searchQuery,
   onSearchChange,
 }: DocsSidebarProps) {
-  // Hardcoded Sections based on requirements
-  const sections = [
-    { label: 'Overview', filter: (d: Document) => d.id === 'doc-overview' },
-    { label: 'Task Manager', filter: (d: Document) => d.category === 'tasks' },
-    { label: 'Organization Chart', filter: (d: Document) => d.category === 'agents' },
-    { label: 'Memory Architecture', filter: (d: Document) => d.category === 'memory' },
-    { label: 'Playbooks', filter: (d: Document) => d.category === 'playbooks' },
-    { label: 'Research', filter: (d: Document) => d.category === 'research' },
-  ];
+  // Dynamic Sections based on document categories (which map to Obsidian folders)
+  const uniqueCategories = Array.from(new Set(docs.map(d => d.category || 'Root'))).sort();
+  
+  // Move 'Root' to top if it exists
+  if (uniqueCategories.includes('Root')) {
+    uniqueCategories.splice(uniqueCategories.indexOf('Root'), 1);
+    uniqueCategories.unshift('Root');
+  }
+
+  const sections = uniqueCategories.map(cat => ({
+    label: cat,
+    filter: (d: Document) => (d.category || 'Root') === cat
+  }));
 
   const groupedDocsLabel = (label: string) => docs.filter(sections.find(s => s.label === label)?.filter || (() => false));
 

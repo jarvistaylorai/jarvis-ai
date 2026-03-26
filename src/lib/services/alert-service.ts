@@ -2,6 +2,7 @@ import {  Alert, AlertSeverity, AlertStatus, PaginatedResult  } from '@contracts
 import { prisma } from './database';
 import { eventBus } from './event-bus';
 import { getWorkspaceId } from '../workspace-utils';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 export type ListAlertsParams = {
   workspaceId: string;
@@ -39,7 +40,7 @@ function normalizeStatus(value: string): AlertStatus {
   return AlertStatus.ACTIVE;
 }
 
-function mapAlert(record: any): Alert {
+function mapAlert(record: Record<string, unknown>): Alert {
   return {
     id: record.id,
     workspace_id: record.workspace_id,

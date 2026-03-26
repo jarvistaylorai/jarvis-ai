@@ -16,7 +16,7 @@ const StatCard = ({ icon: Icon, label, value, subtext, colorClass }: any) => (
   </div>
 );
 
-export const GlobalStatsBar = ({ stats }: { stats: any }) => {
+export const GlobalStatsBar = ({ stats }: { stats: Record<string, any> }) => {
   return (
     <div className="grid grid-cols-4 gap-4">
       <StatCard icon={Server} label="Active Agents" value={stats?.active_agents || 0} subtext="global fleet" colorClass="text-indigo-400" />

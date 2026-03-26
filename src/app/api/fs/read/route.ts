@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     const content = await data.text();
 
     return NextResponse.json({ content });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Layers, ArrowRight } from 'lucide-react';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
-export const AgentRuntimeConfig = ({ configs, models, onUpdate }: { configs: any[], models: any[], onUpdate: () => void }) => {
+export const AgentRuntimeConfig = ({ configs, models, onUpdate }: { configs: unknown[], models: unknown[], onUpdate: () => void }) => {
   return (
     <div className="bg-[#0f0f12] border border-white/[0.05] rounded-2xl p-6 shadow-2xl relative">
       <div className="flex justify-between items-center mb-6">
@@ -15,7 +16,7 @@ export const AgentRuntimeConfig = ({ configs, models, onUpdate }: { configs: any
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {configs.map((agent: any) => {
+        {configs.map((agent: Agent) => {
            const config = agent.agent_model_config || {};
            const primary = config.primary_model?.name || 'Unassigned';
            const fallback = config.fallback_model?.name || 'None';

@@ -24,7 +24,7 @@ interface BoardProps {
   initialLists: ListData[];
   projectId: string; // The ID for lists
   taskProjectId?: string; // Optional: The ID for creating new tasks. If omitted, uses projectId.
-  onTaskClick: (task: Task) => void;
+  onTaskClick?: (task: Task) => void;
   activeWorkspace?: string;
 }
 
@@ -37,7 +37,7 @@ export function Board({ initialLists, projectId, taskProjectId, onTaskClick, act
     const serialized = JSON.stringify(initialLists);
     if (serialized !== prevInitialRef.current) {
       prevInitialRef.current = serialized;
-      setLists(initialLists);
+      Promise.resolve().then(() => setLists(initialLists));
     }
   }, [initialLists]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
@@ -256,7 +256,7 @@ export function Board({ initialLists, projectId, taskProjectId, onTaskClick, act
               <SortableList 
                 key={list.id} 
                 list={list} 
-                onTaskClick={onTaskClick} 
+                onTaskClick={onTaskClick || (() => {})} 
                 onAddTask={handleAddTask}
                 onUpdateTitle={handleUpdateListTitle}
                 onStatusChange={handleStatusChange}

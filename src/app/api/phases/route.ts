@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(phase, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [POST /api/phases]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

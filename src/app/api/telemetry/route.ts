@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     eventBus.publish({ type: 'telemetry.created' as any, payload: telemetry as any });
 
     return NextResponse.json(telemetry, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [POST /api/telemetry]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

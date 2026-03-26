@@ -2,6 +2,7 @@
 import { Agent } from "@/types/agent";
 import { AgentDashboard } from "@/components/agents/AgentDashboard";
 import { PrismaClient } from "@prisma/client";
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const prisma = new PrismaClient();
 
@@ -37,14 +38,14 @@ function deriveLoad(utilization?: number | null, metadataLoad?: Agent['load']): 
   return 'normal';
 }
 
-function deriveLayer(agent: any, metadataLayer?: Agent['layer']): Agent['layer'] {
+function deriveLayer(agent: Agent, metadataLayer?: Agent['layer']): Agent['layer'] {
   if (metadataLayer) return metadataLayer;
   if (agent.kind === 'human') return 'founder';
   if (agent.kind === 'service') return 'infrastructure';
   return 'core';
 }
 
-function normalizeDescription(agent: any, metadata: Partial<AgentMetadata>): string {
+function normalizeDescription(agent: Agent, metadata: Partial<AgentMetadata>): string {
   if (typeof metadata.description === 'string' && metadata.description.trim().length > 0) {
     return metadata.description;
   }
@@ -54,7 +55,7 @@ function normalizeDescription(agent: any, metadata: Partial<AgentMetadata>): str
   return '';
 }
 
-function mapAgent(agent: any): Agent {
+function mapAgent(agent: Agent): Agent {
   const metadata = parseMetadata(agent.metadata);
   const capabilityTags = Array.isArray(agent.capability_tags) ? agent.capability_tags : [];
   const load = deriveLoad(agent.utilization_percent, metadata.load);

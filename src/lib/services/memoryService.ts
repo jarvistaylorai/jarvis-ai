@@ -3,7 +3,7 @@
  * Phase 2: Semantic memory retrieval with pgvector
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -31,29 +31,46 @@ export class MemoryService {
    * Retrieve relevant memories based on semantic similarity
    */
   async retrieve(query: MemoryQuery): Promise<RetrievedMemory[]> {
-    // TODO: Generate embedding for query
-    // const queryEmbedding = await this.embed(query.query);
+    const orchestrator = await prisma.agents.findFirst({ where: { handle: 'orchestrator' }, select: { id: true } });
+    const globalId = orchestrator?.id;
+
+    const normalizedQuery = query.query.replace(/[^a-zA-Z0-9\s]/g, ' ').trim().toLowerCase();
     
-    // For now, return keyword-based results
+    let agentFilter = Prisma.empty;
+    if (query.agentId && globalId && query.agentId !== globalId) {
+      agentFilter = Prisma.sql`AND (agent_id = ${query.agentId}::uuid OR agent_id = ${globalId}::uuid)`;
+    } else if (globalId) {
+      agentFilter = Prisma.sql`AND agent_id = ${globalId}::uuid`;
+    } else if (query.agentId) { // Fallback if no globalId but agentId is provided
+      agentFilter = Prisma.sql`AND agent_id = ${query.agentId}::uuid`;
+    }
+    
+    const minScore = query.minScore !== undefined ? query.minScore : 0.05;
+
     const results = await prisma.$queryRaw`
-      SELECT id, type, content, 
-             ts_rank(to_tsvector('english', content), plainto_tsquery('english', ${query.query})) as score
-      FROM memory_entries
-      WHERE workspace_id = 'business'
-        AND (${query.projectId}::text IS NULL OR project_id = ${query.projectId})
-        AND (${query.taskId}::text IS NULL OR task_id = ${query.taskId})
-        AND (${query.agentId}::text IS NULL OR agent_id = ${query.agentId})
-        AND (${query.types ? prisma.$queryRaw`type = ANY(${query.types})` : prisma.$queryRaw`TRUE`})
+      WITH ranked_memories AS (
+        SELECT id, agent_id, 'file' as type, file_name, content, 
+               ts_rank(to_tsvector('english', content), plainto_tsquery('english', ${normalizedQuery})) + 
+               CASE WHEN file_name = 'MEMORY.md' THEN 0.5 ELSE 0 END as score
+        FROM agent_context_files
+        WHERE 1=1 ${agentFilter}
+      )
+      SELECT * FROM ranked_memories
+      WHERE score >= ${minScore}
       ORDER BY score DESC
       LIMIT ${query.limit || 5}
     `;
-    
+
+    // Map the results to determine scope for debug visibility
     return (results as any[]).map(r => ({
       id: r.id,
       type: r.type,
       content: r.content,
       score: r.score,
-      metadata: {},
+      metadata: {
+        file_name: r.file_name,
+        scope: r.agent_id === globalId ? 'global' : 'agent-specific'
+      }
     }));
   }
   
@@ -67,20 +84,26 @@ export class MemoryService {
     projectId?: string;
     taskId?: string;
     metadata?: Record<string, any>;
-  }): Promise<void> {
-    // TODO: Generate embedding
-    // const embedding = await this.embed(memory.content);
+  }): Promise<any> {
+    if (!memory.agentId) throw new Error('agentId is required to store context files');
     
-    await prisma.memoryEntry.create({
-      data: {
+    const fileName = memory.metadata?.file_name || `memory-${Date.now()}.txt`;
+    
+    return await prisma.agent_context_files.upsert({
+      where: {
+        agent_id_file_name: {
+          agent_id: memory.agentId,
+          file_name: fileName,
+        }
+      },
+      update: {
         content: memory.content,
-        type: memory.type,
-        agentId: memory.agentId,
-        projectId: memory.projectId,
-        taskId: memory.taskId,
-        workspaceId: 'business',
-        metadata: memory.metadata || {},
-        // embedding: embedding, // Requires pgvector
+        updated_at: new Date(),
+      },
+      create: {
+        agent_id: memory.agentId,
+        file_name: fileName,
+        content: memory.content,
       },
     });
   }

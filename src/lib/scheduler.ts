@@ -1,6 +1,7 @@
 const cronParser = require("cron-parser");
 import { v4 as uuidv4 } from "uuid";
 import { getRoutines, updateRoutine, addExecution, Routine, RoutineExecution } from "./routines";
+import { applyBurstSmoothing } from "./llm/burstSmoother";
 
 // Need a global singleton for the timer to avoid multiple intervals during hot reload
 const globalForScheduler = global as unknown as { schedulerInterval?: NodeJS.Timeout };
@@ -54,7 +55,7 @@ export async function executeRoutine(routine: Routine): Promise<RoutineExecution
       // success_rate will be computed dynamically or keep last runs
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     const completed_at = new Date().toISOString();
     const duration_ms = Date.now() - start;
 
@@ -102,7 +103,11 @@ export async function checkAndRunRoutines() {
 
       if (shouldRun) {
         // Trigger execution asynchronously without blocking the loop
-        executeRoutine(routine).catch(console.error);
+        const runWithSmoothing = async () => {
+          await applyBurstSmoothing({ source: 'cron', key: routine.id });
+          await executeRoutine(routine);
+        };
+        runWithSmoothing().catch(console.error);
 
         // Compute next run immediately so it doesn't trigger again
         if (routine.schedule_type === "cron" && routine.cron_expression) {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 
-export const CostAnomalies = ({ anomalies }: { anomalies: any[] }) => {
+export const CostAnomalies = ({ anomalies }: { anomalies: unknown[] }) => {
   if (!anomalies) return <div className="h-64 border border-white/[0.04] rounded-2xl bg-[#0f0f11] animate-pulse"></div>;
 
   return (

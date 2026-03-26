@@ -102,7 +102,7 @@ const PROVIDER_MAP: Record<string, string> = {
 };
 
 // Cost estimates (per 1k tokens input + output avg)
-const COST_ESTIMATES: Record<string, number> = {
+export const COST_ESTIMATES: Record<string, number> = {
   'kimi-k2.5': 0,  // Local
   'claude-3.7-sonnet': 0.009,  // $3 input + $15 output / 2
   'claude-3.7-opus': 0.0225,   // $15 input + $30 output / 2
@@ -210,6 +210,15 @@ export function logRouting(result: RouteResult, request: RouteRequest): void {
   }
 }
 
+export function estimateModelCost(model: string, estimatedTokens: number): number {
+  const rate = COST_ESTIMATES[model] ?? COST_ESTIMATES['claude-3.7-sonnet'];
+  return (estimatedTokens / 1000) * rate;
+}
+
+export function getProviderForModel(model: string): string {
+  return PROVIDER_MAP[model] || 'unknown';
+}
+
 /**
  * Get routing recommendation for UI
  */
@@ -227,7 +236,7 @@ export function getRoutingRecommendation(request: RouteRequest): {
     
     const check = canHandle(model, request.estimatedTokens);
     if (check.canHandle) {
-      const cost = (request.estimatedTokens / 1000) * COST_ESTIMATES[model];
+      const cost = estimateModelCost(model, request.estimatedTokens);
       alternatives.push({
         model,
         reason: check.percentUsed < 50 ? 'Plenty of headroom' : 'Within budget',

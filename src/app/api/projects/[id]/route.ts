@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,13 +24,13 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
     }
 
     // derived agents computation
-    const agentsSet = new Set((project.tasks || []).map((t: any) => t.assigned_agent_id).filter(Boolean));
+    const agentsSet = new Set((project.tasks || []).map((t: Task) => t.assigned_agent_id).filter(Boolean));
 
     return NextResponse.json({
       ...project,
       derived_agents: Array.from(agentsSet)
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`API Error [GET /api/projects/:id]:`, error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -58,7 +59,7 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
     }
 
     return NextResponse.json(updatedProject);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`API Error [PATCH /api/projects/:id]:`, error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

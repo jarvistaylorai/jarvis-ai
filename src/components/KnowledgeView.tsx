@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Document } from '@/lib/docs';
-import { DocsSidebar } from '@/components/docs/DocsSidebar';
-import { DocViewer } from '@/components/docs/DocViewer';
-import { DocEditor } from '@/components/docs/DocEditor';
+import { KnowledgeSidebar } from '@/components/knowledge/KnowledgeSidebar';
+import { DocViewer } from '@/components/knowledge/DocViewer';
+import { DocEditor } from '@/components/knowledge/DocEditor';
 
-export function DocsView({ activeWorkspace = 'business' }: any) {
+export function KnowledgeView({ activeWorkspace = \'business\' }: { activeWorkspace?: string }) {
   const [docs, setDocs] = useState<Document[]>([]);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -15,7 +15,7 @@ export function DocsView({ activeWorkspace = 'business' }: any) {
 
   useEffect(() => {
     fetchDocs();
-  }, []);
+  }, [fetchDocs]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -26,11 +26,11 @@ export function DocsView({ activeWorkspace = 'business' }: any) {
     } else {
       fetchDocs();
     }
-  }, [searchQuery, activeWorkspace]);
+  }, [searchQuery, activeWorkspace, fetchDocs, searchDocs]);
 
   const fetchDocs = async () => {
     try {
-      const res = await fetch(`/api/docs?workspace=${activeWorkspace}`);
+      const res = await fetch(`/api/knowledge?workspace=${activeWorkspace}`);
       const data = await res.json();
       setDocs(data.docs || []);
       
@@ -49,7 +49,7 @@ export function DocsView({ activeWorkspace = 'business' }: any) {
 
   const searchDocs = async (query: string) => {
     try {
-      const res = await fetch(`/api/docs/search?q=${encodeURIComponent(query)}&workspace=${activeWorkspace}`);
+      const res = await fetch(`/api/knowledge/search?q=${encodeURIComponent(query)}&workspace=${activeWorkspace}`);
       const results = await res.json();
       setDocs(results || []);
     } catch (e) {
@@ -63,14 +63,14 @@ export function DocsView({ activeWorkspace = 'business' }: any) {
     try {
       if (activeDoc && activeDoc.id !== 'new-doc-id') {
         // Update existing
-        await fetch(`/api/docs/${activeDoc.id}?workspace=${activeWorkspace}`, {
+        await fetch(`/api/knowledge/${activeDoc.id}?workspace=${activeWorkspace}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title, content, category, tags }),
         });
       } else {
         // Create new
-        const res = await fetch(`/api/docs?workspace=${activeWorkspace}`, {
+        const res = await fetch(`/api/knowledge?workspace=${activeWorkspace}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ title, content, category, tags }),
@@ -92,7 +92,7 @@ export function DocsView({ activeWorkspace = 'business' }: any) {
 
   return (
     <div className="flex h-[calc(100vh-8rem)] bg-[#050505] text-zinc-300 border border-white/[0.04] rounded-2xl shadow-2xl overflow-hidden font-sans">
-      <DocsSidebar 
+      <KnowledgeSidebar 
         docs={docs} 
         selectedDocId={selectedDocId} 
         onSelectDoc={(id) => {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { 
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
   ArrowLeft, Activity, Play, Pause, Plus, Zap, AlertTriangle, 
   CheckCircle, Clock, Users, TerminalSquare, ShieldAlert
 } from 'lucide-react';
@@ -42,6 +43,19 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
     } catch (e) {}
   };
 
+  const handlePriorityChange = async (newPriority: string) => {
+    const dbPriority = newPriority === 'CRITICAL' ? 'mission_critical' : newPriority.toLowerCase();
+    setProject((prev: Record<string, unknown>) => ({ ...prev, priority: newPriority }));
+    try {
+      await fetch(`/api/projects/${projectId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priority: dbPriority })
+      });
+      fetchProject();
+    } catch (e) {}
+  };
+
   const handleAddTask = async () => {
     const title = prompt("Enter task title:");
     if (!title) return;
@@ -59,7 +73,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
   if (!project) return <div className="h-full flex items-center justify-center text-zinc-500">Project not found.</div>;
 
   const tasks = project.tasks || [];
-  const completedTasks = tasks.filter((t: any) => t.status === 'completed').length;
+  const completedTasks = tasks.filter((t: Task) => t.status === 'completed').length;
   const progress = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
   
   const getHealthColor = (health: string) => {
@@ -86,7 +100,16 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
             <h1 className="text-2xl font-semibold text-white tracking-tight flex items-center gap-3">
               {project.name}
               <span className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-md border text-indigo-400 bg-indigo-500/10 border-indigo-500/20`}>{project.status || 'IDEA'}</span>
-              <span className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-md border ${project.priority === 'CRITICAL' || project.priority === 'HIGH' ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' : 'text-zinc-400 bg-zinc-800 border-zinc-700'}`}>{project.priority || 'MEDIUM'}</span>
+              <select
+                value={project.priority === 'mission_critical' ? 'CRITICAL' : project.priority?.toUpperCase() || 'MEDIUM'}
+                onChange={(e) => handlePriorityChange(e.target.value)}
+                className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-md border appearance-none cursor-pointer focus:outline-none ${project.priority === 'CRITICAL' || project.priority === 'HIGH' || project.priority === 'mission_critical' || project.priority === 'high' ? 'text-amber-400 bg-amber-500/10 border-amber-500/20' : 'text-zinc-400 bg-zinc-800 border-zinc-700'}`}
+              >
+                <option value="LOW" className="bg-zinc-900 text-zinc-400 font-bold">LOW</option>
+                <option value="MEDIUM" className="bg-zinc-900 text-amber-500 font-bold">MEDIUM</option>
+                <option value="HIGH" className="bg-zinc-900 text-rose-400 font-bold">HIGH</option>
+                <option value="CRITICAL" className="bg-zinc-900 text-rose-500 font-bold">CRITICAL</option>
+              </select>
             </h1>
           </div>
           <div className="flex items-center gap-4 w-64">
@@ -140,7 +163,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
                     <button onClick={handleAddTask} className="mt-4 px-4 py-2 bg-indigo-500/10 text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-500/20 transition">Start by adding one</button>
                   </div>
                 ) : (
-                  tasks.map((task: any) => (
+                  tasks.map((task: Task) => (
                     <div key={task.id} className="p-4 rounded-xl border border-white/[0.03] bg-[#0a0a0b] flex items-center justify-between group">
                       <div className="flex items-center gap-4">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center ${task.status === 'completed' ? 'bg-emerald-500/10 text-emerald-400' : task.status === 'in-progress' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-zinc-800 text-zinc-500'}`}>
@@ -174,7 +197,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
 
             {activeTab === 'activity' && (
               <div className="flex flex-col gap-0 border-l border-white/10 ml-4 pl-4 py-2">
-                {(project.project_activity || []).map((act: any) => (
+                {(project.project_activity || []).map((act: Record<string, any>) => (
                   <div key={act.id} className="relative pb-6 last:pb-0">
                     <span className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-indigo-500/50 border-2 border-[#0f0f12]"></span>
                     <p className="text-sm text-zinc-300">{act.message}</p>
@@ -218,7 +241,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
                 </div>
                 <div className="flex justify-between items-center p-4 rounded-xl border border-white/[0.03] bg-black/40">
                   <span className="text-xs text-zinc-400">Task Choke</span>
-                  <span className="text-xs font-mono text-zinc-300">{tasks.filter((t:any) => t.status === 'blocked').length} / {tasks.length}</span>
+                  <span className="text-xs font-mono text-zinc-300">{tasks.filter((t: Task) => t.status === 'blocked').length} / {tasks.length}</span>
                 </div>
                 <div className="flex justify-between items-center p-4 rounded-xl border border-white/[0.03] bg-black/40">
                   <span className="text-xs text-zinc-400">Creation</span>

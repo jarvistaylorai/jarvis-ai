@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getSystemState } from '@/lib/system/state';
+import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@/types/contracts';
 
 const prisma = new PrismaClient();
 
 export const dynamic = 'force-dynamic';
 
 // Compute phase progress + status from tasks
-function computePhaseMetrics(tasks: any[]) {
+function computePhaseMetrics(tasks: unknown[]) {
   const total = tasks.length;
   if (total === 0) return { progress: 0, status: 'NOT_STARTED', task_count: 0, completed_tasks: 0 };
   const completed = tasks.filter(t => t.status === 'completed').length;
@@ -18,12 +19,12 @@ function computePhaseMetrics(tasks: any[]) {
   return { progress, status, task_count: total, completed_tasks: completed };
 }
 
-function computeObjectiveMetrics(phases: any[]) {
+function computeObjectiveMetrics(phases: unknown[]) {
   if (phases.length === 0) return { progress: 0, status: 'ACTIVE' };
   const avgProgress = Math.round(phases.reduce((sum: number, p: any) => sum + p.progress, 0) / phases.length);
   let status = 'ACTIVE';
-  if (phases.every((p: any) => p.status === 'COMPLETED')) status = 'COMPLETED';
-  else if (phases.some((p: any) => p.status === 'IN_PROGRESS' || p.status === 'COMPLETED')) status = 'IN_PROGRESS';
+  if (phases.every((p: Project) => p.status === 'COMPLETED')) status = 'COMPLETED';
+  else if (phases.some((p: Project) => p.status === 'IN_PROGRESS' || p.status === 'COMPLETED')) status = 'IN_PROGRESS';
   return { progress: avgProgress, status };
 }
 
@@ -92,19 +93,19 @@ export async function GET(request: Request) {
     const system_state = system_state_arr[0] || { status: 'NORMAL', active_agents: 0, pending_tasks: 0, blocked_tasks: 0, last_evaluated_at: new Date().toISOString() };
 
     // Parse dependencies since SQLite stores it as a literal string
-    const formattedTasks = tasks.map((t: any) => ({
+    const formattedTasks = tasks.map((t: Task) => ({
       ...t,
       dependencies: JSON.parse(t.dependencies || '[]')
     }));
 
     // Compute objective progress from phases
-    const computedObjectives = objectives.map((obj: any) => {
-      const phasesWithMetrics = obj.phases.map((phase: any) => {
+    const computedObjectives = objectives.map((obj: Objective) => {
+      const phasesWithMetrics = obj.phases.map((phase: Record<string, unknown>) => {
         const metrics = computePhaseMetrics(phase.tasks);
         return { id: phase.id, title: phase.title, position: phase.position, target_date: phase.target_date, ...metrics };
       });
       const objMetrics = computeObjectiveMetrics(phasesWithMetrics);
-      const currentPhase = phasesWithMetrics.find((p: any) => p.status === 'IN_PROGRESS') || phasesWithMetrics.find((p: any) => p.status === 'NOT_STARTED');
+      const currentPhase = phasesWithMetrics.find((p: Project) => p.status === 'IN_PROGRESS') || phasesWithMetrics.find((p: Project) => p.status === 'NOT_STARTED');
       return {
         id: obj.id, title: obj.title, description: obj.description, priority: obj.priority,
         target_date: obj.target_date, created_at: obj.created_at, project: obj.project,
@@ -116,18 +117,18 @@ export async function GET(request: Request) {
 
     const fsState = await getSystemState();
 
-    const mergedAgents = agents.map((a: any) => {
-      const fsA = fsState.agents?.find((fa: any) => fa.id === a.id);
+    const mergedAgents = agents.map((a: Agent) => {
+      const fsA = fsState.agents?.find((fa: Record<string, any>) => fa.id === a.id);
       return fsA ? { ...a, ...fsA } : a;
     });
-    const missingAgents = fsState.agents?.filter((fa: any) => !agents.find((a: any) => a.id === fa.id)) || [];
+    const missingAgents = fsState.agents?.filter((fa: Record<string, any>) => !agents.find((a: Agent) => a.id === fa.id)) || [];
     mergedAgents.push(...missingAgents);
 
-    const mergedTasks = formattedTasks.map((t: any) => {
-      const fsT = fsState.tasks?.find((ft: any) => ft.id === t.id);
+    const mergedTasks = formattedTasks.map((t: Task) => {
+      const fsT = fsState.tasks?.find((ft: Record<string, any>) => ft.id === t.id);
       return fsT ? { ...t, ...fsT } : t;
     });
-    const missingTasks = fsState.tasks?.filter((ft: any) => !formattedTasks.find((t: any) => t.id === ft.id)) || [];
+    const missingTasks = fsState.tasks?.filter((ft: Record<string, any>) => !formattedTasks.find((t: Task) => t.id === ft.id)) || [];
     mergedTasks.push(...missingTasks);
 
     const mergedActivity = fsState.activity && fsState.activity.length > 0 ? fsState.activity : activity;
@@ -146,7 +147,7 @@ export async function GET(request: Request) {
       automation_rules,
       global_lists
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API Error [GET /api/system]:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const workspaceId = searchParams.get('workspace') || 'business';
     const result = await listAgents({ workspaceId });
     return NextResponse.json({ data: result.data });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [GET /api/agents]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       layer: body.layer
     });
     return NextResponse.json(agent, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [POST /api/agents]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

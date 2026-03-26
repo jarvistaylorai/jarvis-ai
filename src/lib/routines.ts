@@ -36,7 +36,7 @@ const ROUTINES_FILE = path.join(SYSTEM_DIR, "routines.json");
 const EXECUTIONS_FILE = path.join(SYSTEM_DIR, "executions.json");
 
 // Helpers for atomic writes
-async function writeAtomic(filePath: string, data: any) {
+async function writeAtomic(filePath: string, data: unknown) {
   const tmpPath = `${filePath}.${uuidv4()}.tmp`;
   await fs.writeFile(tmpPath, JSON.stringify(data, null, 2), "utf8");
   await fs.rename(tmpPath, filePath);
@@ -47,7 +47,7 @@ export async function getRoutines(): Promise<Routine[]> {
   try {
     const data = await fs.readFile(ROUTINES_FILE, "utf8");
     return JSON.parse(data);
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err.code === "ENOENT") return [];
     throw err;
   }
@@ -96,7 +96,7 @@ export async function getExecutions(routineId?: string): Promise<RoutineExecutio
       return executions.filter((e) => e.routine_id === routineId);
     }
     return executions;
-  } catch (err: any) {
+  } catch (err: unknown) {
     if (err.code === "ENOENT") return [];
     throw err;
   }

@@ -9,7 +9,7 @@ import { BudgetControls } from './BudgetControls';
 import { Forecasting } from './Forecasting';
 import { Download, Bell, Settings } from 'lucide-react';
 
-export const SpendIntelligenceView = ({ activeWorkspace = 'business' }: any) => {
+export const SpendIntelligenceView = ({ activeWorkspace = \'business\' }: { activeWorkspace?: string }) => {
   const [overview, setOverview] = useState<any>(null);
   const [agentStats, setAgentStats] = useState<any[]>([]);
   const [modelStats, setModelStats] = useState<any[]>([]);
@@ -80,9 +80,9 @@ export const SpendIntelligenceView = ({ activeWorkspace = 'business' }: any) => 
       <div className="grid grid-cols-12 gap-6">
          <div className="col-span-8 flex flex-col gap-6">
             <SpendOverTimeGraph timeseriesData={timeseries} />
-            <SpendByAgentTable agentData={agentStats} />
             <SpendByModelCards modelData={modelStats} />
             <CostBreakdownTable logs={logs} />
+            <SpendByAgentTable agentData={agentStats} />
          </div>
          <div className="col-span-4 flex flex-col gap-6">
             <CostAnomalies anomalies={anomalies || []} />

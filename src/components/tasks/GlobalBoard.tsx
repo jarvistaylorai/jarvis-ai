@@ -163,6 +163,10 @@ export function GlobalBoard({ tasks: initialTasks }: GlobalBoardProps) {
           projectLabels={labels} 
           onLabelsChange={setLabels}
           onUpdateTask={(updates) => setTasks(prev => prev.map(t => t.id === selectedTask.id ? { ...t, ...updates } as Task : t))} 
+          onDeleteTask={(id) => {
+            setTasks(prev => prev.filter(t => t.id !== id));
+            setSelectedTask(null);
+          }}
         />
       )}
     </div>

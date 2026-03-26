@@ -1,7 +1,7 @@
 import React from 'react';
 import { Network, CheckCircle, AlertCircle } from 'lucide-react';
 
-export const ProviderSettings = ({ providers, onUpdate }: { providers: any[], onUpdate: () => void }) => {
+export const ProviderSettings = ({ providers, onUpdate }: { providers: unknown[], onUpdate: () => void }) => {
   const defaultProviders = [
     { id: 'openai', name: 'OpenAI', icon: '⚡' },
     { id: 'anthropic', name: 'Anthropic', icon: '🧠' },

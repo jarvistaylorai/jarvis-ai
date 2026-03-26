@@ -9,13 +9,13 @@ import Link from 'next/link';
 
 import { ProjectFocusView } from './ProjectFocusView';
 
-const Card = ({ children, className = '', onClick }: any) => (
+const Card = ({ children, className = "", onClick }: { children?: React.ReactNode; className?: string; onClick?: () => void }) => (
   <div onClick={onClick} className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-5 relative cursor-pointer ${className}`}>
     {children}
   </div>
 );
 
-const Badge = ({ children, colorClass }: any) => (
+const Badge = ({ children, colorClass }: { children?: React.ReactNode; colorClass?: string }) => (
   <span className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-md ${colorClass}`}>
     {children}
   </span>
@@ -161,7 +161,7 @@ export const ProjectsView = ({ activeWorkspace = 'business' }: { activeWorkspace
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {projects.filter(p => !searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase()))).map((proj) => (
+        {projects.filter(p => !p.name.includes('(Archived)') && (!searchQuery || p.name.toLowerCase().includes(searchQuery.toLowerCase()) || (p.description && p.description.toLowerCase().includes(searchQuery.toLowerCase())))).map((proj) => (
           <Card 
             key={proj.id} 
             onClick={() => setSelectedProjectId(proj.id)}
@@ -180,7 +180,9 @@ export const ProjectsView = ({ activeWorkspace = 'business' }: { activeWorkspace
                   <h3 className="text-xl font-bold text-white truncate">{proj.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge colorClass="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">{proj.status || 'IDEA'}</Badge>
-                    <Badge colorClass={`${proj.priority === 'HIGH' || proj.priority === 'CRITICAL' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-zinc-800 text-zinc-400 border border-zinc-700'}`}>{proj.priority || 'MEDIUM'}</Badge>
+                    <Badge colorClass={`${proj.priority === 'HIGH' || proj.priority === 'CRITICAL' || proj.priority === 'high' || proj.priority === 'mission_critical' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-zinc-800 text-zinc-400 border border-zinc-700'}`}>
+                      {proj.priority === 'mission_critical' ? 'CRITICAL' : proj.priority || 'MEDIUM'}
+                    </Badge>
                   </div>
                 </div>
               </div>

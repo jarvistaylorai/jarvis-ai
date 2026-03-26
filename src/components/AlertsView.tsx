@@ -1,14 +1,15 @@
 import React from 'react';
 import { Bell, AlertOctagon, AlertTriangle, Info, CheckCircle } from 'lucide-react';
 import { useAlerts } from '@/hooks/useMissionControl';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
-const Card = ({ children, className = '' }: any) => (
+const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>
     {children}
   </div>
 );
 
-export const AlertsView = ({ alerts: _a, activeWorkspace = 'business' }: { alerts?: any[], activeWorkspace?: string }) => {
+export const AlertsView = ({ alerts: _a, activeWorkspace = 'business' }: { alerts?: unknown[], activeWorkspace?: string }) => {
   const { data: alertsData, isLoading } = useAlerts(activeWorkspace);
   const alerts = alertsData?.data || _a || [];
 
@@ -32,7 +33,7 @@ export const AlertsView = ({ alerts: _a, activeWorkspace = 'business' }: { alert
             <CheckCircle size={32} className="text-emerald-500 mb-4 opacity-50" />
             <p className="text-sm text-zinc-400">System operating nominally. No active alerts.</p>
           </div>
-        ) : alerts.map((alert: any) => {
+        ) : alerts.map((alert: Alert) => {
           const isCritical = alert.severity === 'critical';
           const Icon = isCritical ? AlertOctagon : (alert.severity === 'warning' ? AlertTriangle : Info);
           const colorClass = isCritical ? 'text-rose-400 bg-rose-500/10 border-rose-500/20' : 

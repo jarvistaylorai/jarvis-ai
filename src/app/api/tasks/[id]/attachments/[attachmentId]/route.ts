@@ -30,7 +30,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [DELETE /api/tasks/[id]/attachments/[attachmentId]]:', error);
     return NextResponse.json({ error: error.message || 'Failed to delete attachment' }, { status: 500 });
   }

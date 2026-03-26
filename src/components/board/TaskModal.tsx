@@ -1,3 +1,4 @@
+import Image from 'next/image';
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -14,6 +15,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@/types/contracts';
 
 function SortableLabel({ label, taskLabelIds, onToggle, onClickExternal }: { label: Label, taskLabelIds: Set<string>, onToggle: (l: Label) => void, onClickExternal: (e: React.MouseEvent) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: label.id });
@@ -41,6 +43,7 @@ interface TaskModalProps {
   task: Task;
   onClose: () => void;
   onUpdateTask: (updates: Partial<Task>) => void;
+  onDeleteTask?: (id: string) => void;
   projectLabels: Label[];
   onLabelsChange: React.Dispatch<React.SetStateAction<Label[]>>;
   listName?: string;
@@ -49,12 +52,24 @@ interface TaskModalProps {
 
 type PopoverType = null | 'add' | 'labels' | 'dates' | 'checklist' | 'members' | 'more' | 'attachment' | 'objective' | 'project';
 
-export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLabels,
+export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTask, projectLabels,
   onLabelsChange,
   listName,
   activeWorkspace = 'business'
 }: TaskModalProps) {
   const [task, setTask] = useState<Task>(initialTask);
+  const [localLabels, setLocalLabels] = useState<Label[]>(projectLabels);
+  
+  useEffect(() => {
+     const fetchScopedLabels = async () => {
+        const pid = task.project_id || 'global';
+        try {
+           const res = await fetch(`/api/labels?project_id=${pid}&workspace=${activeWorkspace}`);
+           if (res.ok) setLocalLabels(await res.json());
+        } catch (e) {}
+     };
+     fetchScopedLabels();
+  }, [task.project_id, activeWorkspace]);
 
   const handleLocalUpdateTask = (updates: Partial<Task>) => {
     setTask((prev: Task) => ({ ...prev, ...updates }));
@@ -184,11 +199,23 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
       const res = await fetch(`/api/tasks/${task.id}/attachments/${deletingAttachmentId}`, { method: 'DELETE' });
       if (res.ok) {
         handleLocalUpdateTask({
-          attachments: task.attachments?.filter((a: any) => a.id !== deletingAttachmentId)
+          attachments: task.attachments?.filter((a: Agent) => a.id !== deletingAttachmentId)
         });
       }
       setDeletingAttachmentId(null);
     } catch (err) { console.error(err); }
+  };
+
+  const handleDeleteTask = async () => {
+    try {
+      const res = await fetch(`/api/tasks/${task.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        if (onDeleteTask) onDeleteTask(task.id);
+        onClose();
+      }
+    } catch (err) {
+      console.error('Failed to delete task:', err);
+    }
   };
 
   const handleDeleteComment = async (commentId: string) => {
@@ -300,6 +327,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
       });
       if (res.ok) {
         const newLabel = await res.json();
+        setLocalLabels((prev) => [...prev, newLabel]);
         onLabelsChange?.([...projectLabels, newLabel]);
         setNewLabelName('');
         setNewLabelColor('#4ade80');
@@ -336,7 +364,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
       let phaseObj = undefined;
       if (phaseId) {
         for (const obj of objectives) {
-          const p = (obj.phases || []).find((ph: any) => ph.id === phaseId);
+          const p = (obj.phases || []).find((ph: Record<string, any>) => ph.id === phaseId);
           if (p) {
             phaseObj = { id: p.id, title: p.title, objective: { id: obj.id, title: obj.title } };
             break;
@@ -410,10 +438,11 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
   const handleDragEndLabels = async (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const oldIndex = projectLabels.findIndex(l => l.id === active.id);
-      const newIndex = projectLabels.findIndex(l => l.id === over.id);
+      const oldIndex = localLabels.findIndex(l => l.id === active.id);
+      const newIndex = localLabels.findIndex(l => l.id === over.id);
       
-      const newOrder = arrayMove(projectLabels, oldIndex, newIndex);
+      const newOrder = arrayMove(localLabels, oldIndex, newIndex);
+      setLocalLabels(newOrder);
       onLabelsChange?.(newOrder);
 
       try {
@@ -426,7 +455,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
     }
   };
 
-  const filteredLabels = projectLabels.filter(l => l.name.toLowerCase().includes(labelSearch.toLowerCase()));
+  const filteredLabels = localLabels.filter(l => l.name.toLowerCase().includes(labelSearch.toLowerCase()));
   const taskLabelIds = new Set((task.labels || []).map(tl => tl.label.id));
 
   // Board members
@@ -629,7 +658,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndLabels}>
                             <SortableContext items={filteredLabels.map(l => l.id)} strategy={verticalListSortingStrategy}>
                               {filteredLabels.map(label => (
-                                <SortableLabel key={label.id} label={label} taskLabelIds={taskLabelIds} onToggle={handleToggleLabel} onClickExternal={(e: any) => { e.stopPropagation() }} />
+                                <SortableLabel key={label.id} label={label} taskLabelIds={taskLabelIds} onToggle={handleToggleLabel} onClickExternal={(e: Record<string, any>) => { e.stopPropagation() }} />
                               ))}
                             </SortableContext>
                           </DndContext>
@@ -894,7 +923,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
 
                     {!selectedObjectiveId ? (
                       /* Objective list */
-                      objectives.length > 0 ? objectives.map((obj: any) => (
+                      objectives.length > 0 ? objectives.map((obj: Objective) => (
                         <button key={obj.id} onClick={() => setSelectedObjectiveId(obj.id)}
                           className="w-full flex items-start gap-3 px-3 py-3 rounded-lg hover:bg-white/[0.04] transition-colors text-left group mb-1">
                           <Target size={16} className="text-amber-400 shrink-0 mt-0.5" />
@@ -918,9 +947,9 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                     ) : (
                       /* Phase list for selected objective */
                       (() => {
-                        const obj = objectives.find((o: any) => o.id === selectedObjectiveId);
+                        const obj = objectives.find((o: Objective) => o.id === selectedObjectiveId);
                         const phases = obj?.phases || [];
-                        return phases.length > 0 ? phases.map((phase: any) => (
+                        return phases.length > 0 ? phases.map((phase: Record<string, unknown>) => (
                           <button key={phase.id} onClick={() => handleAssignPhase(phase.id)}
                             className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors text-left mb-1 ${
                               (task.metadata as any)?.phase_id || (task as any).phase_id === phase.id
@@ -1034,7 +1063,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                 let phaseName = '';
                 let objTitle = '';
                 for (const obj of objectives) {
-                  const p = (obj.phases || []).find((ph: any) => ph.id === ((task.metadata as any)?.phase_id || (task as any).phase_id));
+                  const p = (obj.phases || []).find((ph: Record<string, any>) => ph.id === ((task.metadata as any)?.phase_id || (task as any).phase_id));
                   if (p) { phaseName = p.title; objTitle = obj.title; break; }
                 }
                 return phaseName ? (
@@ -1150,7 +1179,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                 <div className="">
                   <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Files</p>
                   <div className="space-y-3">
-                    {task.attachments.map((att: any) => {
+                    {task.attachments.map((att: Record<string, any>) => {
                       const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(att.file_name);
                       const fileUrl = `/api/fs/raw?storagePath=${encodeURIComponent(att.file_path)}`;
 
@@ -1158,7 +1187,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                       <div key={att.id} className="flex flex-col gap-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] transition-colors group">
                         {isImage && (
                           <div className="w-auto h-40 rounded-lg bg-zinc-900 border border-white/[0.06] flex items-center justify-center overflow-hidden mb-1 cursor-pointer shrink-0" onClick={() => window.open(fileUrl, '_blank')}>
-                            <img src={fileUrl} alt={att.file_name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                            <Image src={fileUrl} alt={att.file_name} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" fill unoptimized />
                           </div>
                         )}
                         <div className="flex items-center gap-4">
@@ -1210,7 +1239,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
                        </div>
                     </div>
                     <div className="space-y-1">
-                      {cl.items.filter((i: any) => !(hiddenChecklists[cl.id] && i.is_completed)).map((item: any) => (
+                      {cl.items.filter((i: Record<string, any>) => !(hiddenChecklists[cl.id] && i.is_completed)).map((item: Record<string, any>) => (
                         <div key={item.id} className="flex items-start gap-3 hover:bg-white/[0.02] p-2.5 -ml-2.5 rounded-lg group transition-colors cursor-pointer" onClick={() => handleToggleChecklistItem(cl.id, item.id, !item.is_completed)}>
                           <div className="mt-0.5 relative flex items-center justify-center w-5 h-5 shrink-0">
                              <input type="checkbox" checked={item.is_completed}
@@ -1275,7 +1304,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar">
-              {[...(task.comments || [])].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((c: any) => (
+              {[...(task.comments || [])].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((c: Task) => (
                 <div key={c.id} className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-xs font-bold text-white shrink-0">
                     {c.author.substring(0, 2).toUpperCase()}
@@ -1328,7 +1357,9 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask,  projectLa
             </div>
 
             <div className="p-4 border-t border-white/[0.04]">
-              <button className="w-full flex items-center justify-center gap-2 text-sm text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 hover:border-rose-500/20 px-4 py-2.5 rounded-xl transition-all font-medium">
+              <button 
+                onClick={handleDeleteTask}
+                className="w-full flex items-center justify-center gap-2 text-sm text-rose-400 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 hover:border-rose-500/20 px-4 py-2.5 rounded-xl transition-all font-medium focus:outline-none focus:ring-0">
                 <Trash2 size={14} /> Delete Task
               </button>
             </div>

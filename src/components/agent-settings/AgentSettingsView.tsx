@@ -8,8 +8,9 @@ import { ModelRoutingRules } from './ModelRoutingRules';
 import { ActiveSessions } from './ActiveSessions';
 import { ProviderSettings } from './ProviderSettings';
 import { CostControls } from './CostControls';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
-export const AgentSettingsView = ({ agents = [], activeWorkspace = 'business' }: { agents?: any[], activeWorkspace?: string }) => {
+export const AgentSettingsView = ({ agents = [], activeWorkspace = 'business' }: { agents?: unknown[], activeWorkspace?: string }) => {
   const [models, setModels] = useState<any[]>([]);
   const [usageStats, setUsageStats] = useState<any>(null);
   const [routingRules, setRoutingRules] = useState<any[]>([]);
@@ -25,16 +26,24 @@ export const AgentSettingsView = ({ agents = [], activeWorkspace = 'business' }:
         fetch('/api/models/providers'),
         fetch('/api/agents/configs')
       ]);
-      setModels(await modRes.json());
+      const mdls = await modRes.json();
+      setModels(Array.isArray(mdls) ? mdls : []);
+      
       setUsageStats(await usgRes.json());
-      setRoutingRules(await routRes.json());
-      setProviders(await provRes.json());
-      setAgentConfigs(await confRes.json());
+      
+      const rRules = await routRes.json();
+      setRoutingRules(Array.isArray(rRules) ? rRules : []);
+      
+      const provs = await provRes.json();
+      setProviders(Array.isArray(provs) ? provs : []);
+      
+      const cfgs = await confRes.json();
+      setAgentConfigs(Array.isArray(cfgs) ? cfgs : []);
     } catch(e) {}
   };
 
   useEffect(() => {
-    refreshData();
+    Promise.resolve().then(() => refreshData());
     const interval = setInterval(refreshData, 10000);
     return () => clearInterval(interval);
   }, []);

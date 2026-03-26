@@ -85,10 +85,12 @@ export function ModelSelector({
       preferredModel: currentModel,
     });
 
-    setRecommendedModel(route.model);
-    setRouteInfo({
-      reason: route.reason,
-      canHandle: route.canHandle,
+    Promise.resolve().then(() => {
+      setRecommendedModel(route.model);
+      setRouteInfo({
+        reason: route.reason,
+        canHandle: route.canHandle,
+      });
     });
 
     // If auto-routing and model changed, notify parent

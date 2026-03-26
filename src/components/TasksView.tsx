@@ -5,9 +5,12 @@ import { Board } from '@/components/board/Board';
 import { TaskModal } from '@/components/board/TaskModal';
 import { ListData, Task, Label } from '@/components/board/types';
 import { CheckSquare, Plus, Filter, ChevronDown, Check } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTasks, useProjects } from '@/hooks/useMissionControl';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
-export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWorkspace = 'business' }: { tasks?: any[], projects?: any[], globalLists?: any[], activeWorkspace?: string }) => {
+export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWorkspace = 'business' }: { tasks?: unknown[], projects?: unknown[], globalLists?: unknown[], activeWorkspace?: string }) => {
+  const queryClient = useQueryClient();
   const { data: tasksData, isLoading: tasksLoading } = useTasks(activeWorkspace);
   const { data: projectsData } = useProjects(activeWorkspace);
   const tasks = tasksData?.data || _t || [];
@@ -17,6 +20,22 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [labels, setLabels] = useState<Label[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleHash = () => {
+      const hash = window.location.hash;
+      if (hash.includes('projectId=')) {
+        const params = new URLSearchParams(hash.split('?')[1]);
+        const pid = params.get('projectId');
+        if (pid && pid !== projectIdFilter) {
+          setProjectIdFilter(pid);
+        }
+      }
+    };
+    handleHash();
+    window.addEventListener('hashchange', handleHash);
+    return () => window.removeEventListener('hashchange', handleHash);
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -41,21 +60,15 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
   }, [projectIdFilter]);
 
   const filteredTasks = useMemo(() => {
-    return tasks.filter((task: any) => {
+    return tasks.filter((task: Task) => {
       if (projectIdFilter !== 'all' && task.project_id !== projectIdFilter) return false;
       return true;
-    }).map((task: any) => {
-      if (projectIdFilter === 'all') {
-        if (task.project_id) {
-          const proj = projects.find((p: any) => p.id === task.project_id);
-          if (proj) return { ...task, project: { id: proj.id, name: proj.name } };
-        }
-        return task;
+    }).map((task: Task) => {
+      if (task.project_id) {
+        const proj = projects.find((p: Project) => p.id === task.project_id);
+        if (proj) return { ...task, project: { id: proj.id, name: proj.name } };
       }
-      // If we are filtering by a specific project, strip out the project object
-      // so the TaskCards don't redundantly display the project badge.
-      const { project, ...rest } = task;
-      return rest;
+      return task;
     });
   }, [tasks, projectIdFilter, projects]);
 
@@ -69,9 +82,9 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
 
   const boardLists: ListData[] = useMemo(() => {
     const lists = globalLists && globalLists.length > 0 ? globalLists : DEFAULT_BOARD_COLUMNS;
-    return lists.map((gl: any) => ({
+    return lists.map((gl: Record<string, any>) => ({
       ...gl,
-      tasks: filteredTasks.filter((t: any) => t.status === gl.id || t.status === gl.id.replace('_', '-')).sort((a: any, b: any) => (a.position||0) - (b.position||0))
+      tasks: filteredTasks.filter((t: Task) => t.status === gl.id || t.status === gl.id.replace('_', '-')).sort((a: any, b: any) => (a.position||0) - (b.position||0))
     }));
   }, [globalLists, filteredTasks]);
 
@@ -84,7 +97,7 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-      filteredTasks.forEach((t: any) => {
+      filteredTasks.forEach((t: Task) => {
         if (t.status === 'in_progress' || t.status === 'in-progress' || t.status === 'under_review') inProgress++;
         if (t.status === 'completed' || t.status === 'done') completed++;
         if (new Date(t.created_at) > oneWeekAgo) thisWeek++;
@@ -97,7 +110,7 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
 
   const activeProjectName = projectIdFilter === 'all' 
     ? 'All Projects' 
-    : projects.find((p: any) => p.id === projectIdFilter)?.name || 'Unknown';
+    : projects.find((p: Project) => p.id === projectIdFilter)?.name || 'Unknown';
 
   const handleTaskClick = (task: Task) => {
     setSelectedTask(task);
@@ -105,7 +118,24 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
 
   const handleUpdateTask = (updates: Partial<Task>) => {
     if (selectedTask) {
-      setSelectedTask({ ...selectedTask, ...updates });
+      const updatedTask = { ...selectedTask, ...updates };
+      setSelectedTask(updatedTask);
+      
+      queryClient.setQueryData(['tasks', activeWorkspace], (old: Record<string, unknown>) => {
+        if (!old || !old.data) return old;
+        const tasks = [...old.data];
+        const idx = tasks.findIndex((t: Task) => t.id === updatedTask.id);
+        if (idx >= 0) tasks[idx] = updatedTask;
+        return { ...old, data: tasks };
+      });
+
+      queryClient.setQueryData(['dashboard', activeWorkspace], (old: Record<string, unknown>) => {
+        if (!old || !old.tasks) return old;
+        const tasks = [...old.tasks];
+        const idx = tasks.findIndex((t: Task) => t.id === updatedTask.id);
+        if (idx >= 0) tasks[idx] = updatedTask;
+        return { ...old, tasks };
+      });
     }
   };
 
@@ -222,9 +252,10 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
           activeWorkspace={activeWorkspace}
           onClose={() => setSelectedTask(null)}
           onUpdateTask={handleUpdateTask}
+          onDeleteTask={() => setSelectedTask(null)}
           projectLabels={labels}
           onLabelsChange={setLabels}
-          listName={DEFAULT_BOARD_COLUMNS.find((l: any) => l.id === selectedTask.status || l.id === selectedTask.status?.replace('_', '-'))?.name || 'Unknown'}
+          listName={DEFAULT_BOARD_COLUMNS.find((l: Record<string, unknown>) => l.id === selectedTask.status || l.id === selectedTask.status?.replace('_', '-'))?.name || 'Unknown'}
         />
       )}
     </div>

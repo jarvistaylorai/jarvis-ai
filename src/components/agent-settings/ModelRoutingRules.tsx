@@ -1,7 +1,7 @@
 import React from 'react';
 import { GitBranch, Plus } from 'lucide-react';
 
-export const ModelRoutingRules = ({ rules, models, onUpdate }: { rules: any[], models: any[], onUpdate: () => void }) => {
+export const ModelRoutingRules = ({ rules, models, onUpdate }: { rules: unknown[], models: unknown[], onUpdate: () => void }) => {
   return (
     <div className="bg-[#0f0f12] border border-white/[0.05] rounded-2xl p-6 shadow-2xl relative">
       <div className="flex justify-between items-center mb-6">

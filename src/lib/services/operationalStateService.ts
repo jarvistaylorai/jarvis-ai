@@ -10,16 +10,16 @@ const prisma = new PrismaClient();
 export interface OperationalState {
   workspaceId: string;
   systemHealth: 'healthy' | 'degraded' | 'critical';
-  activeTasks: any[];
-  blockedTasks: any[];
-  pendingApprovals: any[];
+  activeTasks: unknown[];
+  blockedTasks: unknown[];
+  pendingApprovals: unknown[];
   currentContextTokens: number;
   contextPressureLevel: 'low' | 'medium' | 'high' | 'critical';
   currentModel: string;
   dailySpendUsd: number;
   monthlySpendUsd: number;
   activeAlertsCount: number;
-  criticalAlerts: any[];
+  criticalAlerts: unknown[];
   lastHeartbeatAt: Date;
 }
 
@@ -217,7 +217,7 @@ export class OperationalStateService {
     const state = await this.getState(workspaceId);
     
     await this.updateState(workspaceId, {
-      blockedTasks: state.blockedTasks.filter((b: any) => b.taskId !== taskId),
+      blockedTasks: state.blockedTasks.filter((b: Task) => b.taskId !== taskId),
     });
   }
   

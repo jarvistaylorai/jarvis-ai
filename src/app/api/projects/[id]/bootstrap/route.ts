@@ -97,7 +97,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
     await prisma.$transaction(mutations);
 
     return NextResponse.json({ success: true, tasksCreated: taskTitles.length });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(`API Error [POST /api/projects/:id/bootstrap]:`, error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

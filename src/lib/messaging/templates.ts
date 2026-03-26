@@ -284,7 +284,7 @@ export const render = {
  */
 export const TEMPLATE_REGISTRY: Record<
   string,
-  { templateId: TemplateId; condition?: (context: Record<string, unknown>) => boolean }>
+  { templateId: TemplateId; condition?: (context: Record<string, unknown>) => boolean }
 > = {
   task_start: { templateId: 'task_started' },
   task_queue: { templateId: 'task_queued' },

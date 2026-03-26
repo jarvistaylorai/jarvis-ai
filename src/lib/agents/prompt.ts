@@ -1,4 +1,5 @@
-export function buildSystemPrompt(agent: any, state: any) {
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
+export function buildSystemPrompt(agent: Agent, state: unknown) {
   return `
 You are ${agent.name}, an autonomous AI agent (Role: ${agent.role || "Operator"}).
 

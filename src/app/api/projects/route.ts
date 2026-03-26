@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       data: result.data,
       next_cursor: result.next_cursor
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [GET /api/projects]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -6,7 +6,7 @@ import { FileEditorModal } from './FileEditorModal';
 import { UploadFilesModal } from './UploadFilesModal';
 import { ConfirmDeleteModal } from './ConfirmDeleteModal';
 
-const Card = ({ children, className = '' }: any) => (
+const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>
     {children}
   </div>
@@ -34,7 +34,7 @@ function formatDate(isoStr: string) {
   return `${days}d ago`;
 }
 
-export const FilesystemView = ({ activeWorkspace = 'business' }: any) => {
+export const FilesystemView = ({ activeWorkspace = \'business\' }: { activeWorkspace?: string }) => {
   const [currentPath, setCurrentPath] = useState('/');
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,14 +66,14 @@ export const FilesystemView = ({ activeWorkspace = 'business' }: any) => {
 
   useEffect(() => {
     fetchItems(currentPath);
-  }, [currentPath, activeWorkspace]);
+  }, [currentPath, activeWorkspace, fetchItems]);
 
   const handleSync = () => {
     setSyncing(true);
     fetchItems(currentPath);
   };
 
-  const handleItemClick = (item: any) => {
+  const handleItemClick = (item: Record<string, any>) => {
     if (item.type === 'folder') {
       setCurrentPath(item.path);
     } else {

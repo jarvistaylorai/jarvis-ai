@@ -6,14 +6,15 @@ import {
   CheckCircle, Circle, Clock, Layers, Edit3, GripVertical, X, ExternalLink
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@/types/contracts';
 
-const Card = ({ children, className = '' }: any) => (
+const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-5 ${className}`}>
     {children}
   </div>
 );
 
-const Badge = ({ children, colorClass }: any) => (
+const Badge = ({ children, colorClass }: { children?: React.ReactNode; colorClass?: string }) => (
   <span className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-lg ${colorClass}`}>
     {children}
   </span>
@@ -23,6 +24,9 @@ const priorityColors: Record<string, string> = {
   HIGH: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
   MEDIUM: 'bg-amber-500/10 text-amber-500 border border-amber-500/20',
   LOW: 'bg-zinc-800 text-zinc-400 border border-zinc-700',
+  high: 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
+  medium: 'bg-amber-500/10 text-amber-500 border border-amber-500/20',
+  low: 'bg-zinc-800 text-zinc-400 border border-zinc-700',
 };
 
 const statusColors: Record<string, string> = {
@@ -39,7 +43,7 @@ const phaseStatusColors: Record<string, string> = {
 
 interface ObjectiveDetailViewProps {
   objectiveId: string;
-  projects: any[];
+  projects: Project[];
   onBack: () => void;
 }
 
@@ -103,13 +107,21 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
       setEditingPhaseId(null);
       return;
     }
+    // Optimistic update
+    setObjective((prev: Record<string, unknown>) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        phases: prev.phases?.map((p: Project) => p.id === phaseId ? { ...p, title: editingTitle.trim() } : p)
+      };
+    });
+    setEditingPhaseId(null);
     try {
       await fetch(`/api/phases/${phaseId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: editingTitle.trim() })
       });
-      setEditingPhaseId(null);
       await fetchObjective();
     } catch (err) { console.error(err); }
   };
@@ -146,13 +158,24 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
       setEditingTaskId(null);
       return;
     }
+    // Optimistic update
+    setObjective((prev: Record<string, unknown>) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        phases: prev.phases?.map((p: Project) => ({
+          ...p,
+          tasks: p.tasks?.map((t: Task) => t.id === taskId ? { ...t, title: editingTaskTitle.trim() } : t)
+        }))
+      };
+    });
+    setEditingTaskId(null);
     try {
       await fetch(`/api/tasks/${taskId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: editingTaskTitle.trim() })
       });
-      setEditingTaskId(null);
       await fetchObjective();
     } catch (err) { console.error(err); }
   };
@@ -163,6 +186,19 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phase_id: null })
+      });
+      await fetchObjective();
+    } catch (err) { console.error(err); }
+  };
+
+  const handlePriorityChange = async (newPriority: string) => {
+    // Optimistic update
+    setObjective((prev: Record<string, unknown>) => ({ ...prev, priority: newPriority }));
+    try {
+      await fetch(`/api/objectives/${objectiveId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priority: newPriority })
       });
       await fetchObjective();
     } catch (err) { console.error(err); }
@@ -200,7 +236,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
   };
 
   const selectedPhase = selectedPhaseId
-    ? objective.phases?.find((p: any) => p.id === selectedPhaseId)
+    ? objective.phases?.find((p: Project) => p.id === selectedPhaseId)
     : null;
 
   return (
@@ -253,24 +289,14 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
       </div>
 
       {/* PROGRESS BAR */}
-      <div className="w-full flex bg-black h-3 rounded-full overflow-hidden border border-white/5 mb-2 shadow-inner gap-[1px]">
-        {objective.phases?.length > 0 ? (
-          objective.phases.map((phase: any, i: number) => (
-            <div
-              key={phase.id || i}
-              style={{ flex: 1 }}
-              className={phase.status === 'COMPLETED' ? "bg-emerald-500" : phase.status === 'IN_PROGRESS' ? "bg-amber-400" : "bg-zinc-800"}
-            />
-          ))
-        ) : (
-          <div
-            className="h-full bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 rounded-full transition-all duration-700 shadow-[0_0_15px_rgba(245,158,11,0.5)]"
-            style={{ width: `${objective.progress}%` }}
-          />
-        )}
+      <div className="w-full bg-black h-3 rounded-full overflow-hidden border border-white/5 mb-2 shadow-inner">
+        <div
+          className={`h-full relative transition-all duration-500 ${objective.progress > 0 ? 'bg-gradient-to-r from-amber-600 via-amber-500 to-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.5)]' : 'bg-transparent'}`}
+          style={{ width: `${objective.progress || 0}%` }}
+        />
       </div>
       <div className="text-xs text-zinc-500 mt-1 mb-10 flex justify-between">
-        <span>{objective.progress}% complete • {objective.phases?.filter((p:any) => p.status==='COMPLETED').length || 0}/{objective.phases?.length || 0} phases</span>
+        <span>{objective.progress}% complete • {objective.phases?.filter((p: Project) => p.status==='COMPLETED').length || 0}/{objective.phases?.length || 0} phases</span>
       </div>
 
       {/* MAIN LAYOUT */}
@@ -312,11 +338,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
                           : 'bg-[#0a0a0b] border-white/[0.04] hover:border-white/[0.08] hover:bg-white/[0.01]'
                     }`}
                     onClick={() => {
-                      if (objective.project?.id) {
-                        router.push(`/projects/${objective.project.id}/board?phase=${phase.id}`);
-                      } else {
-                        setSelectedPhaseId(isSelected ? null : phase.id);
-                      }
+                      setSelectedPhaseId(isSelected ? null : phase.id);
                     }}
                   >
                     <div className="flex items-start gap-4">
@@ -389,7 +411,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
                       <button
                         onClick={() => {
                           if (objective.project?.id) {
-                            router.push(`/projects/${objective.project.id}/board?phase=${phase.id}`);
+                            window.location.hash = `tasks?projectId=${objective.project.id}&phaseId=${phase.id}`;
                           } else {
                             setSelectedPhaseId(phase.id);
                           }
@@ -399,7 +421,13 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
                         ▶ Open Tasks
                       </button>
                       <button
-                        onClick={() => setAssigningTaskPhaseId(phase.id)}
+                        onClick={() => {
+                          if (objective.project?.id) {
+                            window.location.hash = `tasks?projectId=${objective.project.id}&phaseId=${phase.id}`;
+                          } else {
+                            setAssigningTaskPhaseId(phase.id);
+                          }
+                        }}
                         className="px-3 py-1.5 bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 rounded-md text-xs font-medium text-zinc-300 transition-colors flex items-center gap-2"
                       >
                         <Plus size={12} /> Add Task
@@ -485,7 +513,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
 
               {selectedPhase.tasks && selectedPhase.tasks.length > 0 ? (
                 <div className="flex flex-col gap-2">
-                  {selectedPhase.tasks.map((task: any) => (
+                  {selectedPhase.tasks.map((task: Task) => (
                     <div
                       key={task.id}
                       className="flex items-center gap-3 p-3 rounded-xl bg-[#0a0a0b] border border-white/[0.04] hover:border-white/[0.08] transition-colors group"
@@ -583,7 +611,15 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
 
               <div>
                 <div className="text-[9px] uppercase tracking-widest text-zinc-600 font-bold mb-1">Priority</div>
-                <Badge colorClass={priorityColors[objective.priority] || priorityColors.MEDIUM}>{objective.priority}</Badge>
+                <select
+                  value={objective.priority?.toUpperCase() || 'MEDIUM'}
+                  onChange={(e) => handlePriorityChange(e.target.value.toLowerCase())}
+                  className={`px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded-lg appearance-none cursor-pointer focus:outline-none ${priorityColors[objective.priority] || priorityColors.MEDIUM}`}
+                >
+                  <option value="LOW" className="bg-zinc-900 text-zinc-400 font-bold">LOW</option>
+                  <option value="MEDIUM" className="bg-zinc-900 text-amber-500 font-bold">MEDIUM</option>
+                  <option value="HIGH" className="bg-zinc-900 text-rose-400 font-bold">HIGH</option>
+                </select>
               </div>
 
               <div>

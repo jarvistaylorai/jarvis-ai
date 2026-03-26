@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, AlertCircle, Clock, Loader2 } from "lucide-react";
 
-export function TodayView({ routines, onClickRoutine }: any) {
+export function TodayView({ routines, onClickRoutine }: { routines: unknown[], onClickRoutine: any }) {
   const [executions, setExecutions] = useState<any[]>([]);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function TodayView({ routines, onClickRoutine }: any) {
         <h2 className="text-lg font-medium text-white mb-6">Today's Timeline</h2>
         <div className="relative pl-6 border-l border-neutral-800 space-y-8">
           
-          {routines.filter((r: any) => r.last_run_at).sort((a: any, b: any) => new Date(b.last_run_at).getTime() - new Date(a.last_run_at).getTime()).map((r: any) => (
+          {routines.filter((r: Record<string, any>) => r.last_run_at).sort((a: any, b: any) => new Date(b.last_run_at).getTime() - new Date(a.last_run_at).getTime()).map((r: Record<string, any>) => (
             <div key={r.id} className="relative group cursor-pointer" onClick={() => onClickRoutine(r)}>
               <div className={`absolute -left-[33px] top-1 w-4 h-4 rounded-full border-4 border-neutral-900 ${r.status === 'failing' ? 'bg-red-500' : 'bg-green-500'} group-hover:scale-125 transition-transform`} />
               

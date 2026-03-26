@@ -3,7 +3,7 @@
  * Phase 2: Production-grade context management with 7-layer system
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, type agents } from '@prisma/client';
 import { 
   checkBudget, 
   enforceBudget, 
@@ -13,6 +13,26 @@ import {
 } from '@/lib/context/budgetEnforcer';
 import { computePromptFingerprints, type FingerprintLayer } from '@/lib/context/promptFingerprint';
 import { contextCache } from '@/lib/context/contextCache';
+import { memoryService } from '@/lib/services/memoryService';
+
+const MEMORY_KEYWORDS = [
+  'system',
+  'mission',
+  'safety',
+  'principle',
+  'operating',
+  'orchestrator',
+  'platform',
+  'scope',
+  'directive',
+  'policy',
+  'canonical',
+  'memory',
+  'jarvis'
+];
+
+const MAX_CANONICAL_SEGMENTS = 2;
+const MAX_SEGMENT_CHARS = 800;
 
 const prisma = new PrismaClient();
 
@@ -26,6 +46,12 @@ export interface ContextLayer {
   tokens: number;
   fingerprint?: string;
   reused?: boolean;
+}
+
+interface CanonicalMemoryStats {
+  used: boolean;
+  matchCount: number;
+  files: string[];
 }
 
 export interface ContextAssemblyRequest {
@@ -53,6 +79,9 @@ export interface ContextAssemblyResult {
     recommendedModel?: string;
     fingerprints: ReturnType<typeof computePromptFingerprints>;
     reusedLayers: string[];
+    canonicalMemoryUsed: boolean;
+    canonicalMemoryMatches: number;
+    canonicalMemoryFiles: string[];
   };
 }
 
@@ -76,12 +105,15 @@ export class ContextAssemblyService {
   async assemble(request: ContextAssemblyRequest): Promise<ContextAssemblyResult> {
     const modelBudget = MODEL_BUDGETS[request.model] || MODEL_BUDGETS['kimi-k2.5'];
     
+    const agentRecord = await prisma.agents.findUnique({ where: { id: request.agentId } });
+    const memoryLayer = await this.buildLayer3(request, agentRecord);
+
     // Build all layers
     const layers: ContextLayer[] = [
-      await this.buildLayer0(request),
+      await this.buildLayer0(request, agentRecord),
       await this.buildLayer1(request),
       await this.buildLayer2(request),
-      await this.buildLayer3(request),
+      memoryLayer.layer,
       await this.buildLayer4(request),
       await this.buildLayer5(request),
       await this.buildLayer6(request),
@@ -118,6 +150,10 @@ export class ContextAssemblyService {
         reusedLayers.push(layer.name);
       }
     }
+
+    const canonicalLayerIncluded = finalLayers.some(
+      (layer) => layer.name === 'memory' && layer.content.trim().length > 0
+    );
     
     // Final budget check
     const budgetStatus = checkBudget(assembledPrompt, request.model);
@@ -138,6 +174,9 @@ export class ContextAssemblyService {
           : undefined,
         fingerprints,
         reusedLayers,
+        canonicalMemoryUsed: canonicalLayerIncluded && memoryLayer.stats.used,
+        canonicalMemoryMatches: canonicalLayerIncluded ? memoryLayer.stats.matchCount : 0,
+        canonicalMemoryFiles: canonicalLayerIncluded ? memoryLayer.stats.files : [],
       },
     };
   }
@@ -147,12 +186,18 @@ export class ContextAssemblyService {
    * Identity, capabilities, safety rules
    * NEVER excluded
    */
-  private async buildLayer0(request: ContextAssemblyRequest): Promise<ContextLayer> {
-    // TODO: Load from database instead of file
-    const content = `You are ${request.agentId}, an AI assistant. 
-Be helpful, concise, and accurate. 
-Follow safety guidelines. 
-Use tools when appropriate.`;
+  private async buildLayer0(request: ContextAssemblyRequest, agent?: agents | null): Promise<ContextLayer> {
+    const agentName = agent?.name || request.agentId;
+    const handle = agent?.handle ? ` (${agent.handle})` : '';
+    const roleLine = agent?.role ? `Role: ${agent.role}` : 'Role: Autonomous operator';
+    const capabilities = Array.isArray(agent?.capability_tags) && agent.capability_tags.length > 0
+      ? `Capabilities: ${agent.capability_tags.join(', ')}`
+      : 'Capabilities: mission control, orchestration, execution';
+
+    const content = `You are ${agentName}${handle}.
+${roleLine}.
+${capabilities}.
+Obey safety rails, respect mission constraints, and only take actions you can justify.`;
     
     return {
       name: 'system',
@@ -226,17 +271,65 @@ Use tools when appropriate.`;
    * Layer 3: Retrieved Memory
    * Relevant project/task memory from semantic search
    */
-  private async buildLayer3(request: ContextAssemblyRequest): Promise<ContextLayer> {
-    // TODO: Implement semantic retrieval
-    // For now, return empty (will be populated in Phase 3)
-    
-    return {
+  private async buildLayer3(request: ContextAssemblyRequest, agent?: agents | null): Promise<{ layer: ContextLayer; stats: CanonicalMemoryStats }> {
+    const stats: CanonicalMemoryStats = { used: false, matchCount: 0, files: [] };
+    let content = '';
+
+    const includeMemory = this.shouldIncludeCanonicalMemory(request, agent);
+
+    if (includeMemory) {
+      try {
+        const query = request.userMessage?.trim() || 'system directives';
+        const results = await memoryService.retrieve({
+          query,
+          agentId: request.agentId,
+          limit: 3,
+          minScore: 0.1,
+        });
+
+        const prioritized = results.filter((r) => (r.metadata?.file_name || '').toLowerCase() === 'memory.md');
+        const searchPool = prioritized.length > 0 ? prioritized : results;
+        const sections: string[] = [];
+
+        for (const memory of searchPool) {
+          if (sections.length >= MAX_CANONICAL_SEGMENTS) break;
+          const fileName = memory.metadata?.file_name || memory.type || 'memory';
+          const remainingSlots = MAX_CANONICAL_SEGMENTS - sections.length;
+          const snippets = this.extractMemorySections(memory.content, query, remainingSlots);
+          if (snippets.length === 0) continue;
+          stats.files.push(fileName);
+          stats.matchCount += snippets.length;
+          for (const snippet of snippets) {
+            sections.push(`Source: ${fileName}\n${snippet}`);
+            if (sections.length >= MAX_CANONICAL_SEGMENTS) break;
+          }
+        }
+
+        if (sections.length > 0) {
+          stats.used = true;
+          content = sections.slice(0, MAX_CANONICAL_SEGMENTS).join('\n\n---\n\n');
+        }
+      } catch (error) {
+        console.warn('[Context Assembly] Canonical memory retrieval failed', error);
+      }
+    }
+
+    const layer: ContextLayer = {
       name: 'memory',
       priority: 3,
       maxTokens: 2000,
       required: false,
-      content: '',
-      tokens: 0,
+      content,
+      tokens: content ? estimateTokens(content) : 0,
+    };
+
+    return {
+      layer,
+      stats: {
+        used: stats.used,
+        matchCount: stats.used ? stats.matchCount : 0,
+        files: stats.used ? Array.from(new Set(stats.files)) : [],
+      },
     };
   }
   
@@ -374,6 +467,55 @@ Use tools when appropriate.`;
     return parts.join('\n\n');
   }
   
+  private shouldIncludeCanonicalMemory(request: ContextAssemblyRequest, agent?: agents | null): boolean {
+    if (agent?.handle === 'orchestrator' || agent?.handle === 'mission-control') {
+      return true;
+    }
+
+    const recentConversation = (request.conversationHistory || [])
+      .slice(-5)
+      .map((m) => m.content)
+      .join(' ');
+
+    const haystack = `${request.userMessage || ''} ${recentConversation}`.toLowerCase();
+    return MEMORY_KEYWORDS.some((keyword) => haystack.includes(keyword));
+  }
+
+  private extractMemorySections(content: string, query: string, maxSections: number = MAX_CANONICAL_SEGMENTS): string[] {
+    const normalized = content.replace(/\r\n/g, '\n');
+    const sections = normalized.split(/\n(?=## )/g).map((section) => section.trim()).filter(Boolean);
+    const keywords = this.buildKeywordList(query);
+
+    const scored = (sections.length > 0 ? sections : [normalized])
+      .map((section) => {
+        const lower = section.toLowerCase();
+        const score = keywords.reduce((acc, keyword) => acc + (lower.includes(keyword) ? 1 : 0), 0);
+        return { section: section.slice(0, MAX_SEGMENT_CHARS).trim(), score };
+      });
+
+    const positive = scored.filter((entry) => entry.score > 0);
+    const pool = (positive.length > 0 ? positive : scored)
+      .sort((a, b) => {
+        if (b.score === a.score) {
+          return b.section.length - a.section.length;
+        }
+        return b.score - a.score;
+      });
+
+    const limit = Math.max(1, maxSections);
+    return pool.slice(0, limit).map((entry) => entry.section).filter(Boolean);
+  }
+
+  private buildKeywordList(query: string): string[] {
+    const base = (query || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .split(/\s+/)
+      .filter((token) => token.length > 3);
+
+    return Array.from(new Set([...base, ...MEMORY_KEYWORDS]));
+  }
+
   /**
    * Suggest larger model if budget exceeded
    */

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Zap, Play, PowerOff } from 'lucide-react';
 
-const Card = ({ children, className = '' }: any) => (
+const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>
     {children}
   </div>
 );
 
-export const AutomationsView = ({ rules = [], activeWorkspace = 'business' }: { rules?: any[], activeWorkspace?: string }) => {
+export const AutomationsView = ({ rules = [], activeWorkspace = 'business' }: { rules?: unknown[], activeWorkspace?: string }) => {
   return (
     <div className="animate-in fade-in duration-500">
       <div className="flex items-center justify-between mb-8">
@@ -24,7 +24,7 @@ export const AutomationsView = ({ rules = [], activeWorkspace = 'business' }: { 
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {rules && rules.map((rule: any) => (
+        {rules && rules.map((rule: Record<string, unknown>) => (
           <Card key={rule.id} className="p-5 flex items-center gap-6 border-white/[0.02]">
             <div className="shrink-0 p-3 rounded-xl bg-white/[0.03] border border-white/[0.05]">
               {rule.enabled ? (

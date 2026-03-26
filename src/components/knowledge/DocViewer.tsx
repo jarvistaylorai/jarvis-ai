@@ -31,7 +31,7 @@ export function DocViewer({ doc, onEdit }: DocViewerProps) {
           <div className="flex items-center space-x-4 text-sm text-neutral-500">
             <span className="capitalize">{doc.category}</span>
             <span>•</span>
-            <span>Updated {format(new Date(doc.updated_at), 'MMM dd, yyyy')}</span>
+            <span>Updated {format(new Date(doc.lastModified || new Date().toISOString()), 'MMM dd, yyyy')}</span>
           </div>
         </div>
         <button

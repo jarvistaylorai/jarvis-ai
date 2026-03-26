@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, message: 'Moved successfully' });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

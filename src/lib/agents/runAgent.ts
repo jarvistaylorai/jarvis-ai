@@ -7,8 +7,12 @@ import { wrapToolExecution, pruneMessages, quickRoute, estimateTokens, executePa
 import { queueRequest } from "@/lib/ai/requestQueue"
 import { safeModelCall } from "@/lib/ai/safeModelCall"
 import { emitDigest, flushDigests, withDigest } from "@/lib/messaging/digest"
+import type { DigestResult } from "@/lib/messaging/digest"
 import { render as renderTemplate } from "@/lib/messaging/templates"
 import { MessageClass } from "@/lib/messaging/constants"
+import { applyBurstSmoothing } from "@/lib/llm/burstSmoother"
+import { recordDigestSavings } from "@/lib/services/telemetry-service"
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const agentLocks = new Set<string>()
 
@@ -17,11 +21,32 @@ const executeToolCall = wrapToolExecution(originalExecuteToolCall)
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
+async function persistDigestSavings(
+  agent: Agent | null,
+  task: Task | null,
+  digests: DigestResult[]
+) {
+  if (!agent || digests.length === 0) return;
+  for (const digest of digests) {
+    if (!digest.avoidedTokens || digest.avoidedTokens <= 0) continue;
+    await recordDigestSavings({
+      workspaceId: agent.workspace_id || 'business',
+      agentId: agent.id,
+      taskId: task?.id,
+      projectId: task?.project_id,
+      messageClass: digest.messageClass,
+      tokensAvoided: digest.avoidedTokens,
+      entryCount: digest.entryCount,
+      context: digest.context,
+    });
+  }
+}
+
 /**
  * Activity logging with digest aggregation
  * Collapses repetitive status messages into concise updates
  */
-async function logActivity(agent: any, message: any) {
+async function logActivity(agent: Agent, message: any) {
   const state = await getSystemState()
   const timestamp = new Date().toISOString()
 
@@ -92,13 +117,13 @@ async function logActivity(agent: any, message: any) {
     })
   } else if (message.tool_calls) {
     instrumentation.logMessage(agent.id, `Executed ${message.tool_calls.length} tool calls`, agent.current_task_id, {
-      tools: message.tool_calls.map((c: any) => c.function.name),
+      tools: message.tool_calls.map((c: Task) => c.function.name),
       isDigest: true
     })
   }
 }
 
-function getToolDefinitions(agent: any) {
+function getToolDefinitions(agent: Agent) {
   return [
     {
       type: "function",
@@ -211,6 +236,7 @@ export async function runAgent(agentId: string) {
   let lastCompletedId: string | null = null;
   let loopCount = 0;
   let lastDigestFlush = Date.now();
+  let currentAgent: any | null = null;
   
   instrumentation.agentStatus(agentId, "active")
 
@@ -225,12 +251,14 @@ export async function runAgent(agentId: string) {
     loopCount++
     const state = await getSystemState()
 
-    const agent = state.agents?.find((a: any) => a.id === agentId)
+    const agent = state.agents?.find((a: Agent) => a.id === agentId)
+    currentAgent = agent || currentAgent
     // End execution if agent goes inactive or gets deleted
     if (!agent || agent.status !== "active") {
       // Flush any pending digests before exiting
       const digests = flushDigests()
       if (digests.length > 0) {
+        await persistDigestSavings(agent || null, null, digests)
         console.log(`[Agent ${agentId}] Final digests:`, digests.map(d => d.content).join(' | '))
       }
       
@@ -248,11 +276,12 @@ export async function runAgent(agentId: string) {
       break
     }
 
-    const task = state.tasks?.find((t: any) => t.id === agent.current_task_id)
+    const task = state.tasks?.find((t: Task) => t.id === agent.current_task_id)
     if (!task) {
       // Flush digests before stopping
       const digests = flushDigests()
       if (digests.length > 0) {
+        await persistDigestSavings(agent, null, digests)
         console.log(`[Agent ${agentId}] Final digests:`, digests.map(d => d.content).join(' | '))
       }
       
@@ -292,6 +321,7 @@ export async function runAgent(agentId: string) {
     if (Date.now() - lastDigestFlush > 10000) {
       const digests = flushDigests()
       if (digests.length > 0) {
+        await persistDigestSavings(agent, task, digests)
         console.log(`[Agent ${agentId}] Progress:`, digests.map(d => d.content).join(' | '))
       }
       lastDigestFlush = Date.now()
@@ -320,6 +350,8 @@ export async function runAgent(agentId: string) {
       }
 
       agentLocks.add(agent.id)
+
+      await applyBurstSmoothing({ source: 'agent', key: agent.id })
 
       // Wrap execution in digest context
       const result = await withDigest(
@@ -386,7 +418,7 @@ export async function runAgent(agentId: string) {
 
       await logActivity(agent, message)
       
-    } catch (e: any) {
+    } catch (e: unknown) {
       emitDigest(MessageClass.ERROR_RECOVERY, renderTemplate.failed({
         taskId: task.id,
         errorCode: e.name || 'AGENT_ERROR',
@@ -411,6 +443,7 @@ export async function runAgent(agentId: string) {
   // Final flush of any remaining digests
   const finalDigests = flushDigests()
   if (finalDigests.length > 0) {
+    await persistDigestSavings(currentAgent, null, finalDigests)
     console.log(`[Agent ${agentId}] Final summary:`, finalDigests.map(d => d.content).join(' | '))
   }
 }
@@ -424,7 +457,7 @@ export async function runAgentWithDigest(agentId: string): Promise<string[]> {
   
   // Override console.log for this run to capture digests
   const originalLog = console.log
-  console.log = (...args: any[]) => {
+  console.log = (...args: unknown[]) => {
     const message = args.join(' ')
     if (message.includes('[Agent') && message.includes('Progress:')) {
       results.push(message.replace(/.*Progress: /, ''))

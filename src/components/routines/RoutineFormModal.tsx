@@ -12,7 +12,7 @@ export function RoutineFormModal({ onClose, onAdded, activeWorkspace = 'business
   const [cronExpression, setCronExpression] = useState("0 8 * * *");
   const [enabled, setEnabled] = useState(true);
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: Record<string, any>) => {
     e.preventDefault();
     const payload = {
       name,

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import type { Task, Agent, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 type Paginated<T> = { data: T[]; next_cursor?: string };
 
@@ -65,7 +66,7 @@ export function useLiveMissionControl(workspaceId: string) {
     eventSource.addEventListener('snapshot', (e) => {
       try {
         const telemetry = JSON.parse(e.data);
-        queryClient.setQueryData(['dashboard', workspaceId], (old: any) => ({
+        queryClient.setQueryData(['dashboard', workspaceId], (old: Record<string, unknown>) => ({
           ...(old || {}),
           telemetry: telemetry
         }));
@@ -83,10 +84,10 @@ export function useLiveMissionControl(workspaceId: string) {
           else tasks.unshift(task);
           return { ...old, data: tasks };
         });
-        queryClient.setQueryData(['dashboard', workspaceId], (old: any) => {
+        queryClient.setQueryData(['dashboard', workspaceId], (old: Record<string, unknown>) => {
           if (!old) return old;
           const tasks = [...(old.tasks || [])];
-          const idx = tasks.findIndex((t: any) => t.id === task.id);
+          const idx = tasks.findIndex((t: Task) => t.id === task.id);
           if (idx >= 0) tasks[idx] = task;
           else tasks.unshift(task);
           return { ...old, tasks };
@@ -105,10 +106,10 @@ export function useLiveMissionControl(workspaceId: string) {
           else agents.unshift(agent);
           return { ...old, data: agents };
         });
-        queryClient.setQueryData(['dashboard', workspaceId], (old: any) => {
+        queryClient.setQueryData(['dashboard', workspaceId], (old: Record<string, unknown>) => {
           if (!old) return old;
           const agents = [...(old.agents || [])];
-          const idx = agents.findIndex((a: any) => a.id === agent.id);
+          const idx = agents.findIndex((a: Agent) => a.id === agent.id);
           if (idx >= 0) agents[idx] = agent;
           else agents.unshift(agent);
           return { ...old, agents };
@@ -123,7 +124,7 @@ export function useLiveMissionControl(workspaceId: string) {
           if (!old) return old;
           return { ...old, data: [alert, ...old.data] };
         });
-        queryClient.setQueryData(['dashboard', workspaceId], (old: any) => {
+        queryClient.setQueryData(['dashboard', workspaceId], (old: Record<string, unknown>) => {
           if (!old) return old;
           return { ...old, alerts: [alert, ...(old.alerts || [])] };
         });
@@ -133,7 +134,7 @@ export function useLiveMissionControl(workspaceId: string) {
     eventSource.addEventListener('telemetry.created', (e) => {
       try {
         const event = JSON.parse(e.data);
-        queryClient.setQueryData(['dashboard', workspaceId], (old: any) => {
+        queryClient.setQueryData(['dashboard', workspaceId], (old: Record<string, unknown>) => {
           if (!old || !old.telemetry) return old;
           return {
             ...old,
@@ -143,7 +144,7 @@ export function useLiveMissionControl(workspaceId: string) {
             }
           };
         });
-        queryClient.setQueryData(['telemetry', workspaceId], (old: any) => {
+        queryClient.setQueryData(['telemetry', workspaceId], (old: Record<string, unknown>) => {
           if (!old) return old;
           return {
             events: [event, ...(old.events || [])]
@@ -181,7 +182,7 @@ export function useUpdateTask() {
 
 export function useCreateTask() {
   return useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: unknown) => {
       const res = await fetch(`/api/tasks`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

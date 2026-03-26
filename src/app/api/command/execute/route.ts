@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +16,7 @@ export async function POST(req: Request) {
     const cmd = command.toLowerCase();
     let actions_executed: string[] = [];
     let warnings: string[] = [];
-    let mutations: any[] = [];
+    let mutations: unknown[] = [];
 
     const tasks = await prisma.tasks.findMany();
     const agents = await prisma.agents.findMany();
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
       const agentTarget = matchAgent ? matchAgent[1].trim() : 'Jarvis';
       
       let assignedCount = 0;
-      tasks.forEach((t: any) => {
+      tasks.forEach((t: Task) => {
         if ((t.priority === 'high' || t.priority === 'critical') && t.status === 'pending') {
           mutations.push(prisma.tasks.update({ where: { id: t.id }, data: { assigned_agent_id: agentTarget, status: 'in_progress' } }));
           assignedCount++;
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
 
     // Command: "Start <Project Name> sprint" or "Start project"
     else if (cmd.includes('start') && (cmd.includes('sprint') || cmd.includes('project'))) {
-      const targetProj = projects.find((p: any) => cmd.includes(p.name.toLowerCase()));
+      const targetProj = projects.find((p: Project) => cmd.includes(p.name.toLowerCase()));
       if (targetProj) {
         if (targetProj.status !== 'building') {
           mutations.push(prisma.projects.update({ where: { id: targetProj.id }, data: { status: 'building' } }));
@@ -82,13 +83,13 @@ export async function POST(req: Request) {
         let finalStatus = 'pending';
         
         if (defaultProject) {
-           const activeAgents = agents.filter((a: any) => a.status === 'active' || a.status === 'idle');
+           const activeAgents = agents.filter((a: Agent) => a.status === 'active' || a.status === 'idle');
            if (activeAgents.length > 0) {
              // Find least loaded agent (simplistic logic: randomly select, or ideally check who has fewest tasks)
              // We will check tasks allocated to each agent
-             const agentLoads = activeAgents.map((a: any) => ({
+             const agentLoads = activeAgents.map((a: Agent) => ({
                  agent: a,
-                 load: tasks.filter((t: any) => t.assigned_agent === a.name && (t.status === 'pending' || t.status === 'in-progress')).length
+                 load: tasks.filter((t: Task) => t.assigned_agent === a.name && (t.status === 'pending' || t.status === 'in-progress')).length
              }));
              agentLoads.sort((a: any, b: any) => a.load - b.load);
              const leastLoaded = agentLoads[0]?.agent;
@@ -148,7 +149,7 @@ export async function POST(req: Request) {
 
     // Command: "Halt execution" or "Stop all agents"
     else if (cmd.includes('halt') || cmd.includes('stop all')) {
-      agents.forEach((a: any) => {
+      agents.forEach((a: Agent) => {
         if (a.status === 'active') {
           mutations.push(prisma.agents.update({ where: { id: a.id }, data: { status: 'idle', current_task_id: '' } }));
         }
@@ -171,7 +172,7 @@ export async function POST(req: Request) {
       warnings
     });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("API Error [POST /api/command/execute]:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

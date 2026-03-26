@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     stopAgent(agentId)
     return NextResponse.json({ success: true, message: `Agent ${agentId} autonomous loop stopped` })
-  } catch (error: any) {
+  } catch (error: unknown) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getWorkspaceId } from '@/lib/workspace-utils';
 import { v4 as uuidv4 } from 'uuid';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const prisma = new PrismaClient();
 
@@ -23,16 +24,16 @@ export async function POST(request: Request) {
     ]);
 
     let stateMutated = false;
-    const taskUpdates: any[] = [];
-    const alertCreates: any[] = [];
-    const telemetryCreates: any[] = [];
-    const agentUpdates: any[] = [];
+    const taskUpdates: unknown[] = [];
+    const alertCreates: unknown[] = [];
+    const telemetryCreates: unknown[] = [];
+    const agentUpdates: unknown[] = [];
 
     // 2. Alerting & Bottlenecks (Task Dependencies)
-    tasks.forEach((task: any) => {
+    tasks.forEach((task: Task) => {
       if (task.status !== 'completed' && task.dependency_ids && task.dependency_ids.length > 0) {
         const depsCompleted = task.dependency_ids.every(
-          (depId: string) => tasks.find((t: any) => t.id === depId)?.status === 'completed'
+          (depId: string) => tasks.find((t: Task) => t.id === depId)?.status === 'completed'
         );
         const isBlocked = !depsCompleted;
         
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
           taskUpdates.push(prisma.tasks.update({ where: { id: task.id }, data: { status: 'blocked' } }));
           stateMutated = true;
           
-          if (!alerts.find((a: any) => a.message.includes(task.id) && a.status === 'active')) {
+          if (!alerts.find((a: Agent) => a.message.includes(task.id) && a.status === 'active')) {
             alertCreates.push(prisma.alerts.create({
               data: {
                 id: uuidv4(),
@@ -62,11 +63,12 @@ export async function POST(request: Request) {
       }
     });
 
-    // 3. Autonomous Task Routing
-    const availableAgents = agents.filter((a: any) => a.status === 'active' || a.status === 'idle');
+    // 3. Autonomous Task Routing (Disabled as per user request)
+    /*
+    const availableAgents = agents.filter((a: Agent) => a.status === 'active' || a.status === 'idle');
     if (availableAgents.length > 0) {
       let agentIndex = 0;
-      tasks.forEach((task: any) => {
+      tasks.forEach((task: Task) => {
         if (task.status === 'pending' && !task.assigned_agent_id) {
           const selectedAgent = availableAgents[agentIndex % availableAgents.length];
           task.assigned_agent_id = selectedAgent.id;
@@ -101,12 +103,13 @@ export async function POST(request: Request) {
         }
       });
     }
+    */
 
     // 5. System State Engine
-    const blockedTasksCount = tasks.filter((t: any) => t.status === 'blocked').length;
-    const pendingTasksCount = tasks.filter((t: any) => t.status === 'pending').length;
-    const inProgressCount = tasks.filter((t: any) => t.status === 'in_progress').length;
-    const activeAgentsCount = agents.filter((a: any) => a.status === 'active').length;
+    const blockedTasksCount = tasks.filter((t: Task) => t.status === 'blocked').length;
+    const pendingTasksCount = tasks.filter((t: Task) => t.status === 'pending').length;
+    const inProgressCount = tasks.filter((t: Task) => t.status === 'in_progress').length;
+    const activeAgentsCount = agents.filter((a: Agent) => a.status === 'active').length;
     
     let newStatus = 'NORMAL';
     if (blockedTasksCount > 0) newStatus = 'BLOCKED';
@@ -123,7 +126,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, mutated: stateMutated, status: newStatus });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("API Error [POST /api/engine]:", err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }

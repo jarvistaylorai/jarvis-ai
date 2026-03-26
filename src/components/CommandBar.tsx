@@ -38,7 +38,7 @@ export const CommandBar = ({ isOpen, onClose, onExecute }: { isOpen: boolean, on
       const data = await res.json();
       setResult(data);
       onExecute();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setResult({ success: false, error: err.message });
     } finally {
       setLoading(false);

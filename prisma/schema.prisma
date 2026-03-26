@@ -402,6 +402,17 @@ model spendLog {
   cost             Float
   task_id          String?  @db.Uuid
   project_id       String?  @db.Uuid
+  message_class    String?
+  priority         String?
+  duplicate_status String?
+  downgraded_from  String?
+  avoided_tokens   Int      @default(0)
+  avoided_usd      Float    @default(0)
+  avoided_reason   String?
+  tokens_reused    Int      @default(0)
+  tokens_truncated Int      @default(0)
+  verbosity_flag   Boolean  @default(false)
+  pressure_mode    String?
   created_at       DateTime @default(now())
 }
 
@@ -411,6 +422,48 @@ model spendLimit {
   per_agent_limit    Float    @default(10.0)
   per_task_limit     Float    @default(2.0)
   per_model_limit    Float    @default(20.0)
+}
+
+model promptFingerprint {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace       String   @default("business")
+  prompt_hash     String
+  context_hash    String?
+  message_class   String?
+  priority        String?
+  model           String?
+  agent_id        String?
+  total_calls     Int      @default(0)
+  duplicate_calls Int      @default(0)
+  first_seen      DateTime @default(now())
+  last_seen       DateTime @default(now())
+
+  @@unique([workspace, prompt_hash])
+}
+
+model promptFingerprintDay {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace       String   @default("business")
+  prompt_hash     String
+  day             DateTime @default(now())
+  calls           Int      @default(0)
+  duplicate_calls Int      @default(0)
+
+  @@unique([workspace, prompt_hash, day])
+}
+
+model messageClassStat {
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  workspace     String   @default("business")
+  message_class String
+  day           DateTime @default(now())
+  total_tokens  Int      @default(0)
+  sample_count  Int      @default(0)
+  rolling_avg   Float    @default(0)
+  last_sample   DateTime @default(now())
+  last_alert    DateTime?
+
+  @@unique([workspace, message_class, day])
 }
 
 model task_attachments {

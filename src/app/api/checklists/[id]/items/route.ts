@@ -15,13 +15,13 @@ export async function POST(
       return NextResponse.json({ error: 'Missing content' }, { status: 400 });
     }
 
-    const lastItem = await prisma.taskChecklistItem.findFirst({
+    const lastItem = await prisma.task_checklist_items.findFirst({
       where: { checklist_id: checklistId },
       orderBy: { position: 'desc' },
     });
     const position = lastItem ? lastItem.position + 1024 : 1024;
 
-    const item = await prisma.taskChecklistItem.create({
+    const item = await prisma.task_checklist_items.create({
       data: {
         checklist_id: checklistId,
         content,

@@ -88,7 +88,7 @@ class TelemetryClient {
 
   // --- Convenience Methods ---
 
-  public taskStarted(agentId: string, taskId: string, projectId?: string, metadata?: any) {
+  public taskStarted(agentId: string, taskId: string, projectId?: string, metadata?: Record<string, any>) {
     this.track({
       type: "TASK_STARTED",
       agent_id: agentId,
@@ -99,7 +99,7 @@ class TelemetryClient {
     });
   }
 
-  public taskCompleted(agentId: string, taskId: string, projectId?: string, metadata?: any) {
+  public taskCompleted(agentId: string, taskId: string, projectId?: string, metadata?: Record<string, any>) {
     this.track({
       type: "TASK_COMPLETED",
       agent_id: agentId,
@@ -110,7 +110,7 @@ class TelemetryClient {
     });
   }
 
-  public agentStatus(agentId: string, status: string, metadata?: any) {
+  public agentStatus(agentId: string, status: string, metadata?: Record<string, any>) {
     this.track({
       type: "AGENT_STATUS",
       agent_id: agentId,
@@ -119,7 +119,7 @@ class TelemetryClient {
     });
   }
 
-  public agentError(agentId: string, error: Error | string, taskId?: string, metadata?: any) {
+  public agentError(agentId: string, error: Error | string, taskId?: string, metadata?: Record<string, any>) {
     const errorMsg = error instanceof Error ? error.message : error;
     this.track({
       type: "AGENT_ERROR",
@@ -130,7 +130,7 @@ class TelemetryClient {
     });
   }
 
-  public logMessage(agentId: string, message: string, taskId?: string, metadata?: any) {
+  public logMessage(agentId: string, message: string, taskId?: string, metadata?: Record<string, any>) {
     this.track({
       type: "LOG_MESSAGE",
       agent_id: agentId,
@@ -140,7 +140,7 @@ class TelemetryClient {
     });
   }
 
-  public subagentSpawned(agentId: string, subagentId: string, taskId?: string, metadata?: any) {
+  public subagentSpawned(agentId: string, subagentId: string, taskId?: string, metadata?: Record<string, any>) {
     this.track({
       type: "SUBAGENT_SPAWNED",
       agent_id: agentId,

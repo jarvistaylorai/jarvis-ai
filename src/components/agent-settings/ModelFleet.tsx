@@ -1,7 +1,7 @@
 import React from 'react';
 import { Cpu, Settings2 } from 'lucide-react';
 
-export const ModelFleet = ({ models, onUpdate }: { models: any[], onUpdate: () => void }) => {
+export const ModelFleet = ({ models, onUpdate }: { models: unknown[], onUpdate: () => void }) => {
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'active': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.1)]';

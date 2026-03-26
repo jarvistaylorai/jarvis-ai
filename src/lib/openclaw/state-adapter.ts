@@ -1,5 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 const DEFAULT_WORKSPACE_ROOT = path.resolve(process.cwd(), '..', '..');
 const STATE_ROOT = process.env.OPENCLAW_STATE_ROOT || DEFAULT_WORKSPACE_ROOT;
@@ -10,7 +11,7 @@ async function readJsonFile<T>(fileName: string, fallback: T): Promise<T> {
   try {
     const raw = await fs.readFile(target, 'utf8');
     return JSON.parse(raw) as T;
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error.code !== 'ENOENT') {
       console.warn(`[openclaw-state] Failed to read ${fileName}:`, error.message);
     }
@@ -36,21 +37,21 @@ export async function loadOpenClawSnapshot() {
     objectives,
     alerts,
     telemetry: {
-      events: (activity || []).map((evt: any) => ({
+      events: (activity || []).map((evt: TelemetryEvent) => ({
         ...evt,
         created_at: evt.timestamp || evt.created_at || new Date().toISOString()
       })),
       stats: {
         total: (activity || []).length,
-        errors: (activity || []).filter((evt: any) => evt.status === 'error').length,
-        heartbeats: (activity || []).filter((evt: any) => evt.category === 'heartbeat').length
+        errors: (activity || []).filter((evt: TelemetryEvent) => evt.status === 'error').length,
+        heartbeats: (activity || []).filter((evt: TelemetryEvent) => evt.category === 'heartbeat').length
       }
     },
     system_state: system_state || {
       status: 'NORMAL',
-      active_agents: agents.filter((a: any) => a.status === 'active').length,
-      pending_tasks: tasks.filter((t: any) => t.status === 'pending').length,
-      blocked_tasks: tasks.filter((t: any) => t.status === 'blocked').length,
+      active_agents: agents.filter((a: Agent) => a.status === 'active').length,
+      pending_tasks: tasks.filter((t: Task) => t.status === 'pending').length,
+      blocked_tasks: tasks.filter((t: Task) => t.status === 'blocked').length,
       last_evaluated_at: new Date().toISOString()
     }
   };

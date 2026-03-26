@@ -53,7 +53,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json({ items });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('List Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

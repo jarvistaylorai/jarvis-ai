@@ -1,12 +1,36 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
+import { getOpenAIUsageByModel, getOpenAIdailySpend } from '@/lib/openai-spend';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const workspace = searchParams.get('workspace') || 'business';
+
+    try {
+      const openAiUsage = await getOpenAIUsageByModel(7);
+      if (openAiUsage && openAiUsage.length > 0) {
+         let totalCost = 0;
+         const openAiCosts = await getOpenAIdailySpend(7);
+         if (openAiCosts && openAiCosts.length > 0) {
+            totalCost = openAiCosts.reduce((sum, b) => sum + b.spend, 0);
+         }
+         
+         const allTokens = openAiUsage.reduce((s, m) => s + m.tokens, 0);
+
+         const mapped = openAiUsage.map((m: Record<string, any>) => {
+            if (allTokens > 0) {
+              m.spend = (m.tokens / allTokens) * totalCost;
+            } else {
+              m.spend = 0;
+            }
+            return m;
+         });
+         return NextResponse.json(mapped.sort((a,b) => b.spend - a.spend));
+      }
+    } catch(e) {
+      console.error('OpenAI Models pipeline failed', e);
+    }
 
     const grouped = await prisma.spendLog.groupBy({
       by: ['model'],

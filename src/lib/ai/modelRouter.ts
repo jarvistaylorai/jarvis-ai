@@ -56,7 +56,7 @@ export async function executeWithModelFallback<T>(
       attempts.push({ model, success: true });
       console.log(`[ModelRouter] Using ${model}`);
       return { result, modelUsed: model, attempts };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = error?.message || String(error);
       attempts.push({ model, success: false, error: message });
       console.warn(`[ModelRouter] ${model} failed: ${message}`);

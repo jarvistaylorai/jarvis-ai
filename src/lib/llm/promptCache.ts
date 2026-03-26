@@ -28,6 +28,7 @@ interface RunOptions {
   allowReplay: boolean;
   replayTtlMs?: number;
   estTokens?: number;
+  coalesceInFlight?: boolean;
 }
 
 interface RunResult<T> {
@@ -77,7 +78,7 @@ class PromptCache {
       }
     }
 
-    if (this.inflight.has(key)) {
+    if (options.coalesceInFlight && this.inflight.has(key)) {
       const entry = this.inflight.get(key)!;
       return new Promise<RunResult<T>>((resolve, reject) => {
         entry.waiters.push((value: T) => {

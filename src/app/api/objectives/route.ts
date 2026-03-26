@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/services/database';
 import { getWorkspaceId } from '@/lib/workspace-utils';
+import { Agent, Task, Project, Alert, TelemetryEvent } from '@/types/contracts';
 
 export const dynamic = 'force-dynamic';
 
 // Compute phase progress + status from tasks
-function computePhaseMetrics(tasks: any[]) {
+function computePhaseMetrics(tasks: unknown[]) {
   const total = tasks.length;
   if (total === 0) return { progress: 0, status: 'NOT_STARTED', task_count: 0, completed_tasks: 0 };
   const completed = tasks.filter(t => t.status === 'completed').length;
@@ -17,19 +18,19 @@ function computePhaseMetrics(tasks: any[]) {
 }
 
 // Compute objective progress + status from phases
-function computeObjectiveMetrics(phases: any[], created_at: Date) {
+function computeObjectiveMetrics(phases: unknown[], created_at: Date) {
   let last_activity_at = created_at.getTime();
   let tasks_completed_today = 0;
 
   const todayStr = new Date().toISOString().split('T')[0];
 
-  phases.forEach((p: any) => {
+  phases.forEach((p: Project) => {
     // Phase created_at gives a base line for phase activity
     if (p.created_at && p.created_at.getTime() > last_activity_at) {
       last_activity_at = p.created_at.getTime();
     }
     
-    (p.tasks || []).forEach((t: any) => {
+    (p.tasks || []).forEach((t: Task) => {
       const taskUpdatedStr = new Date(t.updated_at).toISOString().split('T')[0];
       const taskUpdatedTime = new Date(t.updated_at).getTime();
       
@@ -45,8 +46,8 @@ function computeObjectiveMetrics(phases: any[], created_at: Date) {
 
   let status = 'ACTIVE';
   if (phases.length > 0) {
-    if (phases.every((p: any) => p.status === 'COMPLETED')) status = 'COMPLETED';
-    else if (phases.some((p: any) => p.status === 'IN_PROGRESS' || p.status === 'COMPLETED')) status = 'IN_PROGRESS';
+    if (phases.every((p: Project) => p.status === 'COMPLETED')) status = 'COMPLETED';
+    else if (phases.some((p: Project) => p.status === 'IN_PROGRESS' || p.status === 'COMPLETED')) status = 'IN_PROGRESS';
   }
 
   const avgProgress = phases.length === 0 ? 0 : Math.round(phases.reduce((sum: number, p: any) => sum + p.progress, 0) / phases.length);
@@ -112,7 +113,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(computed);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [GET /api/objectives]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -141,7 +142,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(objective, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('API Error [POST /api/objectives]:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
