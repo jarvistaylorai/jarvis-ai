@@ -1,5 +1,5 @@
-import Image from 'next/image';
 'use client';
+import Image from 'next/image';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Task, Label } from './types';
