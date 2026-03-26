@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
+import { Task, Project, Objective } from '@contracts';
 
 const prisma = new PrismaClient();
 
@@ -47,7 +47,7 @@ function computeObjectiveMetrics(phases: unknown[], created_at: Date) {
     else if (phases.some((p: Project) => p.status === 'IN_PROGRESS' || p.status === 'COMPLETED')) status = 'IN_PROGRESS';
   }
 
-  const avgProgress = phases.length === 0 ? 0 : Math.round(phases.reduce((sum: number, p: any) => sum + p.progress, 0) / phases.length);
+  const avgProgress = phases.length === 0 ? 0 : Math.round(phases.reduce((sum: number, p: unknown) => sum + p.progress, 0) / phases.length);
 
   return { progress: avgProgress, status, last_activity_at: new Date(last_activity_at).toISOString(), tasks_completed_today };
 }

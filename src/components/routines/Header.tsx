@@ -2,9 +2,9 @@
 
 import { Activity, Plus, RefreshCcw } from "lucide-react";
 
-export function Header({ routines, view, setView, onNew }: { routines: unknown[], view: string, setView: any, onNew: any }) {
+export function Header({ routines, view, setView, onNew }: { routines: unknown[], view: string, setView: unknown, onNew: unknown }) {
   // Compute total running or failing to show in signal
-  const activeExesCount = routines.reduce((acc: number, r: any) => acc + (r.status === "running" ? 1 : 0), 0);
+  const activeExesCount = routines.reduce((acc: number, r: unknown) => acc + (r.status === "running" ? 1 : 0), 0);
   const isOverloaded = activeExesCount > 5;
 
   return (
@@ -60,7 +60,7 @@ export function Header({ routines, view, setView, onNew }: { routines: unknown[]
           <span>Always Running</span>
         </div>
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-          {routines.map((r: Record<string, any>) => (
+          {routines.map((r: Record<string, unknown>) => (
             <div 
               key={r.id} 
               className="flex items-center gap-3 bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-2 hover:border-neutral-700 transition-colors cursor-pointer group"

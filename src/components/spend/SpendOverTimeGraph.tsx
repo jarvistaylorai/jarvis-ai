@@ -59,7 +59,7 @@ export const SpendOverTimeGraph = ({ timeseriesData }: { timeseriesData: unknown
             <Tooltip 
               contentStyle={{ backgroundColor: '#0a0a0b', borderColor: 'rgba(255,255,255,0.1)', borderRadius: '12px', fontSize: '12px' }}
               itemStyle={{ color: '#fff' }}
-              formatter={(value: Record<string, any>) => [`$${Number(value).toFixed(2)}`, 'Spend']}
+              formatter={(value: Record<string, unknown>) => [`$${Number(value).toFixed(2)}`, 'Spend']}
               labelFormatter={(label) => new Date(label).toLocaleDateString()}
             />
             <Line 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Target, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
-export const Forecasting = ({ forecastData }: { forecastData: Record<string, any> }) => {
+export const Forecasting = ({ forecastData }: { forecastData: Record<string, unknown> }) => {
   if (!forecastData) return <div className="h-64 border border-white/[0.04] rounded-2xl bg-[#0f0f11] animate-pulse"></div>;
 
   const trendIcon = forecastData.trend_direction === 'up' 

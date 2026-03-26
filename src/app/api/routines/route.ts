@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const workspace = searchParams.get('workspace') || 'business';
 
   let routines = await getRoutines();
-  routines = routines.filter(r => (r as any).workspace === workspace || (!(r as any).workspace && workspace === 'business'));
+  routines = routines.filter(r => (r as unknown).workspace === workspace || (!(r as unknown).workspace && workspace === 'business'));
 
   const allExecutions = await getExecutions();
 

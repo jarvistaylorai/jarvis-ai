@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { updateTask } from '@/lib/services/task-service';
 import { prisma } from '@/lib/services/database';
 import { supabaseAdmin } from '@/lib/supabase-storage';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent } from '@contracts';
 
 export async function PATCH(
   request: Request,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Target } from 'lucide-react';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent } from '@contracts';
 
 export const SpendByAgentTable = ({ agentData }: { agentData: unknown[] }) => {
   return (

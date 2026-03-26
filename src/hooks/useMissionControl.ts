@@ -14,7 +14,7 @@ const fetcher = async <T,>(url: string): Promise<T> => {
 export function useDashboard(workspaceId: string) {
   return useQuery({
     queryKey: ['dashboard', workspaceId],
-    queryFn: () => fetcher<any>(`/api/dashboard?workspace=${workspaceId}`),
+    queryFn: () => fetcher<unknown>(`/api/dashboard?workspace=${workspaceId}`),
     refetchInterval: false, // Relies on SSE
   });
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/services/database';
 import { getWorkspaceId } from '@/lib/workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
+import { Task, Project } from '@contracts';
 
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +50,7 @@ function computeObjectiveMetrics(phases: unknown[], created_at: Date) {
     else if (phases.some((p: Project) => p.status === 'IN_PROGRESS' || p.status === 'COMPLETED')) status = 'IN_PROGRESS';
   }
 
-  const avgProgress = phases.length === 0 ? 0 : Math.round(phases.reduce((sum: number, p: any) => sum + p.progress, 0) / phases.length);
+  const avgProgress = phases.length === 0 ? 0 : Math.round(phases.reduce((sum: number, p: unknown) => sum + p.progress, 0) / phases.length);
 
   return { progress: avgProgress, status, last_activity_at: new Date(last_activity_at).toISOString(), tasks_completed_today };
 }

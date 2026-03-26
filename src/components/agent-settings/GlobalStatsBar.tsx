@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity, Zap, Server, ShieldCheck, Database, DollarSign, BrainCircuit, AlertTriangle } from 'lucide-react';
 
-const StatCard = ({ icon: Icon, label, value, subtext, colorClass }: any) => (
+const StatCard = ({ icon: Icon, label, value, subtext, colorClass }: unknown) => (
   <div className={`p-4 rounded-xl border border-white/[0.05] bg-white/[0.02] flex items-center gap-4 ${colorClass}`}>
     <div className={`p-3 rounded-xl border bg-current/10 border-current/20 text-current shadow-[inset_0_1px_rgba(255,255,255,0.1)]`}>
       <Icon size={18} />
@@ -16,7 +16,7 @@ const StatCard = ({ icon: Icon, label, value, subtext, colorClass }: any) => (
   </div>
 );
 
-export const GlobalStatsBar = ({ stats }: { stats: Record<string, any> }) => {
+export const GlobalStatsBar = ({ stats }: { stats: Record<string, unknown> }) => {
   return (
     <div className="grid grid-cols-4 gap-4">
       <StatCard icon={Server} label="Active Agents" value={stats?.active_agents || 0} subtext="global fleet" colorClass="text-indigo-400" />

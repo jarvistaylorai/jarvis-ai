@@ -84,7 +84,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
 
     // Use any typing to circumvent the cached Typescript strict schema lint error if any
     mutations.push(
-      (prisma.telemetry_events as any).create({
+      (prisma.telemetry_events as unknown).create({
          data: {
            project_id: project.id,
            workspace_id: project.workspace_id,

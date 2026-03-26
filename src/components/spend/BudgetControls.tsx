@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 export const BudgetControls = () => {
-  const [config, setConfig] = useState<any>(null);
+  const [config, setConfig] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   
   useEffect(() => {

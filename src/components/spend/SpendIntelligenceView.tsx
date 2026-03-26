@@ -10,13 +10,13 @@ import { Forecasting } from './Forecasting';
 import { Download, Bell, Settings } from 'lucide-react';
 
 export const SpendIntelligenceView = ({ activeWorkspace = 'business' }: { activeWorkspace?: string }) => {
-  const [overview, setOverview] = useState<any>(null);
-  const [agentStats, setAgentStats] = useState<any[]>([]);
-  const [modelStats, setModelStats] = useState<any[]>([]);
-  const [logs, setLogs] = useState<any[]>([]);
-  const [forecast, setForecast] = useState<any>(null);
-  const [timeseries, setTimeseries] = useState<any>(null);
-  const [anomalies, setAnomalies] = useState<any[] | null>(null);
+  const [overview, setOverview] = useState<unknown>(null);
+  const [agentStats, setAgentStats] = useState<unknown[]>([]);
+  const [modelStats, setModelStats] = useState<unknown[]>([]);
+  const [logs, setLogs] = useState<unknown[]>([]);
+  const [forecast, setForecast] = useState<unknown>(null);
+  const [timeseries, setTimeseries] = useState<unknown>(null);
+  const [anomalies, setAnomalies] = useState<unknown[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

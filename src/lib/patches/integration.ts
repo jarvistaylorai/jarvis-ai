@@ -37,7 +37,7 @@ import { recordRoutingEvent, recordRateLimiterEvent, recordAvoidableSpendEvent }
 import { globalRateLimiter } from '@/lib/llm/rateLimiter';
 import type { Provider } from '@/lib/llm/types';
 import type { PriorityLevel } from '@/lib/llm/providerLimits';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent, Task } from '@contracts';
 
 const prisma = new PrismaClient();
 
@@ -94,9 +94,9 @@ export interface PatchedOpenClawResponse {
  * Applies 500-token limit to all tool outputs before they reach context
  */
 export function wrapToolExecution(
-  originalExecute: (call: Record<string, any>, agent: Agent) => Promise<string>
-): (call: Record<string, any>, agent: Agent) => Promise<string> {
-  return async (call: Record<string, any>, agent: Agent): Promise<string> => {
+  originalExecute: (call: Record<string, unknown>, agent: Agent) => Promise<string>
+): (call: Record<string, unknown>, agent: Agent) => Promise<string> {
+  return async (call: Record<string, unknown>, agent: Agent): Promise<string> => {
     const toolName = call.function?.name || 'unknown';
     
     // Execute original tool
@@ -145,7 +145,7 @@ export function pruneMessages(
  */
 export async function executePatchedOpenClawRequest(
   config: OpenClawRequestConfig,
-  openclawClient: any
+  openclawClient: unknown
 ): Promise<PatchedOpenClawResponse> {
   const startTime = Date.now();
   

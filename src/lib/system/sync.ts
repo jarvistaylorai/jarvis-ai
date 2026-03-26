@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client"
 import { getSystemState } from "./state"
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent } from '@contracts';
 
 const DEFAULT_BOARD_COLUMNS = ["Ideas", "To-Do", "Doing", "Under Review", "Done"]
 

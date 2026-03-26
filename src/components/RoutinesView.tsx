@@ -8,7 +8,7 @@ import { RoutineDetailPanel } from "./routines/RoutineDetailPanel";
 import { RoutineFormModal } from "./routines/RoutineFormModal";
 
 export function RoutinesView({ activeWorkspace = 'business' }: { activeWorkspace?: string }) {
-  const [routines, setRoutines] = useState<any[]>([]);
+  const [routines, setRoutines] = useState<unknown[]>([]);
   const [view, setView] = useState<"Week" | "Today">("Week");
   const [selectedRoutine, setSelectedRoutine] = useState<any | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -20,7 +20,7 @@ export function RoutinesView({ activeWorkspace = 'business' }: { activeWorkspace
         const data = await res.json();
         setRoutines(data);
         if (selectedRoutine) {
-          const updated = data.find((r: Record<string, any>) => r.id === selectedRoutine.id);
+          const updated = data.find((r: Record<string, unknown>) => r.id === selectedRoutine.id);
           if (updated) setSelectedRoutine(updated);
         }
       }

@@ -12,7 +12,7 @@ function isRateLimitError(error: unknown): boolean {
   if (!error) return false;
   const message = typeof error === 'string'
     ? error
-    : (error as any)?.message || (error as any)?.toString?.();
+    : (error as unknown)?.message || (error as unknown)?.toString?.();
 
   if (!message) return false;
   return message.toLowerCase().includes('rate limit')

@@ -24,7 +24,7 @@ import { FactoryPipeline } from './factory/FactoryPipeline';
 import { KnowledgeView } from './KnowledgeView';
 import { SpendIntelligenceView } from './spend/SpendIntelligenceView';
 import { WorkspacesView } from './workspaces/WorkspacesView';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent, Task, Project, Alert } from '@contracts';
 
 const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>
@@ -38,7 +38,7 @@ const Badge = ({ children, colorClass }: { children?: React.ReactNode; colorClas
   </span>
 );
 
-const NavItem = ({ icon: Icon, label, active, onClick, href }: { icon: any; label: string; active?: boolean; onClick?: () => void; href?: string }) => {
+const NavItem = ({ icon: Icon, label, active, onClick, href }: { icon: unknown; label: string; active?: boolean; onClick?: () => void; href?: string }) => {
   const content = (
     <>
       <Icon size={16} className={active ? 'text-indigo-400' : 'text-zinc-500'} />

@@ -120,7 +120,7 @@ export class ContextAssemblyService {
     ];
     
     // Calculate initial token count
-    let totalTokens = layers.reduce((sum, layer) => sum + layer.tokens, 0);
+    const totalTokens = layers.reduce((sum, layer) => sum + layer.tokens, 0);
     
     // Apply budget enforcement with degradation strategy
     const { finalLayers, excludedLayers, wasTruncated } = this.applyBudgetStrategy(

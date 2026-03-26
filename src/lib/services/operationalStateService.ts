@@ -26,7 +26,7 @@ export interface OperationalState {
 export interface OperationalEvent {
   workspaceId: string;
   eventType: string;
-  eventData: Record<string, any>;
+  eventData: Record<string, unknown>;
   severity: 'info' | 'warning' | 'error' | 'critical';
   agentId?: string;
   taskId?: string;
@@ -66,17 +66,17 @@ export class OperationalStateService {
     
     return {
       workspaceId: state.workspaceId,
-      systemHealth: state.systemHealth as any,
-      activeTasks: state.activeTasks as any[],
-      blockedTasks: state.blockedTasks as any[],
-      pendingApprovals: state.pendingApprovals as any[],
+      systemHealth: state.systemHealth as unknown,
+      activeTasks: state.activeTasks as unknown[],
+      blockedTasks: state.blockedTasks as unknown[],
+      pendingApprovals: state.pendingApprovals as unknown[],
       currentContextTokens: state.currentContextTokens,
-      contextPressureLevel: state.contextPressureLevel as any,
+      contextPressureLevel: state.contextPressureLevel as unknown,
       currentModel: state.currentModel,
       dailySpendUsd: Number(state.dailySpendUsd),
       monthlySpendUsd: Number(state.monthlySpendUsd),
       activeAlertsCount: state.activeAlertsCount,
-      criticalAlerts: state.criticalAlerts as any[],
+      criticalAlerts: state.criticalAlerts as unknown[],
       lastHeartbeatAt: state.lastHeartbeatAt,
     };
   }
@@ -94,7 +94,7 @@ export class OperationalStateService {
       create: {
         workspaceId,
         ...updates,
-      } as any,
+      } as unknown,
       update: {
         ...updates,
         lastHeartbeatAt: new Date(),
@@ -126,7 +126,7 @@ export class OperationalStateService {
   async getRecentEvents(
     workspaceId: string,
     limit: number = 50
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     return prisma.operationalEvent.findMany({
       where: { workspaceId },
       orderBy: { createdAt: 'desc' },

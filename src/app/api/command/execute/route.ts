@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent, Task, Project } from '@contracts';
 
 const prisma = new PrismaClient();
 
@@ -14,9 +14,9 @@ export async function POST(req: Request) {
     if (!command) return NextResponse.json({ success: false, error: 'No command provided' }, { status: 400 });
 
     const cmd = command.toLowerCase();
-    let actions_executed: string[] = [];
-    let warnings: string[] = [];
-    let mutations: unknown[] = [];
+    const actions_executed: string[] = [];
+    const warnings: string[] = [];
+    const mutations: unknown[] = [];
 
     const tasks = await prisma.tasks.findMany();
     const agents = await prisma.agents.findMany();
@@ -91,7 +91,7 @@ export async function POST(req: Request) {
                  agent: a,
                  load: tasks.filter((t: Task) => t.assigned_agent === a.name && (t.status === 'pending' || t.status === 'in-progress')).length
              }));
-             agentLoads.sort((a: any, b: any) => a.load - b.load);
+             agentLoads.sort((a: unknown, b: unknown) => a.load - b.load);
              const leastLoaded = agentLoads[0]?.agent;
              if (leastLoaded) {
                 assignedAgent = leastLoaded.name;
@@ -105,7 +105,7 @@ export async function POST(req: Request) {
           data: {
             id: taskId,
             title: title,
-            status: finalStatus as any,
+            status: finalStatus as unknown,
             priority: 'normal',
             workspace_id: defaultProject.workspace_id,
             project_id: projectId,

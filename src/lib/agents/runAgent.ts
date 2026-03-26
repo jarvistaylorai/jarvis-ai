@@ -12,7 +12,7 @@ import { render as renderTemplate } from "@/lib/messaging/templates"
 import { MessageClass } from "@/lib/messaging/constants"
 import { applyBurstSmoothing } from "@/lib/llm/burstSmoother"
 import { recordDigestSavings } from "@/lib/services/telemetry-service"
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent, Task } from '@contracts';
 
 const agentLocks = new Set<string>()
 
@@ -46,7 +46,7 @@ async function persistDigestSavings(
  * Activity logging with digest aggregation
  * Collapses repetitive status messages into concise updates
  */
-async function logActivity(agent: Agent, message: any) {
+async function logActivity(agent: Agent, message: unknown) {
   const state = await getSystemState()
   const timestamp = new Date().toISOString()
 
@@ -236,7 +236,7 @@ export async function runAgent(agentId: string) {
   let lastCompletedId: string | null = null;
   let loopCount = 0;
   let lastDigestFlush = Date.now();
-  let currentAgent: any | null = null;
+  let currentAgent: unknown | null = null;
   
   instrumentation.agentStatus(agentId, "active")
 

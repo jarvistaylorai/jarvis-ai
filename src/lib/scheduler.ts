@@ -62,7 +62,7 @@ export async function executeRoutine(routine: Routine): Promise<RoutineExecution
     execution.completed_at = completed_at;
     execution.status = "failed";
     execution.duration_ms = duration_ms;
-    execution.error_message = error.message;
+    execution.error_message = error instanceof Error ? error.message : String(error);
 
     await updateRoutine(routine.id, {
       last_run_at: completed_at,
@@ -126,7 +126,7 @@ export async function checkAndRunRoutines() {
            computedNextRun = new Date(now.getTime() + 60000);
         }
 
-        // @ts-ignore
+        // @ts-expect-error
         await updateRoutine(routine.id, { next_run_at: computedNextRun.toISOString() });
       }
     }

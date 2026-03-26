@@ -78,11 +78,11 @@ export async function getOpenAIUsageByModel(days = 7) {
   const endTime = Math.floor(now.getTime() / 1000);
   const startTime = endTime - (days * 24 * 60 * 60);
 
-  let hasMore = true;
-  let nextCursor: string | null = null;
-  let pageCount = 0;
+  const hasMore = true;
+  const nextCursor: string | null = null;
+  const pageCount = 0;
   
-  const modelStats: Record<string, any> = {};
+  const modelStats: Record<string, unknown> = {};
 
   try {
     const url = new URL('https://api.openai.com/v1/organization/usage/completions');

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Activity, XCircle } from 'lucide-react';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent, Task } from '@contracts';
 
 export const ActiveSessions = ({ sessions, onUpdate }: { sessions: unknown[], onUpdate: () => void }) => {
   return (

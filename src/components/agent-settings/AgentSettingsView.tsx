@@ -8,14 +8,14 @@ import { ModelRoutingRules } from './ModelRoutingRules';
 import { ActiveSessions } from './ActiveSessions';
 import { ProviderSettings } from './ProviderSettings';
 import { CostControls } from './CostControls';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent } from '@contracts';
 
 export const AgentSettingsView = ({ agents = [], activeWorkspace = 'business' }: { agents?: unknown[], activeWorkspace?: string }) => {
-  const [models, setModels] = useState<any[]>([]);
-  const [usageStats, setUsageStats] = useState<any>(null);
-  const [routingRules, setRoutingRules] = useState<any[]>([]);
-  const [providers, setProviders] = useState<any[]>([]);
-  const [agentConfigs, setAgentConfigs] = useState<any[]>([]);
+  const [models, setModels] = useState<unknown[]>([]);
+  const [usageStats, setUsageStats] = useState<unknown>(null);
+  const [routingRules, setRoutingRules] = useState<unknown[]>([]);
+  const [providers, setProviders] = useState<unknown[]>([]);
+  const [agentConfigs, setAgentConfigs] = useState<unknown[]>([]);
   
   const refreshData = async () => {
     try {

@@ -1,8 +1,8 @@
-import {  Alert, AlertSeverity, AlertStatus, PaginatedResult  } from '@contracts';
+import { Alert, AlertSeverity, AlertStatus, PaginatedResult } from '@contracts';
 import { prisma } from './database';
 import { eventBus } from './event-bus';
 import { getWorkspaceId } from '../workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Alert } from '@contracts';
 
 export type ListAlertsParams = {
   workspaceId: string;
@@ -18,7 +18,7 @@ export type CreateAlertInput = {
   message: string;
   severity: AlertSeverity;
   status?: AlertStatus;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 };
 
 const validSeverity = new Set(Object.values(AlertSeverity));

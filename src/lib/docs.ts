@@ -11,7 +11,7 @@ export type Document = {
   tags?: string[];
   workspace?: string;
   path: string;
-  frontmatter: Record<string, any>;
+  frontmatter: Record<string, unknown>;
   content: string;
   lastModified: string;
 };
@@ -23,7 +23,7 @@ type DocumentCache = {
 };
 
 type SaveDocPayload = {
-  frontmatter?: Record<string, any>;
+  frontmatter?: Record<string, unknown>;
   body?: string;
 };
 
@@ -219,7 +219,7 @@ function parseDocument(filePath: string): Document | null {
   }
 }
 
-function deriveDocumentType(relativePath: string, frontmatter: Record<string, any>): string {
+function deriveDocumentType(relativePath: string, frontmatter: Record<string, unknown>): string {
   if (typeof frontmatter.type === 'string' && frontmatter.type.trim().length > 0) {
     return frontmatter.type;
   }
@@ -285,7 +285,7 @@ function relativeToVault(absolutePath: string): string {
   return path.relative(getVaultPath(), absolutePath);
 }
 
-function deepMerge(target: Record<string, any>, updates: Record<string, any>): Record<string, any> {
+function deepMerge(target: Record<string, unknown>, updates: Record<string, unknown>): Record<string, unknown> {
   const result = { ...target };
 
   Object.entries(updates).forEach(([key, value]) => {
@@ -306,7 +306,7 @@ function deepMerge(target: Record<string, any>, updates: Record<string, any>): R
   return result;
 }
 
-function isPlainObject(value: unknown): value is Record<string, any> {
+function isPlainObject(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
@@ -370,7 +370,7 @@ export function saveDoc(docPath: string, content: string | SaveDocPayload): Docu
   return updatedDoc;
 }
 
-export function updateDocFrontmatter(id: string, updates: Record<string, any>): Document | null {
+export function updateDocFrontmatter(id: string, updates: Record<string, unknown>): Document | null {
   if (!updates || Object.keys(updates).length === 0) {
     return getDocById(id);
   }

@@ -2,7 +2,7 @@ import React from 'react';
 import { AgentDashboard } from './agents/AgentDashboard';
 import { Agent } from '@/types/agent';
 import { useAgents } from '@/hooks/useMissionControl';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent } from '@contracts';
 
 export const AgentsView = ({ agents: _a, activeWorkspace = 'business' }: { agents?: unknown[], activeWorkspace?: string }) => {
   const { data: agentsData } = useAgents(activeWorkspace);

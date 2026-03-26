@@ -1,4 +1,4 @@
-import {  PaginatedResult, Project, ObjectivePriority, ProjectStatus  } from '@contracts';
+import { PaginatedResult, Project, ObjectivePriority, ProjectStatus } from '@contracts';
 import type { Prisma } from '@prisma/client';
 import { prisma } from './database';
 import { getWorkspaceId } from '../workspace-utils';

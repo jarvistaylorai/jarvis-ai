@@ -111,7 +111,7 @@ export interface Project extends BaseEntity {
   active_sprint?: string;
   objective_ids: UUID[]; // FK -> objectives.id
   tags: string[];
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Agent extends BaseEntity {
@@ -129,7 +129,7 @@ export interface Agent extends BaseEntity {
   tasks_completed_24h: number;
   last_heartbeat_at?: ISODateString;
   error_state?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Task extends BaseEntity {
@@ -151,7 +151,7 @@ export interface Task extends BaseEntity {
   tags: string[];
   auto_execute: boolean;
   history_cursor?: string; // reference into telemetry/log store
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Alert extends BaseEntity {
@@ -163,7 +163,7 @@ export interface Alert extends BaseEntity {
   acknowledged_by_agent_id?: UUID;
   acknowledged_at?: ISODateString;
   resolved_at?: ISODateString;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export interface TelemetryEvent extends BaseEntity {
@@ -174,7 +174,7 @@ export interface TelemetryEvent extends BaseEntity {
   severity: TelemetrySeverity;
   event_type: string; // e.g., "task.assigned"
   message: string;
-  payload?: Record<string, any>;
+  payload?: Record<string, unknown>;
   latency_ms?: number;
   tokens_input?: number;
   tokens_output?: number;
@@ -201,7 +201,7 @@ export interface Objective extends BaseEntity {
     metric_unit?: string;
     current_value?: number;
   }>;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PaginatedResult<T> {

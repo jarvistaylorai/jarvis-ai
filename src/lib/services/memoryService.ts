@@ -22,7 +22,7 @@ export interface RetrievedMemory {
   type: string;
   content: string;
   score: number;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export class MemoryService {
@@ -62,7 +62,7 @@ export class MemoryService {
     `;
 
     // Map the results to determine scope for debug visibility
-    return (results as any[]).map(r => ({
+    return (results as unknown[]).map(r => ({
       id: r.id,
       type: r.type,
       content: r.content,
@@ -83,8 +83,8 @@ export class MemoryService {
     agentId?: string;
     projectId?: string;
     taskId?: string;
-    metadata?: Record<string, any>;
-  }): Promise<any> {
+    metadata?: Record<string, unknown>;
+  }): Promise<unknown> {
     if (!memory.agentId) throw new Error('agentId is required to store context files');
     
     const fileName = memory.metadata?.file_name || `memory-${Date.now()}.txt`;
@@ -124,7 +124,7 @@ export class MemoryService {
   /**
    * Get similar past tasks
    */
-  async getSimilarTasks(taskId: string, limit: number = 3): Promise<any[]> {
+  async getSimilarTasks(taskId: string, limit: number = 3): Promise<unknown[]> {
     // TODO: Implement semantic similarity search
     return [];
   }

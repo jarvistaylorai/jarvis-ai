@@ -20,3 +20,4 @@ export const WorkspacesView = memo(({ activeWorkspace = 'business' }: { activeWo
 
   return <AgentWorkspaceClient agents={agents} currentAgentId={currentAgentId} onAgentSelect={setCurrentAgentId} />;
 });
+WorkspacesView.displayName = 'WorkspacesView';

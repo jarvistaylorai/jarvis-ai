@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Target, Plus, X, Calendar, ChevronRight, Layers, Clock } from 'lucide-react';
 import { ObjectiveDetailView } from './ObjectiveDetailView';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Project } from '@contracts';
 
 const Card = ({ children, className = "", onClick }: { children?: React.ReactNode; className?: string; onClick?: () => void }) => (
   <div onClick={onClick} className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 relative cursor-pointer ${className}`}>
@@ -33,7 +33,7 @@ const statusColors: Record<string, string> = {
 };
 
 export const ObjectivesView = ({ objectives: initialObjectives = [], projects = [], activeWorkspace = 'business' }: { objectives?: unknown[], projects?: unknown[], activeWorkspace?: string }) => {
-  const [objectives, setObjectives] = useState<any[]>(initialObjectives || []);
+  const [objectives, setObjectives] = useState<unknown[]>(initialObjectives || []);
   const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

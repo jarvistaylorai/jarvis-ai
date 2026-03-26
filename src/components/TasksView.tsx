@@ -7,7 +7,7 @@ import { ListData, Task, Label } from '@/components/board/types';
 import { CheckSquare, Plus, Filter, ChevronDown, Check } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTasks, useProjects } from '@/hooks/useMissionControl';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Task, Project } from '@contracts';
 
 export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWorkspace = 'business' }: { tasks?: unknown[], projects?: unknown[], globalLists?: unknown[], activeWorkspace?: string }) => {
   const queryClient = useQueryClient();
@@ -82,9 +82,9 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
 
   const boardLists: ListData[] = useMemo(() => {
     const lists = globalLists && globalLists.length > 0 ? globalLists : DEFAULT_BOARD_COLUMNS;
-    return lists.map((gl: Record<string, any>) => ({
+    return lists.map((gl: Record<string, unknown>) => ({
       ...gl,
-      tasks: filteredTasks.filter((t: Task) => t.status === gl.id || t.status === gl.id.replace('_', '-')).sort((a: any, b: any) => (a.position||0) - (b.position||0))
+      tasks: filteredTasks.filter((t: Task) => t.status === gl.id || t.status === gl.id.replace('_', '-')).sort((a: unknown, b: unknown) => (a.position||0) - (b.position||0))
     }));
   }, [globalLists, filteredTasks]);
 

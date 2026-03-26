@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const GlobalSpendOverview = ({ stats }: { stats: Record<string, any> }) => {
+export const GlobalSpendOverview = ({ stats }: { stats: Record<string, unknown> }) => {
   if (!stats) return <div className="animate-pulse h-32 bg-white/5 rounded-2xl"></div>;
 
   return (

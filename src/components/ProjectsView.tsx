@@ -77,7 +77,7 @@ export const ProjectsView = ({ activeWorkspace = 'business' }: { activeWorkspace
     }
   };
 
-  const handleAction = async (e: React.MouseEvent, projectId: string, action: string, currentData?: any) => {
+  const handleAction = async (e: React.MouseEvent, projectId: string, action: string, currentData?: unknown) => {
     e.stopPropagation();
     try {
        if (action === 'start') {

@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       payload: metadata
     });
 
-    eventBus.publish({ type: 'telemetry.created' as any, payload: telemetry as any });
+    eventBus.publish({ type: 'telemetry.created' as unknown, payload: telemetry as unknown });
 
     return NextResponse.json(telemetry, { status: 201 });
   } catch (error: unknown) {

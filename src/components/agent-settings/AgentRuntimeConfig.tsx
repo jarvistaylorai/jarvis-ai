@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layers, ArrowRight } from 'lucide-react';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent } from '@contracts';
 
 export const AgentRuntimeConfig = ({ configs, models, onUpdate }: { configs: unknown[], models: unknown[], onUpdate: () => void }) => {
   return (

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { Task, Project } from '@contracts';
 import { 
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
   ArrowLeft, Activity, Play, Pause, Plus, Zap, AlertTriangle, 
   CheckCircle, Clock, Users, TerminalSquare, ShieldAlert
 } from 'lucide-react';
 
 export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'business' }: { projectId: string; onBack: () => void; activeWorkspace?: string; }) => {
-  const [project, setProject] = useState<any>(null);
+  const [project, setProject] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('tasks');
 
@@ -197,7 +197,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
 
             {activeTab === 'activity' && (
               <div className="flex flex-col gap-0 border-l border-white/10 ml-4 pl-4 py-2">
-                {(project.project_activity || []).map((act: Record<string, any>) => (
+                {(project.project_activity || []).map((act: Record<string, unknown>) => (
                   <div key={act.id} className="relative pb-6 last:pb-0">
                     <span className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-indigo-500/50 border-2 border-[#0f0f12]"></span>
                     <p className="text-sm text-zinc-300">{act.message}</p>

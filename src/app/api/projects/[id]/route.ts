@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Task, Project } from '@contracts';
 
 export const dynamic = 'force-dynamic';
 

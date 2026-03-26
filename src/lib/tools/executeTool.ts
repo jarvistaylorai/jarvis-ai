@@ -2,7 +2,7 @@ import fs from "fs/promises"
 import path from "path"
 import { exec } from "child_process"
 import { getSystemState, updateSystemState } from "../system/state"
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent, Task } from '@contracts';
 
 const WORKSPACE_BASE = "/Users/jarvis/.openclaw/workspace/jarvis"
 
@@ -94,7 +94,7 @@ export function runCommand(command: string): Promise<string> {
   })
 }
 
-export async function executeToolCall(call: Record<string, any>, agent: Agent) {
+export async function executeToolCall(call: Record<string, unknown>, agent: Agent) {
   const { name, arguments: argsString } = call.function
   const args = JSON.parse(argsString)
   

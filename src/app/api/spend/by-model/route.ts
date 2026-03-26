@@ -18,7 +18,7 @@ export async function GET(request: Request) {
          
          const allTokens = openAiUsage.reduce((s, m) => s + m.tokens, 0);
 
-         const mapped = openAiUsage.map((m: Record<string, any>) => {
+         const mapped = openAiUsage.map((m: Record<string, unknown>) => {
             if (allTokens > 0) {
               m.spend = (m.tokens / allTokens) * totalCost;
             } else {

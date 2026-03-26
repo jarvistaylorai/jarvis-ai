@@ -262,7 +262,7 @@ class RateLimiter {
     throw lastError;
   }
 
-  private isRetryable(error: any): boolean {
+  private isRetryable(error: unknown): boolean {
     if (error?.retryable === false) return false;
     if (error?.code && ['context_length_exceeded', 'invalid_request'].includes(error.code)) {
       return false;

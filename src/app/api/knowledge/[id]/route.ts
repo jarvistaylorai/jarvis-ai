@@ -45,7 +45,7 @@ export async function PATCH(
     frontmatterUpdates.updated_at = new Date().toISOString();
 
     const updatedDoc = saveDoc(existingDoc.path, {
-      frontmatter: frontmatterUpdates as Record<string, any>,
+      frontmatter: frontmatterUpdates as Record<string, unknown>,
       body: contentUpdate,
     }) ?? existingDoc;
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { X, Save, Clock, Calendar } from "lucide-react";
 
-export function RoutineFormModal({ onClose, onAdded, activeWorkspace = 'business' }: any) {
+export function RoutineFormModal({ onClose, onAdded, activeWorkspace = 'business' }: unknown) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [agent, setAgent] = useState("jarvis");
@@ -12,7 +12,7 @@ export function RoutineFormModal({ onClose, onAdded, activeWorkspace = 'business
   const [cronExpression, setCronExpression] = useState("0 8 * * *");
   const [enabled, setEnabled] = useState(true);
 
-  const handleSubmit = async (e: Record<string, any>) => {
+  const handleSubmit = async (e: Record<string, unknown>) => {
     e.preventDefault();
     const payload = {
       name,
@@ -74,7 +74,7 @@ export function RoutineFormModal({ onClose, onAdded, activeWorkspace = 'business
             {scheduleType === "interval" ? (
               <div className="animate-fade-in">
                 <label className="block text-sm font-medium text-neutral-400 mb-1.5">Interval (Seconds)</label>
-                <input type="number" required min={5} value={intervalSeconds} onChange={e => setIntervalSeconds(e.target.value as any)} placeholder="60" className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
+                <input type="number" required min={5} value={intervalSeconds} onChange={e => setIntervalSeconds(e.target.value as unknown)} placeholder="60" className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition-colors" />
               </div>
             ) : (
               <div className="animate-fade-in">

@@ -2,7 +2,7 @@
 
 import { X, Clock, AlertTriangle, CheckCircle } from "lucide-react";
 
-export function ExecutionDetailModal({ execution, routine, onClose }: any) {
+export function ExecutionDetailModal({ execution, routine, onClose }: unknown) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-fade-in-up">

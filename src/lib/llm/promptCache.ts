@@ -52,8 +52,8 @@ function buildKey(parts: PromptCacheKey): string {
 }
 
 class PromptCache {
-  private inflight = new Map<string, InFlightEntry<any>>();
-  private recent = new Map<string, CacheEntry<any>>();
+  private inflight = new Map<string, InFlightEntry<unknown>>();
+  private recent = new Map<string, CacheEntry<unknown>>();
   private metrics = {
     inFlightCoalesced: 0,
     replayHits: 0,

@@ -2,7 +2,7 @@
 import { Agent } from "@/types/agent";
 import { AgentDashboard } from "@/components/agents/AgentDashboard";
 import { PrismaClient } from "@prisma/client";
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent } from '@contracts';
 
 const prisma = new PrismaClient();
 

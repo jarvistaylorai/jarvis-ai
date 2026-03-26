@@ -1,4 +1,4 @@
-import { TelemetryCategory, TelemetrySeverity } from '@contracts';
+
 
 export type OpenClawEventType = 
   | "TASK_STARTED" 
@@ -14,7 +14,7 @@ export interface TelemetryPayload {
   task_id?: string;
   project_id?: string;
   timestamp: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 class TelemetryClient {
@@ -88,7 +88,7 @@ class TelemetryClient {
 
   // --- Convenience Methods ---
 
-  public taskStarted(agentId: string, taskId: string, projectId?: string, metadata?: Record<string, any>) {
+  public taskStarted(agentId: string, taskId: string, projectId?: string, metadata?: Record<string, unknown>) {
     this.track({
       type: "TASK_STARTED",
       agent_id: agentId,
@@ -99,7 +99,7 @@ class TelemetryClient {
     });
   }
 
-  public taskCompleted(agentId: string, taskId: string, projectId?: string, metadata?: Record<string, any>) {
+  public taskCompleted(agentId: string, taskId: string, projectId?: string, metadata?: Record<string, unknown>) {
     this.track({
       type: "TASK_COMPLETED",
       agent_id: agentId,
@@ -110,7 +110,7 @@ class TelemetryClient {
     });
   }
 
-  public agentStatus(agentId: string, status: string, metadata?: Record<string, any>) {
+  public agentStatus(agentId: string, status: string, metadata?: Record<string, unknown>) {
     this.track({
       type: "AGENT_STATUS",
       agent_id: agentId,
@@ -119,7 +119,7 @@ class TelemetryClient {
     });
   }
 
-  public agentError(agentId: string, error: Error | string, taskId?: string, metadata?: Record<string, any>) {
+  public agentError(agentId: string, error: Error | string, taskId?: string, metadata?: Record<string, unknown>) {
     const errorMsg = error instanceof Error ? error.message : error;
     this.track({
       type: "AGENT_ERROR",
@@ -130,7 +130,7 @@ class TelemetryClient {
     });
   }
 
-  public logMessage(agentId: string, message: string, taskId?: string, metadata?: Record<string, any>) {
+  public logMessage(agentId: string, message: string, taskId?: string, metadata?: Record<string, unknown>) {
     this.track({
       type: "LOG_MESSAGE",
       agent_id: agentId,
@@ -140,7 +140,7 @@ class TelemetryClient {
     });
   }
 
-  public subagentSpawned(agentId: string, subagentId: string, taskId?: string, metadata?: Record<string, any>) {
+  public subagentSpawned(agentId: string, subagentId: string, taskId?: string, metadata?: Record<string, unknown>) {
     this.track({
       type: "SUBAGENT_SPAWNED",
       agent_id: agentId,

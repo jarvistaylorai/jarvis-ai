@@ -36,7 +36,7 @@ function formatDate(isoStr: string) {
 
 export const FilesystemView = ({ activeWorkspace = 'business' }: { activeWorkspace?: string }) => {
   const [currentPath, setCurrentPath] = useState('/');
-  const [items, setItems] = useState<any[]>([]);
+  const [items, setItems] = useState<unknown[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [syncing, setSyncing] = useState(false);
@@ -46,7 +46,7 @@ export const FilesystemView = ({ activeWorkspace = 'business' }: { activeWorkspa
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [creatingFolder, setCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
-  const [itemToDelete, setItemToDelete] = useState<any>(null);
+  const [itemToDelete, setItemToDelete] = useState<unknown>(null);
 
   const fetchItems = async (path: string) => {
     setLoading(true);
@@ -73,7 +73,7 @@ export const FilesystemView = ({ activeWorkspace = 'business' }: { activeWorkspa
     fetchItems(currentPath);
   };
 
-  const handleItemClick = (item: Record<string, any>) => {
+  const handleItemClick = (item: Record<string, unknown>) => {
     if (item.type === 'folder') {
       setCurrentPath(item.path);
     } else {
@@ -81,7 +81,7 @@ export const FilesystemView = ({ activeWorkspace = 'business' }: { activeWorkspa
     }
   };
 
-  const handleDelete = (e: React.MouseEvent, item: any) => {
+  const handleDelete = (e: React.MouseEvent, item: unknown) => {
     e.stopPropagation();
     setItemToDelete(item);
   };

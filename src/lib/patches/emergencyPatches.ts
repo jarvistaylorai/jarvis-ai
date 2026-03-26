@@ -192,7 +192,7 @@ export function selectModelForRequest(
 ): { model: string; reason: string; warnings: string[] } {
   const routeRequest: RouteRequest = {
     estimatedTokens,
-    taskType: taskType as any,
+    taskType: taskType as unknown,
     preferredModel,
   };
   

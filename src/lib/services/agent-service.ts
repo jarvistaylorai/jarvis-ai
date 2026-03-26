@@ -1,8 +1,8 @@
-import {  PaginatedResult, Agent, AgentStatus, AgentKind  } from '@contracts';
+import { PaginatedResult, Agent, AgentStatus, AgentKind } from '@contracts';
 import { prisma } from './database';
 import { eventBus } from './event-bus';
 import { getWorkspaceId } from '../workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Agent } from '@contracts';
 
 export type CreateAgentInput = {
   workspaceId: string;
@@ -26,7 +26,7 @@ export type UpdateAgentInput = {
   currentChannel?: string;
   capabilityTags?: string[];
   utilizationPercent?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 };
 
 // Replaced by workspace-utils
@@ -54,7 +54,7 @@ function parseJson<T>(value: string | null | undefined, fallback: T): T {
 
 function mapAgent(record: Record<string, unknown>, completedMap: Map<string, number>): Agent {
   const capabilityTags = parseJson<string[]>(record.capability_tags, []);
-  const metadata = parseJson<Record<string, any>>(record.metadata, {});
+  const metadata = parseJson<Record<string, unknown>>(record.metadata, {});
 
   const utilization =
     typeof record.utilization_percent === 'number'

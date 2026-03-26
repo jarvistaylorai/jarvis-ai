@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { eventBus } from '@/lib/services/event-bus';
 import { getTelemetrySummary } from '@/lib/services/telemetry-service';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { TelemetryEvent } from '@contracts';
 
 export const runtime = 'nodejs';
 
@@ -15,8 +15,8 @@ export async function GET(request: Request) {
 
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
-        let heartbeat: any;
-        let unsubscribe: any;
+        let heartbeat: unknown;
+        let unsubscribe: unknown;
 
         const cleanup = () => {
           if (heartbeat) clearInterval(heartbeat);

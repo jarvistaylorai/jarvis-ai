@@ -1,6 +1,6 @@
 import fs from "fs/promises"
 import path from "path"
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Project, Alert } from '@contracts';
 
 const DEFAULT_BASE = path.join(process.env.HOME ?? "", ".openclaw", "workspace", "jarvis", "system")
 const STATE_BASE = process.env.JARVIS_STATE_DIR || DEFAULT_BASE
@@ -31,7 +31,7 @@ export type JarvisState = {
   automation_rules: unknown[]
   agent_memory: unknown[]
   messages: unknown[]
-  system_state: Record<string, any> | null
+  system_state: Record<string, unknown> | null
   global_lists: unknown[]
 }
 

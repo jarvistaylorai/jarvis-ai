@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { Client } from 'pg';
 import { randomUUID } from 'crypto';
-import {  Agent, Alert, Task  } from '@contracts';
+import { Agent, Alert, Task } from '@contracts';
 
 export type MissionControlEvent =
   | { type: 'task.updated'; payload: Task }

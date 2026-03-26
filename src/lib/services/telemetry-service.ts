@@ -1,4 +1,4 @@
-import {  PaginatedResult, TelemetryEvent, TelemetryCategory, TelemetrySeverity  } from '@contracts';
+import { PaginatedResult, TelemetryEvent, TelemetryCategory, TelemetrySeverity } from '@contracts';
 import { prisma } from './database';
 import { getWorkspaceId } from '../workspace-utils';
 import type { Provider } from '../llm/types';
@@ -7,7 +7,7 @@ import type { ProviderPressure, RateLimiterMetricsSnapshot } from '../llm/rateLi
 import type { DuplicateStatus } from '../llm/promptCache';
 import type { MessageClassId } from '../messaging/messageClasses';
 import { resolveVerbosityThreshold } from '../messaging/verbosityThresholds';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { TelemetryEvent } from '@contracts';
 
 const DIGEST_TOKEN_RATE_USD = Number(process.env.DIGEST_TOKEN_RATE_USD ?? 0.000002);
 const VERBOSITY_ALERT_COOLDOWN_MS = Number(
@@ -38,7 +38,7 @@ export type CreateTelemetryInput = {
   severity: TelemetrySeverity;
   eventType: string;
   message: string;
-  payload?: Record<string, any>;
+  payload?: Record<string, unknown>;
   latencyMs?: number;
   tokensInput?: number;
   tokensOutput?: number;
@@ -118,7 +118,7 @@ export async function recordTelemetry(input: CreateTelemetryInput): Promise<Tele
       tokens_input: input.tokensInput || null,
       tokens_output: input.tokensOutput || null,
       cost_usd: input.costUsd || null
-    } as any
+    } as unknown
   });
   return mapTelemetry(record);
 }
@@ -388,7 +388,7 @@ export async function recordVerbositySample(params: {
       context: {
         rollingAvg,
         thresholds,
-      } as any,
+      } as unknown,
     },
   });
 

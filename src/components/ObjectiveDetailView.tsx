@@ -6,7 +6,7 @@ import {
   CheckCircle, Circle, Clock, Layers, Edit3, GripVertical, X, ExternalLink
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
+import { Task, Project, Objective } from '@contracts';
 
 const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-5 ${className}`}>
@@ -49,7 +49,7 @@ interface ObjectiveDetailViewProps {
 
 export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: ObjectiveDetailViewProps) => {
   const router = useRouter();
-  const [objective, setObjective] = useState<any>(null);
+  const [objective, setObjective] = useState<unknown>(null);
   const [loading, setLoading] = useState(true);
   const [selectedPhaseId, setSelectedPhaseId] = useState<string | null>(null);
   const [newPhaseTitle, setNewPhaseTitle] = useState('');
@@ -312,7 +312,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
           </div>
 
           <div className="flex flex-col gap-3">
-            {objective.phases?.map((phase: any, index: number) => {
+            {objective.phases?.map((phase: unknown, index: number) => {
               const isSelected = selectedPhaseId === phase.id;
               const isEditing = editingPhaseId === phase.id;
               const isActive = phase.status === 'IN_PROGRESS';

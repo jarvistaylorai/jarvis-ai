@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getSystemState } from '@/lib/system/state';
-import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
+import { Agent, Task, Project, Objective } from '@contracts';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +21,7 @@ function computePhaseMetrics(tasks: unknown[]) {
 
 function computeObjectiveMetrics(phases: unknown[]) {
   if (phases.length === 0) return { progress: 0, status: 'ACTIVE' };
-  const avgProgress = Math.round(phases.reduce((sum: number, p: any) => sum + p.progress, 0) / phases.length);
+  const avgProgress = Math.round(phases.reduce((sum: number, p: unknown) => sum + p.progress, 0) / phases.length);
   let status = 'ACTIVE';
   if (phases.every((p: Project) => p.status === 'COMPLETED')) status = 'COMPLETED';
   else if (phases.some((p: Project) => p.status === 'IN_PROGRESS' || p.status === 'COMPLETED')) status = 'IN_PROGRESS';
@@ -118,17 +118,17 @@ export async function GET(request: Request) {
     const fsState = await getSystemState();
 
     const mergedAgents = agents.map((a: Agent) => {
-      const fsA = fsState.agents?.find((fa: Record<string, any>) => fa.id === a.id);
+      const fsA = fsState.agents?.find((fa: Record<string, unknown>) => fa.id === a.id);
       return fsA ? { ...a, ...fsA } : a;
     });
-    const missingAgents = fsState.agents?.filter((fa: Record<string, any>) => !agents.find((a: Agent) => a.id === fa.id)) || [];
+    const missingAgents = fsState.agents?.filter((fa: Record<string, unknown>) => !agents.find((a: Agent) => a.id === fa.id)) || [];
     mergedAgents.push(...missingAgents);
 
     const mergedTasks = formattedTasks.map((t: Task) => {
-      const fsT = fsState.tasks?.find((ft: Record<string, any>) => ft.id === t.id);
+      const fsT = fsState.tasks?.find((ft: Record<string, unknown>) => ft.id === t.id);
       return fsT ? { ...t, ...fsT } : t;
     });
-    const missingTasks = fsState.tasks?.filter((ft: Record<string, any>) => !formattedTasks.find((t: Task) => t.id === ft.id)) || [];
+    const missingTasks = fsState.tasks?.filter((ft: Record<string, unknown>) => !formattedTasks.find((t: Task) => t.id === ft.id)) || [];
     mergedTasks.push(...missingTasks);
 
     const mergedActivity = fsState.activity && fsState.activity.length > 0 ? fsState.activity : activity;

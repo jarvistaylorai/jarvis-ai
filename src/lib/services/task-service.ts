@@ -1,9 +1,9 @@
 import type { Prisma } from '@prisma/client';
 import { prisma } from './database';
 import { eventBus } from './event-bus';
-import {  Task, TaskPriority, TaskStatus, TaskType, PaginatedResult  } from '@contracts';
+import { Task, TaskPriority, TaskStatus, TaskType, PaginatedResult } from '@contracts';
 import { getWorkspaceId } from '../workspace-utils';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Task } from '@contracts';
 
 const taskInclude = {
   objectives: { select: { id: true } },
@@ -41,7 +41,7 @@ export type CreateTaskInput = {
   startedAt?: string;
   completedAt?: string;
   blockedReason?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 };
 
 export type UpdateTaskInput = Partial<CreateTaskInput>;
@@ -87,7 +87,7 @@ function coerceType(type: string | null | undefined): TaskType {
 }
 
 function mergeMetadata(record: TaskRecord) {
-  const metadata = safeParse<Record<string, any>>(record.metadata, {});
+  const metadata = safeParse<Record<string, unknown>>(record.metadata, {});
   return metadata || {};
 }
 

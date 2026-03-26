@@ -3,7 +3,7 @@
 import React, { useState, useMemo } from 'react';
 import { CheckSquare, MessageSquare, Paperclip, Filter, Search } from 'lucide-react';
 import Link from 'next/link';
-import { Agent, Task, Project, Alert, TelemetryEvent } from '@contracts';
+import { Task, Project } from '@contracts';
 
 interface GlobalTaskListProps {
   initialTasks: unknown[];
@@ -112,7 +112,7 @@ export function GlobalTaskList({ initialTasks, projects, allLabels }: GlobalTask
                    {task.checklists?.length > 0 && (
                      <div className="flex items-center gap-1.5" title="Checklists">
                        <CheckSquare className="w-4 h-4" />
-                       <span className="text-xs">{task.checklists.reduce((acc: number, c: any) => acc + c.items.filter((i: Record<string, any>) => i.is_completed).length, 0)}/{task.checklists.reduce((acc: number, c: any) => acc + c.items.length, 0)}</span>
+                       <span className="text-xs">{task.checklists.reduce((acc: number, c: unknown) => acc + c.items.filter((i: Record<string, unknown>) => i.is_completed).length, 0)}/{task.checklists.reduce((acc: number, c: unknown) => acc + c.items.length, 0)}</span>
                      </div>
                    )}
                    {task.comments?.length > 0 && (

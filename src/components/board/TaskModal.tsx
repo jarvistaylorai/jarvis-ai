@@ -15,7 +15,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Agent, Task, Project, Alert, TelemetryEvent, Objective } from '@contracts';
+import { Agent, Task, Project, Objective } from '@contracts';
 
 function SortableLabel({ label, taskLabelIds, onToggle, onClickExternal }: { label: Label, taskLabelIds: Set<string>, onToggle: (l: Label) => void, onClickExternal: (e: React.MouseEvent) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: label.id });
@@ -97,8 +97,8 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
   const [newLabelName, setNewLabelName] = useState('');
   const [newLabelColor, setNewLabelColor] = useState('#4ade80');
   const [isUploading, setIsUploading] = useState(false);
-  const [objectives, setObjectives] = useState<any[]>([]);
-  const [projects, setProjects] = useState<any[]>([]);
+  const [objectives, setObjectives] = useState<unknown[]>([]);
+  const [projects, setProjects] = useState<unknown[]>([]);
   const [selectedObjectiveId, setSelectedObjectiveId] = useState<string | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const moreMenuRef = useRef<HTMLDivElement>(null);
@@ -364,7 +364,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
       let phaseObj = undefined;
       if (phaseId) {
         for (const obj of objectives) {
-          const p = (obj.phases || []).find((ph: Record<string, any>) => ph.id === phaseId);
+          const p = (obj.phases || []).find((ph: Record<string, unknown>) => ph.id === phaseId);
           if (p) {
             phaseObj = { id: p.id, title: p.title, objective: { id: obj.id, title: obj.title } };
             break;
@@ -372,7 +372,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
         }
       }
       
-      handleLocalUpdateTask({ phase_id: phaseId, phase: phaseObj } as any);
+      handleLocalUpdateTask({ phase_id: phaseId, phase: phaseObj } as unknown);
       setActivePopover(null);
       setSelectedObjectiveId(null);
     } catch (err) { console.error(err); }
@@ -658,7 +658,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
                           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndLabels}>
                             <SortableContext items={filteredLabels.map(l => l.id)} strategy={verticalListSortingStrategy}>
                               {filteredLabels.map(label => (
-                                <SortableLabel key={label.id} label={label} taskLabelIds={taskLabelIds} onToggle={handleToggleLabel} onClickExternal={(e: Record<string, any>) => { e.stopPropagation() }} />
+                                <SortableLabel key={label.id} label={label} taskLabelIds={taskLabelIds} onToggle={handleToggleLabel} onClickExternal={(e: Record<string, unknown>) => { e.stopPropagation() }} />
                               ))}
                             </SortableContext>
                           </DndContext>
@@ -909,7 +909,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
                   </div>
                   <div className="p-3 max-h-72 overflow-y-auto custom-scrollbar">
                     {/* Show current assignment */}
-                    {(task.metadata as any)?.phase_id || (task as any).phase_id && !selectedObjectiveId && (
+                    {(task.metadata as unknown)?.phase_id || (task as unknown).phase_id && !selectedObjectiveId && (
                       <div className="mb-3 p-3 rounded-lg bg-amber-500/[0.05] border border-amber-500/20">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
@@ -952,7 +952,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
                         return phases.length > 0 ? phases.map((phase: Record<string, unknown>) => (
                           <button key={phase.id} onClick={() => handleAssignPhase(phase.id)}
                             className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors text-left mb-1 ${
-                              (task.metadata as any)?.phase_id || (task as any).phase_id === phase.id
+                              (task.metadata as unknown)?.phase_id || (task as unknown).phase_id === phase.id
                                 ? 'bg-amber-500/[0.08] border border-amber-500/20'
                                 : 'hover:bg-white/[0.04]'
                             }`}>
@@ -964,7 +964,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
                               <p className="text-sm font-medium text-white">{phase.title}</p>
                               <span className="text-[10px] text-zinc-500 font-mono">{phase.task_count || 0} tasks · {phase.progress || 0}%</span>
                             </div>
-                            {(task.metadata as any)?.phase_id || (task as any).phase_id === phase.id && (
+                            {(task.metadata as unknown)?.phase_id || (task as unknown).phase_id === phase.id && (
                               <CheckSquare size={14} className="text-amber-400 shrink-0" />
                             )}
                           </button>
@@ -1059,11 +1059,11 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
               )}
 
               {/* Objective / Phase Assignment */}
-              {((task.metadata as any)?.phase_id || (task as any).phase_id) && (() => {
+              {((task.metadata as unknown)?.phase_id || (task as unknown).phase_id) && (() => {
                 let phaseName = '';
                 let objTitle = '';
                 for (const obj of objectives) {
-                  const p = (obj.phases || []).find((ph: Record<string, any>) => ph.id === ((task.metadata as any)?.phase_id || (task as any).phase_id));
+                  const p = (obj.phases || []).find((ph: Record<string, unknown>) => ph.id === ((task.metadata as unknown)?.phase_id || (task as unknown).phase_id));
                   if (p) { phaseName = p.title; objTitle = obj.title; break; }
                 }
                 return phaseName ? (
@@ -1179,7 +1179,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
                 <div className="">
                   <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Files</p>
                   <div className="space-y-3">
-                    {task.attachments.map((att: Record<string, any>) => {
+                    {task.attachments.map((att: Record<string, unknown>) => {
                       const isImage = /\.(jpg|jpeg|png|gif|webp)$/i.test(att.file_name);
                       const fileUrl = `/api/fs/raw?storagePath=${encodeURIComponent(att.file_path)}`;
 
@@ -1239,7 +1239,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
                        </div>
                     </div>
                     <div className="space-y-1">
-                      {cl.items.filter((i: Record<string, any>) => !(hiddenChecklists[cl.id] && i.is_completed)).map((item: Record<string, any>) => (
+                      {cl.items.filter((i: Record<string, unknown>) => !(hiddenChecklists[cl.id] && i.is_completed)).map((item: Record<string, unknown>) => (
                         <div key={item.id} className="flex items-start gap-3 hover:bg-white/[0.02] p-2.5 -ml-2.5 rounded-lg group transition-colors cursor-pointer" onClick={() => handleToggleChecklistItem(cl.id, item.id, !item.is_completed)}>
                           <div className="mt-0.5 relative flex items-center justify-center w-5 h-5 shrink-0">
                              <input type="checkbox" checked={item.is_completed}
@@ -1304,7 +1304,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6 custom-scrollbar">
-              {[...(task.comments || [])].sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((c: Task) => (
+              {[...(task.comments || [])].sort((a: unknown, b: unknown) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).map((c: Task) => (
                 <div key={c.id} className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center text-xs font-bold text-white shrink-0">
                     {c.author.substring(0, 2).toUpperCase()}
