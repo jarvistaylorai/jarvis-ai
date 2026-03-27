@@ -189,7 +189,7 @@ async function main() {
     }
   ];
 
-  function devAgentId(docs: any[]) {
+  function devAgentId(docs: agents[]) {
     return docs.find(a => a.handle === 'dev-agent')?.id;
   }
 
@@ -271,7 +271,7 @@ async function main() {
       canonicalMemoryContent = fs.readFileSync(memoryRootPath, 'utf8');
       console.log('  Loaded canonical MEMORY.md from disk.');
     }
-  } catch (e) {
+    } catch (e) {
     console.warn('  Failed to load physical MEMORY.md, using fallback content.');
   }
 

@@ -126,7 +126,7 @@ export function createDisciplinedHandler(
   handler: (req: NextRequest) => Promise<NextResponse>
 ) {
   return withMessageDiscipline(
-    async (req: NextRequest, ctx: MessageContext) => handler(req),
+        async (req: NextRequest, ctx: MessageContext) => handler(req),
     defaultClass
   );
 }

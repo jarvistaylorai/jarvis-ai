@@ -6,7 +6,7 @@ import { AgentWorkspaceClient } from '@/components/workspaces/AgentWorkspaceClie
 
 export default function WorkspacePage() {
   const params = useParams();
-  const router = useRouter();
+    const router = useRouter();
   const [agents, setAgents] = useState<string[]>([]);
   const agentId = (params?.agentId as string) || 'clay';
 

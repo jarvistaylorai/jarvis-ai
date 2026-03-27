@@ -17,7 +17,7 @@ export const SpendIntelligenceView = ({ activeWorkspace = 'business' }: { active
   const [forecast, setForecast] = useState<unknown>(null);
   const [timeseries, setTimeseries] = useState<unknown>(null);
   const [anomalies, setAnomalies] = useState<unknown[] | null>(null);
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {

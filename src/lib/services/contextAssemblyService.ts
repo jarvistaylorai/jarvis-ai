@@ -6,7 +6,7 @@
 import { PrismaClient, type agents } from '@prisma/client';
 import { 
   checkBudget, 
-  enforceBudget, 
+    enforceBudget, 
   estimateTokens,
   MODEL_BUDGETS,
   type BudgetStatus 
@@ -337,7 +337,7 @@ Obey safety rails, respect mission constraints, and only take actions you can ju
    * Layer 4: Tool Results
    * Summarized tool outputs
    */
-  private async buildLayer4(request: ContextAssemblyRequest): Promise<ContextLayer> {
+    private async buildLayer4(request: ContextAssemblyRequest): Promise<ContextLayer> {
     // TODO: Load from recent tool executions
     // For now, return empty (populated during execution)
     
@@ -355,7 +355,7 @@ Obey safety rails, respect mission constraints, and only take actions you can ju
    * Layer 5: Historical Summary
    * Compressed summary of older conversation
    */
-  private async buildLayer5(request: ContextAssemblyRequest): Promise<ContextLayer> {
+    private async buildLayer5(request: ContextAssemblyRequest): Promise<ContextLayer> {
     // TODO: Generate from older conversation
     // For now, return empty (will be populated in Phase 3)
     
@@ -373,7 +373,7 @@ Obey safety rails, respect mission constraints, and only take actions you can ju
    * Layer 6: File Excerpts
    * Relevant file sections retrieved on-demand
    */
-  private async buildLayer6(request: ContextAssemblyRequest): Promise<ContextLayer> {
+    private async buildLayer6(request: ContextAssemblyRequest): Promise<ContextLayer> {
     // TODO: Retrieve from file index
     // For now, return empty (will be populated in Phase 3)
     
@@ -394,7 +394,7 @@ Obey safety rails, respect mission constraints, and only take actions you can ju
   private applyBudgetStrategy(
     layers: ContextLayer[],
     budget: number,
-    initialTokens: number
+        initialTokens: number
   ): { finalLayers: ContextLayer[]; excludedLayers: string[]; wasTruncated: boolean } {
     const finalLayers: ContextLayer[] = [];
     const excludedLayers: string[] = [];

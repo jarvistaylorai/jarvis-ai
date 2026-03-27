@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Target, ArrowLeft, Plus, Trash2, Calendar, ChevronRight,
-  CheckCircle, Circle, Clock, Layers, Edit3, GripVertical, X, ExternalLink
+    Target, ArrowLeft, Plus, Trash2, Calendar, ChevronRight,
+    CheckCircle, Circle, Clock, Layers, Edit3, GripVertical, X, ExternalLink
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Task, Project, Objective } from '@contracts';
@@ -58,7 +58,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
   const [editingTitle, setEditingTitle] = useState('');
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskTitle, setEditingTaskTitle] = useState('');
-  const [assigningTaskPhaseId, setAssigningTaskPhaseId] = useState<string | null>(null);
+    const [assigningTaskPhaseId, setAssigningTaskPhaseId] = useState<string | null>(null);
   const newPhaseRef = useRef<HTMLInputElement>(null);
   const editRef = useRef<HTMLInputElement>(null);
   const editTaskRef = useRef<HTMLInputElement>(null);
@@ -78,7 +78,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
     fetchObjective();
     const interval = setInterval(fetchObjective, 3000);
     return () => clearInterval(interval);
-  }, [objectiveId]);
+    }, [objectiveId]);
 
   useEffect(() => {
     if (isAddingPhase && newPhaseRef.current) newPhaseRef.current.focus();
@@ -226,7 +226,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
     );
   }
 
-  const timeAgo = (dateStr: string) => {
+    const timeAgo = (dateStr: string) => {
     if (!dateStr) return 'Unknown';
     const num = Math.floor((new Date().getTime() - new Date(dateStr).getTime()) / 60000);
     if (num < 1) return 'Just now';
@@ -496,7 +496,7 @@ export const ObjectiveDetailView = ({ objectiveId, projects, onBack }: Objective
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[11px] font-bold text-zinc-400 uppercase tracking-[0.15em]">
-                  TASKS IN "{selectedPhase.title}"
+                  TASKS IN &quot;{selectedPhase.title}&quot;
                 </h3>
                 <div className="flex items-center gap-3">
                   <span className="text-[10px] text-zinc-600 font-mono">

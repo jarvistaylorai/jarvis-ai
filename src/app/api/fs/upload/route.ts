@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const { data: uploadData, error } = await supabaseAdmin.storage
+        const { data: uploadData, error } = await supabaseAdmin.storage
       .from(BUCKET_NAME)
       .upload(safeStoragePath, buffer, {
         contentType: file.type,

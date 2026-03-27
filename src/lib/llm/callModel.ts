@@ -145,7 +145,7 @@ export async function callModelWithDiscipline({
   // 2. MODEL SELECTION & DEGRADATION
   const runtimeNotices: string[] = [];
   const requestedModel = model;
-  const requestedProvider: Provider = provider;
+    const requestedProvider: Provider = provider;
   let selectedModel = model;
   let selectedProvider: Provider = provider;
   let downgradedFrom: string | undefined;
@@ -155,7 +155,7 @@ export async function callModelWithDiscipline({
   const globalUtilization =
     GLOBAL_DAILY_CAP === Infinity ? 0 : globalSpendToday / GLOBAL_DAILY_CAP;
 
-  const maybeDowngrade = (reason: string) => {
+    const maybeDowngrade = (reason: string) => {
     const downgraded = MODEL_DOWNGRADE_MAP[selectedModel];
     if (!downgraded || downgraded === selectedModel) return;
     

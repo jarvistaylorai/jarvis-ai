@@ -72,7 +72,7 @@ export function GlobalBoard({ tasks: initialTasks }: GlobalBoardProps) {
       try {
         const res = await fetch('/api/labels?project_id=global');
         if (res.ok) setLabels(await res.json());
-      } catch (e) {}
+            } catch (e) {}
     };
     fetchLabels();
   }, []);
@@ -125,7 +125,7 @@ export function GlobalBoard({ tasks: initialTasks }: GlobalBoardProps) {
 
     if (active.data.current?.type === 'Task') {
       const activeStatus = active.data.current.task.status;
-      const overStatus = over.data.current?.type === 'Column' ? overId : over.data.current?.task?.status;
+            const overStatus = over.data.current?.type === 'Column' ? overId : over.data.current?.task?.status;
       
       const prevTask = initialTasks.find(t => t.id === activeId);
       if (prevTask && prevTask.status !== activeStatus) {

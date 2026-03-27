@@ -1,4 +1,4 @@
-export type Provider = 'openai' | 'anthropic' | 'google' | 'ollama' | string;
+export type Provider = 'openrouter' | 'openai' | 'anthropic' | 'google' | 'ollama' | string;
 
 export interface RateLimiterMetadata {
   requestId?: string;

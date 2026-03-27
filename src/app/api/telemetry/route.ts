@@ -6,7 +6,7 @@ import { TelemetryCategory, TelemetrySeverity } from '@contracts';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { type, agent_id, task_id, project_id, timestamp, metadata } = body;
+        const { type, agent_id, task_id, project_id, timestamp, metadata } = body;
 
     if (!type) {
       return NextResponse.json({ error: 'type is required' }, { status: 400 });

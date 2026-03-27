@@ -10,10 +10,10 @@ import { RoutineFormModal } from "./routines/RoutineFormModal";
 export function RoutinesView({ activeWorkspace = 'business' }: { activeWorkspace?: string }) {
   const [routines, setRoutines] = useState<unknown[]>([]);
   const [view, setView] = useState<"Week" | "Today">("Week");
-  const [selectedRoutine, setSelectedRoutine] = useState<any | null>(null);
+  const [selectedRoutine, setSelectedRoutine] = useState<unknown | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const fetchRoutines = async () => {
+    const fetchRoutines = async () => {
     try {
       const res = await fetch(`/api/routines?workspace=${activeWorkspace}`);
       if (res.ok) {

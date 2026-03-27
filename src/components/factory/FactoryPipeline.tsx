@@ -17,7 +17,7 @@ const columnsData = [
 export const FactoryPipeline = ({ activeWorkspace = 'business' }: { activeWorkspace?: string }) => {
   const [tasks, setTasks] = useState<FactoryTask[]>([]);
   const [activeTask, setActiveTask] = useState<FactoryTask | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
 
   // Stats derived state
   const shippedToday = tasks.filter(t => t.stage === 'deployment' && new Date(t.updated_at).getDate() === new Date().getDate()).length;

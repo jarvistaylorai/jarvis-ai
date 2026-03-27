@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Task, Project } from '@contracts';
 import { 
-  ArrowLeft, Activity, Play, Pause, Plus, Zap, AlertTriangle, 
-  CheckCircle, Clock, Users, TerminalSquare, ShieldAlert
+      ArrowLeft, Activity, Play, Pause, Plus, Zap, AlertTriangle, 
+    CheckCircle, Clock, Users, TerminalSquare, ShieldAlert
 } from 'lucide-react';
 
 export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'business' }: { projectId: string; onBack: () => void; activeWorkspace?: string; }) => {
@@ -16,7 +16,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
       if (res.ok) {
          setProject(await res.json());
       }
-    } catch (e) {} finally {
+        } catch (e) {} finally {
       setLoading(false);
     }
   };
@@ -25,7 +25,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
     fetchProject();
     const interval = setInterval(fetchProject, 3000);
     return () => clearInterval(interval);
-  }, [projectId]);
+    }, [projectId]);
 
   const handleAction = async (action: string) => {
     try {
@@ -40,7 +40,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
           body: JSON.stringify(data)
        });
        fetchProject();
-    } catch (e) {}
+        } catch (e) {}
   };
 
   const handlePriorityChange = async (newPriority: string) => {
@@ -53,7 +53,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
         body: JSON.stringify({ priority: dbPriority })
       });
       fetchProject();
-    } catch (e) {}
+        } catch (e) {}
   };
 
   const handleAddTask = async () => {
@@ -66,7 +66,7 @@ export const ProjectFocusView = ({ projectId, onBack, activeWorkspace = 'busines
           body: JSON.stringify({ title, project_id: projectId })
        });
        fetchProject();
-    } catch(e) {}
+        } catch(e) {}
   };
 
   if (loading) return <div className="h-full flex items-center justify-center text-zinc-500">Loading project...</div>;

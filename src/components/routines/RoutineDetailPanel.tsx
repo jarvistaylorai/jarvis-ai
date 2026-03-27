@@ -8,9 +8,9 @@ export function RoutineDetailPanel({ routine, onClose, onRefresh }: { routine: u
   const [executions, setExecutions] = useState<unknown[]>([]);
   const [loadingExecs, setLoadingExecs] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
-  const [selectedExecution, setSelectedExecution] = useState<any | null>(null);
+  const [selectedExecution, setSelectedExecution] = useState<unknown | null>(null);
 
-  const fetchExecutions = async () => {
+    const fetchExecutions = async () => {
     try {
       const res = await fetch(`/api/routines/${routine.id}/executions`);
       if (res.ok) {

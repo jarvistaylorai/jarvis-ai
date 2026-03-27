@@ -30,7 +30,7 @@ export const getSafeFsPath = (userPath: string | null, workspace: string = 'busi
 export const ensureDirectory = async (dirPath: string) => {
   try {
     await fs.mkdir(dirPath, { recursive: true });
-  } catch (error) {
+    } catch (error) {
     // Ignore if directory already exists
   }
 };

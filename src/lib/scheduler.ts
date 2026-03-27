@@ -1,4 +1,4 @@
-const cronParser = require("cron-parser");
+import cronParser from "cron-parser";
 import { v4 as uuidv4 } from "uuid";
 import { getRoutines, updateRoutine, addExecution, Routine, RoutineExecution } from "./routines";
 import { applyBurstSmoothing } from "./llm/burstSmoother";
@@ -114,7 +114,7 @@ export async function checkAndRunRoutines() {
           try {
             const interval = cronParser.parseExpression(routine.cron_expression);
             computedNextRun = interval.next().toDate();
-          } catch (e) {
+                    } catch (e) {
             console.error("Invalid cron", routine.cron_expression);
             // Default retry in 5 mins
              computedNextRun = new Date(now.getTime() + 5 * 60000);
@@ -126,7 +126,7 @@ export async function checkAndRunRoutines() {
            computedNextRun = new Date(now.getTime() + 60000);
         }
 
-        // @ts-expect-error
+        // @ts-expect-error - overriding next_run_at with an ISO string is acceptable for DB sync
         await updateRoutine(routine.id, { next_run_at: computedNextRun.toISOString() });
       }
     }

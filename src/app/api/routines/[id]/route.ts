@@ -14,7 +14,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   try {
     const updated = await updateRoutine(id, body);
     return NextResponse.json(updated);
-  } catch (error) {
+    } catch (error) {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }

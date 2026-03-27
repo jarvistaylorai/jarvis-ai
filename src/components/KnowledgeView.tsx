@@ -28,7 +28,7 @@ export function KnowledgeView({ activeWorkspace = 'business' }: { activeWorkspac
     }
   }, [searchQuery, activeWorkspace, fetchDocs, searchDocs]);
 
-  const fetchDocs = async () => {
+      const fetchDocs = async () => {
     try {
       const res = await fetch(`/api/knowledge?workspace=${activeWorkspace}`);
       const data = await res.json();
@@ -47,7 +47,7 @@ export function KnowledgeView({ activeWorkspace = 'business' }: { activeWorkspac
     }
   };
 
-  const searchDocs = async (query: string) => {
+    const searchDocs = async (query: string) => {
     try {
       const res = await fetch(`/api/knowledge/search?q=${encodeURIComponent(query)}&workspace=${activeWorkspace}`);
       const results = await res.json();

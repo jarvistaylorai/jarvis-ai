@@ -8,7 +8,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const workspace = searchParams.get('workspace') || 'business';
 
-    const [avoidableByAgent, messageClassStats, reasonStats, downgradeStats, totalCalls, duplicateCalls, avoidableEvents, trendRows, fingerprintLeaders, fingerprintTrend] = await Promise.all([
+        const [avoidableByAgent, messageClassStats, reasonStats, downgradeStats, totalCalls, duplicateCalls, avoidableEvents, trendRows, fingerprintLeaders, fingerprintTrend] = await Promise.all([
       prisma.spendLog.groupBy({
         by: ['agent_id'],
         where: { workspace },

@@ -22,7 +22,7 @@ export async function GET(
     }
 
     return NextResponse.json(config);
-  } catch (error) {
+    } catch (error) {
     return NextResponse.json({ error: "Failed to fetch config" }, { status: 500 });
   }
 }

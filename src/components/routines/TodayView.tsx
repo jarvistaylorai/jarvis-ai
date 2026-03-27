@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, AlertCircle, Clock, Loader2 } from "lucide-react";
 
 export function TodayView({ routines, onClickRoutine }: { routines: unknown[], onClickRoutine: unknown }) {
-  const [executions, setExecutions] = useState<unknown[]>([]);
+      const [executions, setExecutions] = useState<unknown[]>([]);
 
   useEffect(() => {
     // Fetch recent executions across all routines
@@ -22,7 +22,7 @@ export function TodayView({ routines, onClickRoutine }: { routines: unknown[], o
   return (
     <div className="h-full pt-4 flex flex-col items-center">
       <div className="w-full max-w-3xl bg-neutral-900 border border-neutral-800 rounded-2xl h-full p-6 overflow-y-auto">
-        <h2 className="text-lg font-medium text-white mb-6">Today's Timeline</h2>
+        <h2 className="text-lg font-medium text-white mb-6">Today&apos;s Timeline</h2>
         <div className="relative pl-6 border-l border-neutral-800 space-y-8">
           
           {routines.filter((r: Record<string, unknown>) => r.last_run_at).sort((a: unknown, b: unknown) => new Date(b.last_run_at).getTime() - new Date(a.last_run_at).getTime()).map((r: Record<string, unknown>) => (

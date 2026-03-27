@@ -1,10 +1,11 @@
-type ModelId = 'google/gemini-3-pro' | 'openai/gpt-4o' | 'ollama/llama3.3';
+type ModelId = string;
 
-const FALLBACK_CHAIN: ModelId[] = [
-  'google/gemini-3-pro',
-  'openai/gpt-4o',
-  'ollama/llama3.3',
-];
+const ENV_FALLBACK = (process.env.OPENROUTER_FALLBACK_CHAIN || '')
+  .split(',')
+  .map((entry) => entry.trim())
+  .filter(Boolean);
+
+const FALLBACK_CHAIN: ModelId[] = ENV_FALLBACK.length > 0 ? ENV_FALLBACK : [process.env.OPENROUTER_DEFAULT_MODEL || 'openrouter/auto'];
 
 type AttemptLog = {
   model: string;
@@ -18,36 +19,33 @@ type FallbackResult<T> = {
   attempts: AttemptLog[];
 };
 
-function providerAvailable(model: ModelId): boolean {
-  if (model.startsWith('google/')) {
-    return Boolean(process.env.GEMINI_API_KEY);
-  }
-  if (model.startsWith('openai/')) {
-    return Boolean(process.env.OPENAI_API_KEY);
-  }
-  return true; // assume local/ollama always available
+function providerAvailable(): boolean {
+  return Boolean(process.env.OPENROUTER_API_KEY);
 }
 
-function resolveChain(preferred?: string): ModelId[] {
-  if (!preferred) return FALLBACK_CHAIN;
+function resolveChain(preferred?: string, overrides?: string[]): ModelId[] {
+  const baseChain = overrides && overrides.length > 0 ? overrides : FALLBACK_CHAIN;
+  if (!preferred) return baseChain;
+
   const normalized = preferred as ModelId;
-  if (!FALLBACK_CHAIN.includes(normalized)) {
-    return [normalized, ...FALLBACK_CHAIN];
+  if (!baseChain.includes(normalized)) {
+    return [normalized, ...baseChain];
   }
-  const rest = FALLBACK_CHAIN.filter(m => m !== normalized);
+  const rest = baseChain.filter((model) => model !== normalized);
   return [normalized, ...rest];
 }
 
 export async function executeWithModelFallback<T>(
   preferredModel: string | undefined,
-  handler: (model: string) => Promise<T>
+  handler: (model: string) => Promise<T>,
+  options?: { fallbackChain?: string[] }
 ): Promise<FallbackResult<T>> {
-  const chain = resolveChain(preferredModel);
+  const chain = resolveChain(preferredModel, options?.fallbackChain);
   const attempts: AttemptLog[] = [];
 
   for (const model of chain) {
-    if (!providerAvailable(model)) {
-      attempts.push({ model, success: false, error: 'provider credentials missing' });
+    if (!providerAvailable()) {
+      attempts.push({ model, success: false, error: 'openrouter credentials missing' });
       continue;
     }
 
@@ -57,7 +55,7 @@ export async function executeWithModelFallback<T>(
       console.log(`[ModelRouter] Using ${model}`);
       return { result, modelUsed: model, attempts };
     } catch (error: unknown) {
-      const message = error?.message || String(error);
+      const message = (error as Error)?.message || String(error);
       attempts.push({ model, success: false, error: message });
       console.warn(`[ModelRouter] ${model} failed: ${message}`);
     }

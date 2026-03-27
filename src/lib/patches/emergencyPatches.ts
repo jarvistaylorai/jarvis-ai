@@ -52,8 +52,8 @@ function patchToolOutputs(): void {
   console.log('[Patch 1] Tool output summarization enabled');
   
   // Store original console methods for tool output logging
-  const originalConsoleLog = console.log;
-  const originalConsoleError = console.error;
+    const originalConsoleLog = console.log;
+    const originalConsoleError = console.error;
   
   // This would be hooked into the actual tool execution layer
   // For now, we provide the summarization function

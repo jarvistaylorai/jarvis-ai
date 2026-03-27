@@ -70,7 +70,7 @@ export function useLiveMissionControl(workspaceId: string) {
           ...(old || {}),
           telemetry: telemetry
         }));
-      } catch (err) {}
+            } catch (err) {}
     });
 
     eventSource.addEventListener('task.updated', (e) => {
@@ -92,7 +92,7 @@ export function useLiveMissionControl(workspaceId: string) {
           else tasks.unshift(task);
           return { ...old, tasks };
         });
-      } catch (err) {}
+            } catch (err) {}
     });
 
     eventSource.addEventListener('agent.updated', (e) => {
@@ -114,7 +114,7 @@ export function useLiveMissionControl(workspaceId: string) {
           else agents.unshift(agent);
           return { ...old, agents };
         });
-      } catch (err) {}
+            } catch (err) {}
     });
 
     eventSource.addEventListener('alert.created', (e) => {
@@ -128,7 +128,7 @@ export function useLiveMissionControl(workspaceId: string) {
           if (!old) return old;
           return { ...old, alerts: [alert, ...(old.alerts || [])] };
         });
-      } catch (err) {}
+            } catch (err) {}
     });
 
     eventSource.addEventListener('telemetry.created', (e) => {
@@ -150,7 +150,7 @@ export function useLiveMissionControl(workspaceId: string) {
             events: [event, ...(old.events || [])]
           };
         });
-      } catch (err) {}
+            } catch (err) {}
     });
 
     return () => {
@@ -161,7 +161,7 @@ export function useLiveMissionControl(workspaceId: string) {
 
 // Mutations
 export function useUpdateTask() {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...data }: Partial<Task> & { id: string }) => {
       const res = await fetch(`/api/tasks/${id}`, {
@@ -172,7 +172,7 @@ export function useUpdateTask() {
       if (!res.ok) throw new Error(await res.text());
       return res.json();
     },
-    onSuccess: (data, variables) => {
+            onSuccess: (data, variables) => {
       // The SSE stream will catch the update and update the queries automatically,
       // but we can also eagerly invalidate if desired.
       // queryClient.invalidateQueries({ queryKey: ['tasks'] });

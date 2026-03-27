@@ -36,7 +36,7 @@ export const FileEditorModal: React.FC<FileEditorModalProps> = ({ isOpen, onClos
         fetchContent();
       }
     }
-  }, [isOpen, filePath, isUneditable]);
+    }, [isOpen, filePath, isUneditable]);
 
   const fetchContent = async () => {
     setLoading(true);

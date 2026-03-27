@@ -48,7 +48,7 @@ export const FilesystemView = ({ activeWorkspace = 'business' }: { activeWorkspa
   const [newFolderName, setNewFolderName] = useState('');
   const [itemToDelete, setItemToDelete] = useState<unknown>(null);
 
-  const fetchItems = async (path: string) => {
+    const fetchItems = async (path: string) => {
     setLoading(true);
     try {
       const res = await fetch(`/api/fs/list?path=${encodeURIComponent(path)}&workspace=${activeWorkspace}`, { cache: 'no-store' });

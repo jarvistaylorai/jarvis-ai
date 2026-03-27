@@ -38,7 +38,7 @@ export async function GET() {
     }
 
     return NextResponse.json(providers);
-  } catch (error) {
+    } catch (error) {
     return NextResponse.json({ error: "Failed to fetch providers" }, { status: 500 });
   }
 }
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       }
     });
     return NextResponse.json(provider);
-  } catch (error) {
+    } catch (error) {
     return NextResponse.json({ error: "Failed to update provider" }, { status: 500 });
   }
 }

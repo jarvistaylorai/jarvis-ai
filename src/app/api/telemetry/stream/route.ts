@@ -5,6 +5,8 @@ import { TelemetryEvent } from '@contracts';
 
 export const runtime = 'nodejs';
 
+type StreamEvent = { payload?: Record<string, unknown>; type?: string; event_type?: string };
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -15,33 +17,32 @@ export async function GET(request: Request) {
 
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
-        let heartbeat: unknown;
-        let unsubscribe: unknown;
-
-        const cleanup = () => {
-          if (heartbeat) clearInterval(heartbeat);
-          if (unsubscribe) unsubscribe();
-        };
-
-        const send = (event: TelemetryEvent) => {
-          const payloadWorkspace = (event.payload?.workspace_id || event.payload?.workspace) ?? workspaceId;
-          if (payloadWorkspace !== workspaceId) return;
-          try {
-            controller.enqueue(
-              encoder.encode(`event: ${event.type}\ndata: ${JSON.stringify(event.payload)}\n\n`)
-            );
-          } catch (err) {
-            cleanup();
-          }
-        };
-
-        heartbeat = setInterval(() => {
+        let unsubscribe: (() => void) | undefined;
+        const heartbeat = setInterval(() => {
           try {
             controller.enqueue(encoder.encode(': keep-alive\n\n'));
           } catch (err) {
             cleanup();
           }
         }, 15000);
+
+        const cleanup = () => {
+          clearInterval(heartbeat);
+          if (unsubscribe) unsubscribe();
+        };
+
+        const send = (event: StreamEvent) => {
+          const payload = event.payload as Record<string, unknown> | undefined;
+          const payloadWorkspace = (payload?.workspace_id ?? payload?.workspace) as string | undefined;
+          if ((payloadWorkspace || workspaceId) !== workspaceId) return;
+          try {
+            controller.enqueue(
+              encoder.encode(`event: ${event.event_type || event.type || 'message'}\ndata: ${JSON.stringify(event.payload)}\n\n`)
+            );
+          } catch (err) {
+            cleanup();
+          }
+        };
 
         try {
           controller.enqueue(
@@ -66,6 +67,7 @@ export async function GET(request: Request) {
     });
   } catch (error: unknown) {
     console.error('API Error [GET /api/telemetry/stream]:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const msg = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

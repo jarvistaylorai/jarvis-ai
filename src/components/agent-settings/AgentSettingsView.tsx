@@ -39,7 +39,7 @@ export const AgentSettingsView = ({ agents = [], activeWorkspace = 'business' }:
       
       const cfgs = await confRes.json();
       setAgentConfigs(Array.isArray(cfgs) ? cfgs : []);
-    } catch(e) {}
+        } catch(e) {}
   };
 
   useEffect(() => {

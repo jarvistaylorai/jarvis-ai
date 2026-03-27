@@ -11,10 +11,10 @@ import { Task, Project } from '@contracts';
 
 export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWorkspace = 'business' }: { tasks?: unknown[], projects?: unknown[], globalLists?: unknown[], activeWorkspace?: string }) => {
   const queryClient = useQueryClient();
-  const { data: tasksData, isLoading: tasksLoading } = useTasks(activeWorkspace);
+    const { data: tasksData, isLoading: tasksLoading } = useTasks(activeWorkspace);
   const { data: projectsData } = useProjects(activeWorkspace);
-  const tasks = tasksData?.data || _t || [];
-  const projects = projectsData?.data || _p || [];
+    const tasks = tasksData?.data || _t || [];
+    const projects = projectsData?.data || _p || [];
   const [projectIdFilter, setProjectIdFilter] = useState<string>('all');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -35,7 +35,7 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
     handleHash();
     window.addEventListener('hashchange', handleHash);
     return () => window.removeEventListener('hashchange', handleHash);
-  }, []);
+    }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -54,10 +54,10 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
         const pid = projectIdFilter === 'all' ? 'global' : projectIdFilter;
         const res = await fetch(`/api/labels?project_id=${pid}&workspace=${activeWorkspace}`);
         if (res.ok) setLabels(await res.json());
-      } catch (e) {}
+            } catch (e) {}
     };
     fetchLabels();
-  }, [projectIdFilter]);
+    }, [projectIdFilter]);
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task: Task) => {
@@ -86,7 +86,7 @@ export const TasksView = ({ tasks: _t, projects: _p, globalLists = [], activeWor
       ...gl,
       tasks: filteredTasks.filter((t: Task) => t.status === gl.id || t.status === gl.id.replace('_', '-')).sort((a: unknown, b: unknown) => (a.position||0) - (b.position||0))
     }));
-  }, [globalLists, filteredTasks]);
+    }, [globalLists, filteredTasks]);
 
   const stats = useMemo(() => {
     const total = filteredTasks.length;

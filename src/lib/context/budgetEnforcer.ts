@@ -21,6 +21,12 @@ export interface BudgetStatus {
 
 // Hard limits for each model
 export const MODEL_BUDGETS: Record<string, ModelBudget> = {
+  'openrouter/auto': {
+    model: 'openrouter/auto',
+    totalBudget: 200000,
+    warningThreshold: 0.75,
+    criticalThreshold: 0.9,
+  },
   'kimi-k2.5': {
     model: 'kimi-k2.5',
     totalBudget: 100000,      // Leave 28k for output
@@ -53,8 +59,8 @@ export const MODEL_BUDGETS: Record<string, ModelBudget> = {
   },
 };
 
-// Default to Kimi budget if model not found
-const DEFAULT_BUDGET: ModelBudget = MODEL_BUDGETS['kimi-k2.5'];
+// Default to OpenRouter auto budget if model not found
+const DEFAULT_BUDGET: ModelBudget = MODEL_BUDGETS['openrouter/auto'];
 
 /**
  * Estimate token count from text
@@ -146,13 +152,12 @@ export function enforceBudget(
  * Quick routing for emergency use
  */
 export function suggestModel(estimatedTokens: number): string {
-  if (estimatedTokens < 16000) {
-    return 'kimi-k2.5';
-  } else if (estimatedTokens < 100000) {
-    return 'claude-3.7-sonnet';
-  } else {
-    return 'gemini-1.5-pro';
+  const defaultModel = 'openrouter/auto';
+  const budget = MODEL_BUDGETS[defaultModel];
+  if (!budget || estimatedTokens <= budget.totalBudget * 0.9) {
+    return defaultModel;
   }
+  return defaultModel;
 }
 
 /**

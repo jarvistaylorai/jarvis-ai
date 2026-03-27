@@ -16,7 +16,7 @@ export function CanonicalMemoryView() {
     fetchMemory();
   }, [fetchMemory]);
 
-  const fetchMemory = async () => {
+    const fetchMemory = async () => {
     setLoading(true);
     try {
       // For viewing purposes, we assume it's synced. Let's trigger a sync and get from DB.

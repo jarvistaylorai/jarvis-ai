@@ -63,12 +63,12 @@ const MODELS: ModelInfo[] = [
 ];
 
 export function ModelSelector({
-  agentId,
+    agentId,
   currentModel = "kimi-k2.5",
   estimatedTokens = 0,
   taskType = "conversation",
   onModelChange,
-  workspaceId = "business",
+    workspaceId = "business",
 }: ModelSelectorProps) {
   const [selectedModel, setSelectedModel] = useState(currentModel);
   const [recommendedModel, setRecommendedModel] = useState(currentModel);
@@ -97,7 +97,7 @@ export function ModelSelector({
     if (route.model !== selectedModel && onModelChange) {
       onModelChange(route.model);
     }
-  }, [estimatedTokens, taskType, currentModel]);
+    }, [estimatedTokens, taskType, currentModel]);
 
   const handleModelChange = (modelId: string) => {
     setSelectedModel(modelId);

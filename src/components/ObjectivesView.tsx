@@ -58,7 +58,7 @@ export const ObjectivesView = ({ objectives: initialObjectives = [], projects = 
   useEffect(() => {
     fetchObjectives();
     // Removed aggressive polling to fix rendering glitches
-  }, [activeWorkspace]);
+    }, [activeWorkspace]);
 
   const handleSubmit = async () => {
     if (!form.title) return;

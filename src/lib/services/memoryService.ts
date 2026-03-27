@@ -124,7 +124,7 @@ export class MemoryService {
   /**
    * Get similar past tasks
    */
-  async getSimilarTasks(taskId: string, limit: number = 3): Promise<unknown[]> {
+    async getSimilarTasks(taskId: string, limit: number = 3): Promise<unknown[]> {
     // TODO: Implement semantic similarity search
     return [];
   }

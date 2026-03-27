@@ -63,6 +63,16 @@ const FALLBACK_LIMITS: ProviderLimits = {
 };
 
 const BASE_LIMITS: Record<Provider, ProviderLimits> = {
+  openrouter: {
+    rpm: Number(process.env.OPENROUTER_RPM_LIMIT ?? 60),
+    tpm: Number(process.env.OPENROUTER_TPM_LIMIT ?? 200_000),
+    concurrency: Number(process.env.OPENROUTER_CONCURRENCY_LIMIT ?? 3),
+    safetyMultiplier: Number(process.env.OPENROUTER_TOKEN_SAFETY ?? 1.05),
+    headroom: DEFAULT_HEADROOM,
+    burstJitterMs: 200,
+    priorityWeights: DEFAULT_PRIORITY_WEIGHTS,
+    retry: DEFAULT_RETRIES,
+  },
   openai: {
     rpm: Number(process.env.OPENAI_RPM_LIMIT ?? 5),
     tpm: Number(process.env.OPENAI_TPM_LIMIT ?? 300_000),

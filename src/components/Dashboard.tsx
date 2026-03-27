@@ -5,9 +5,9 @@ import React, { useState, useEffect } from 'react';
 import { useDashboard, useLiveMissionControl } from '@/hooks/useMissionControl';
 import { 
   Activity, AlertTriangle, CheckCircle, Database, Layers,
-  ShieldAlert, Cpu, Settings, LayoutDashboard, Users, 
+    ShieldAlert, Cpu, Settings, LayoutDashboard, Users, 
   FolderKanban, CheckSquare, TerminalSquare, Command,
-  Target, Zap, Bell, BrainCircuit, ChevronDown, Fingerprint
+  Target, Zap, Bell, BrainCircuit, ChevronDown, Fingerprint, MessageSquare
 } from 'lucide-react';
 import { ProjectsView } from './ProjectsView';
 import { AgentsView } from './AgentsView';
@@ -24,7 +24,8 @@ import { FactoryPipeline } from './factory/FactoryPipeline';
 import { KnowledgeView } from './KnowledgeView';
 import { SpendIntelligenceView } from './spend/SpendIntelligenceView';
 import { WorkspacesView } from './workspaces/WorkspacesView';
-import { Agent, Task, Project, Alert } from '@contracts';
+import { ChatView } from './chat/ChatView';
+import { Agent, Task, Project, Alert, Objective } from '@contracts';
 
 const Card = ({ children, className = "" }: { children?: React.ReactNode; className?: string }) => (
   <div className={`bg-[#0f0f11] border border-white/[0.04] rounded-2xl shadow-2xl p-6 ${className}`}>
@@ -58,7 +59,7 @@ const NavItem = ({ icon: Icon, label, active, onClick, href }: { icon: unknown; 
 };
 
 const VALID_VIEWS = [
-  'dashboard', 'projects', 'agents', 'agent-settings', 'tasks', 'pipeline', 'objectives',
+  'dashboard', 'chat', 'projects', 'agents', 'agent-settings', 'tasks', 'pipeline', 'objectives',
   'alerts', 'routines', 'automations', 'telemetry', 'filesystem', 'settings', 'knowledge', 'spend', 'workspaces'
 ];
 
@@ -75,6 +76,7 @@ export const Dashboard = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('jarvis_workspace');
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (saved) setActiveWorkspaceState(saved);
     }
   }, []);
@@ -104,7 +106,7 @@ export const Dashboard = () => {
   }, []);
   // React Query & SSE Hook setup
   useLiveMissionControl(activeWorkspace);
-  const { data: dashboardData, isLoading, isError } = useDashboard(activeWorkspace);
+    const { data: dashboardData, isLoading, isError } = useDashboard(activeWorkspace);
 
   // Fallback defaults to match legacy structures while loading
   const data = dashboardData || {
@@ -113,15 +115,15 @@ export const Dashboard = () => {
     objectives: [], phases: [], alerts: [], agent_memory: [], automation_rules: [], global_lists: []
   };
 
-  // Re-map telemetry to activity to preserve sub-component compat
+  const mappedData = { ...data };
   if (dashboardData?.telemetry?.events) {
-    data.activity = dashboardData.telemetry.events;
+    mappedData.activity = dashboardData.telemetry.events;
   }
   
   useEffect(() => {
     // Engine loop can stay but we rely on SSE for live updates
     const engineInterval = setInterval(async () => {
-      try { await fetch(`/api/engine?workspace=${activeWorkspace}`, { method: 'POST' }); } catch (e) {}
+            try { await fetch(`/api/engine?workspace=${activeWorkspace}`, { method: 'POST' }); } catch (e) {}
     }, 5000);
     return () => clearInterval(engineInterval);
   }, [activeWorkspace]);
@@ -139,7 +141,7 @@ export const Dashboard = () => {
     return 'text-zinc-400 bg-zinc-500/10 border-zinc-500/20';
   };
 
-  const activeAlerts = (data.alerts || []).filter((a: Agent) => a.status === 'ACTIVE');
+  const activeAlerts = (data.alerts || []).filter((a: Alert) => a.status === 'ACTIVE');
 
   return (
     <div className="flex h-screen bg-[#050505] text-zinc-300 font-sans tracking-tight overflow-hidden">
@@ -202,6 +204,7 @@ export const Dashboard = () => {
         <nav className="flex-1 py-6 px-4 flex flex-col gap-2 overflow-y-auto">
           <div className="text-[9px] font-bold text-zinc-600 uppercase tracking-[0.2em] px-4 mb-2">Systems</div>
           <NavItem icon={LayoutDashboard} label="Dashboard" active={activeView === 'dashboard'} onClick={() => setActiveView('dashboard')} />
+          <NavItem icon={MessageSquare} label="Chat" active={activeView === 'chat'} onClick={() => setActiveView('chat')} />
           <NavItem icon={FolderKanban} label="Projects" active={activeView === 'projects'} onClick={() => setActiveView('projects')} />
           <NavItem icon={Users} label="Agents" active={activeView === 'agents' || activeView === 'agent-settings' || activeView === 'spend'} onClick={() => setActiveView('agents')} />
           { (activeView === 'agents' || activeView === 'agent-settings' || activeView === 'spend') && (
@@ -445,6 +448,10 @@ export const Dashboard = () => {
                 </section>
               </div>
             </div>
+          )}
+
+          {activeView === 'chat' && (
+            <ChatView activeWorkspace={activeWorkspace} />
           )}
 
           {/* PHASE 3 VIEWS */}

@@ -66,7 +66,7 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
         try {
            const res = await fetch(`/api/labels?project_id=${pid}&workspace=${activeWorkspace}`);
            if (res.ok) setLocalLabels(await res.json());
-        } catch (e) {}
+                } catch (e) {}
      };
      fetchScopedLabels();
   }, [task.project_id, activeWorkspace]);
@@ -465,8 +465,8 @@ export function TaskModal({ task: initialTask, onClose, onUpdateTask, onDeleteTa
 
   const filteredMembers = boardMembers.filter(m => m.name.toLowerCase().includes(memberSearch.toLowerCase()));
 
-  const checklistTotal = task.checklists?.reduce((acc, c) => acc + c.items.length, 0) || 0;
-  const checklistDone = task.checklists?.reduce((acc, c) => acc + c.items.filter(i => i.is_completed).length, 0) || 0;
+    const checklistTotal = task.checklists?.reduce((acc, c) => acc + c.items.length, 0) || 0;
+    const checklistDone = task.checklists?.reduce((acc, c) => acc + c.items.filter(i => i.is_completed).length, 0) || 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/60 backdrop-blur-md p-4 pt-12 animate-in fade-in duration-200 overflow-y-auto" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>

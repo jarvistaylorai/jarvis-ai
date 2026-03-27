@@ -138,7 +138,7 @@ export const WorkspaceMain = ({
                     {content}
                   </ReactMarkdown>
                 ) : (
-                  <div className="text-zinc-600 italic">This file is currently empty. Click "Quick Edit" to add content.</div>
+                  <div className="text-zinc-600 italic">This file is currently empty. Click &quot;Quick Edit&quot; to add content.</div>
                 )}
               </div>
             )}

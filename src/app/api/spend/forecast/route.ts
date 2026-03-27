@@ -4,7 +4,7 @@ import { getOpenAIdailySpend } from '@/lib/openai-spend';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const workspace = searchParams.get('workspace') || 'business';
+        const workspace = searchParams.get('workspace') || 'business';
 
     let last7DaysSpend = 0;
     
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       if (openAiData && openAiData.length > 0) {
         last7DaysSpend = openAiData.reduce((sum, b) => sum + b.spend, 0);
       }
-    } catch(e) {}
+        } catch(e) {}
 
     // Algorithm based on straight-line run rate
     const projected_weekly = last7DaysSpend; 

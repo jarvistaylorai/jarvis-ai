@@ -23,7 +23,7 @@ export const ModelRoutingRules = ({ rules, models, onUpdate }: { rules: unknown[
                      <span className="text-zinc-500 font-mono">IF</span>
                      <span className="text-amber-400 font-mono">task</span>
                      <span className="text-zinc-500 font-mono">==</span>
-                     <span className="text-emerald-400 font-mono">"{rule.task_type}"</span>
+                     <span className="text-emerald-400 font-mono">&quot;{rule.task_type}&quot;</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs">
                      <span className="text-zinc-500 text-[10px] uppercase font-bold tracking-widest">USE</span>

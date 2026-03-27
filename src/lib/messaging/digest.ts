@@ -214,7 +214,7 @@ class DigestCollector {
 
   private renderGroup(
     group: { operation: string; count: number; latest: DigestEntry; context?: Record<string, unknown> },
-    messageClass: MessageClassId
+        messageClass: MessageClassId
   ): string {
     // Use template if available
     const operation = group.operation;
@@ -322,7 +322,7 @@ export function withDigest<T>(
   entityId: string,
   fn: () => Promise<T>
 ): Promise<T> {
-  const collector = getDigestCollector();
+    const collector = getDigestCollector();
 
   emitDigest('status_update', `${operation} starting`, {
     operation: 'start',

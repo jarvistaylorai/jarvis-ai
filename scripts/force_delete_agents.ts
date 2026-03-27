@@ -40,7 +40,7 @@ async function main() {
     // Make sure we re-enable triggers even if we fail
     try {
       await prisma.$executeRawUnsafe(`ALTER TABLE telemetry_events ENABLE TRIGGER ALL;`);
-    } catch(e) {}
+        } catch(e) {}
     await prisma.$disconnect();
   }
 }

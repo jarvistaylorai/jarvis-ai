@@ -78,7 +78,7 @@ function ensureWatcher() {
         if (isWithinAllowedScope(absolutePath)) {
           invalidateCache();
         }
-      } catch (error) {
+            } catch (error) {
         // If the changed file was removed, resolve can fail. Ignore.
       }
     };

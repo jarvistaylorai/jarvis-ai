@@ -6,7 +6,7 @@ interface TokenWindowEntry {
   tokens: number;
 }
 
-interface ScheduledTask<T = any> {
+interface ScheduledTask<T = unknown> {
   priority: PriorityLevel;
   estimatedTokens: number;
   runner: () => Promise<T>;

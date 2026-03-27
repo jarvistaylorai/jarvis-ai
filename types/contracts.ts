@@ -101,11 +101,14 @@ export interface BaseEntity {
 export interface Project extends BaseEntity {
   name: string;
   description?: string;
-  status: ProjectStatus;
-  priority: ObjectivePriority;
+  status: ProjectStatus | string;
+  priority: ObjectivePriority | string;
   owner_agent_id?: UUID; // FK -> agents.id
   health_score: number; // 0-100 signal for observability
-  progress_percent: number; // derived from tasks/objectives
+  progress_percent: number;
+  progress?: number;
+  progress?: number;
+  current_phase?: string; // derived from tasks/objectives
   start_date?: ISODateString;
   due_date?: ISODateString;
   active_sprint?: string;
@@ -118,11 +121,12 @@ export interface Agent extends BaseEntity {
   name: string;
   handle: string; // human-friendly slug (e.g., "dev_agent")
   kind: AgentKind;
-  status: AgentStatus;
+  status: AgentStatus | string;
   role: string;
   capability_tags: string[];
   assigned_workspace_ids: UUID[];
-  current_task_id?: UUID; // FK -> tasks.id
+  current_task_id?: UUID;
+  current_task?: string; // FK -> tasks.id
   current_project_id?: UUID; // FK -> projects.id
   current_channel?: string; // e.g., OpenClaw session key
   utilization_percent: number; // rolling 24h utilization
@@ -138,10 +142,11 @@ export interface Task extends BaseEntity {
   objective_id?: UUID; // FK -> objectives.id
   title: string;
   description?: string;
-  status: TaskStatus;
-  priority: TaskPriority;
+  status: TaskStatus | string;
+  priority: TaskPriority | string;
   type: TaskType;
-  assigned_agent_id?: UUID; // FK -> agents.id
+  assigned_agent_id?: UUID;
+  assigned_agent?: string; // FK -> agents.id
   requested_by_agent_id?: UUID; // FK -> agents.id
   due_at?: ISODateString;
   started_at?: ISODateString;
@@ -158,8 +163,9 @@ export interface Alert extends BaseEntity {
   source_type: 'system' | 'task' | 'agent' | 'project' | 'objective';
   source_id?: UUID;
   message: string;
+  type?: string;
   severity: AlertSeverity;
-  status: AlertStatus;
+  status: AlertStatus | string;
   acknowledged_by_agent_id?: UUID;
   acknowledged_at?: ISODateString;
   resolved_at?: ISODateString;
@@ -174,6 +180,7 @@ export interface TelemetryEvent extends BaseEntity {
   severity: TelemetrySeverity;
   event_type: string; // e.g., "task.assigned"
   message: string;
+  type?: string;
   payload?: Record<string, unknown>;
   latency_ms?: number;
   tokens_input?: number;
@@ -187,9 +194,12 @@ export interface Objective extends BaseEntity {
   parent_objective_id?: UUID; // FK -> objectives.id
   title: string;
   description?: string;
-  status: ObjectiveStatus;
-  priority: ObjectivePriority;
+  status: ObjectiveStatus | string;
+  priority: ObjectivePriority | string;
   progress_percent: number;
+  progress?: number;
+  progress?: number;
+  current_phase?: string;
   owner_agent_id?: UUID; // FK -> agents.id
   target_date?: ISODateString;
   current_phase?: string;

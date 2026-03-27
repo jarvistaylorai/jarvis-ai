@@ -27,7 +27,7 @@ export async function GET() {
       let capabilities = [];
       try {
         capabilities = JSON.parse(model.capabilities);
-      } catch (e) {
+            } catch (e) {
         // use empty
       }
 

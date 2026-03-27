@@ -7,7 +7,7 @@ export async function GET() {
       orderBy: { priority: "desc" }
     });
     return NextResponse.json(rules);
-  } catch (error) {
+    } catch (error) {
     return NextResponse.json({ error: "Failed to fetch routing rules" }, { status: 500 });
   }
 }
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       }
     });
     return NextResponse.json(rule);
-  } catch (error) {
+    } catch (error) {
     return NextResponse.json({ error: "Failed to create routing rule" }, { status: 500 });
   }
 }

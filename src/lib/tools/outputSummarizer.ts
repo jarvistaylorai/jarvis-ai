@@ -61,7 +61,7 @@ export function summarizeToolOutput(
 function summarizeFileRead(
   content: string,
   maxTokens: number,
-  options: SummarizeOptions
+    options: SummarizeOptions
 ): SummarizationResult {
   const originalTokens = estimateTokens(content);
   
@@ -108,7 +108,7 @@ function summarizeFileRead(
 function summarizeExec(
   output: string,
   maxTokens: number,
-  options: SummarizeOptions
+    options: SummarizeOptions
 ): SummarizationResult {
   const originalTokens = estimateTokens(output);
   const lines = output.split('\n');
@@ -206,7 +206,7 @@ function summarizeWebSearch(
   maxTokens: number
 ): SummarizationResult {
   const originalTokens = estimateTokens(content);
-  const maxChars = maxTokens * 4;
+    const maxChars = maxTokens * 4;
   
   // Try to extract results
   const results: Array<{ title: string; snippet: string; url?: string }> = [];
@@ -214,7 +214,7 @@ function summarizeWebSearch(
   // Simple pattern matching for common formats
   const resultMatches = content.match(/\d+\.\s+([^\n]+)/g);
   if (resultMatches) {
-    resultMatches.slice(0, 10).forEach((match, i) => {
+        resultMatches.slice(0, 10).forEach((match, i) => {
       results.push({
         title: match.replace(/^\d+\.\s*/, ''),
         snippet: '',

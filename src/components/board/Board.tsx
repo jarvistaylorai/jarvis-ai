@@ -12,7 +12,7 @@ import {
   DragStartEvent,
   DragOverEvent,
   DragEndEvent,
-  defaultDropAnimationSideEffects,
+    defaultDropAnimationSideEffects,
 } from '@dnd-kit/core';
 import { arrayMove, SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortable';
 import { SortableList } from './SortableList';
@@ -42,8 +42,8 @@ export function Board({ initialLists, projectId, taskProjectId, onTaskClick, act
   }, [initialLists]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [activeList, setActiveList] = useState<ListData | null>(null);
-  const [isAddingList, setIsAddingList] = useState(false);
-  const [newListName, setNewListName] = useState('');
+      const [isAddingList, setIsAddingList] = useState(false);
+      const [newListName, setNewListName] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -210,7 +210,7 @@ export function Board({ initialLists, projectId, taskProjectId, onTaskClick, act
     return lists.find((l) => l.tasks.some((t) => t.id === taskId));
   };
 
-  const handleAddList = async (e: React.FormEvent) => {
+    const handleAddList = async (e: React.FormEvent) => {
     e.preventDefault();
     // Disabled in Supabase (statuses are ENUMs)
   };
@@ -227,7 +227,7 @@ export function Board({ initialLists, projectId, taskProjectId, onTaskClick, act
         const task = await res.json();
         setLists((prev) => prev.map(l => l.id === listId ? { ...l, tasks: [...l.tasks, task] } : l));
       }
-    } catch(err) {}
+        } catch(err) {}
   };
 
   const handleUpdateListTitle = async (listId: string, name: string) => {

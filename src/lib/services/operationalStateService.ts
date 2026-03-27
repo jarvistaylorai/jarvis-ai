@@ -177,7 +177,7 @@ export class OperationalStateService {
   async addSpend(
     workspaceId: string,
     costUsd: number,
-    tokens: number
+        tokens: number
   ): Promise<void> {
     const state = await this.getState(workspaceId);
     

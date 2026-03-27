@@ -20,7 +20,7 @@ export async function GET() {
     });
     
     return NextResponse.json(agents);
-  } catch (error) {
+    } catch (error) {
     return NextResponse.json({ error: "Failed to fetch agent configs" }, { status: 500 });
   }
 }

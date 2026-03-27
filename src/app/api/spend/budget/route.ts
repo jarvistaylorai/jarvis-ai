@@ -32,7 +32,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    const { monthly_budget_limit, id, ...dbData } = data;
+        const { monthly_budget_limit, id, ...dbData } = data;
     
     const merged = await prisma.spendLimit.upsert({
       where: { id: "global" },

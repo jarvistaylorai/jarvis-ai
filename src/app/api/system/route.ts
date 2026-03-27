@@ -33,7 +33,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const workspace = searchParams.get('workspace') || 'business';
 
-    let [
+    const [
       agents,
       tasks,
       activity,

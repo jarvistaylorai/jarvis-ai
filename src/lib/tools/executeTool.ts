@@ -86,7 +86,7 @@ async function assignTask({ taskId, agentId }: { taskId: string; agentId: string
 
 // Terminal Tool
 export function runCommand(command: string): Promise<string> {
-  return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
     exec(command, { cwd: WORKSPACE_BASE }, (err, stdout, stderr) => {
       if (err) resolve(`Error: ${err.message}\nStderr: ${stderr}`)
       else resolve(stdout || stderr || "Command executed without output.")

@@ -1,0 +1,4194 @@
+{
+  "projects": [
+    {
+      "id": "proj_assetosx",
+      "title": "AssetOSX",
+      "description": "Enterprise media logistics platform handling multi-stage workflows, approvals, permissions, and billing."
+    },
+    {
+      "id": "proj_jarvis_sys",
+      "title": "Jarvis",
+      "description": "AI command center, agents, memory system, and execution dashboard with internal Mission Control UI."
+    },
+    {
+      "id": "proj_openclaw",
+      "title": "OpenClaw Integration",
+      "description": "LLM routing, budget enforcement, rate limiting, and provider abstraction."
+    },
+    {
+      "id": "proj_cortana",
+      "title": "Cortana AI",
+      "description": "User-facing AI product layer with assistant interface, workflow automation, and user memory."
+    },
+    {
+      "id": "proj_medellin",
+      "title": "Medellin Social Club",
+      "description": "Premium membership platform with onboarding, membership tiers, events, and admin tools in the main app."
+    }
+  ],
+  "objectives": [
+    {
+      "id": "obj_ast_1",
+      "project_id": "proj_assetosx",
+      "title": "Deploy Multi-Stage Workflows & Media Gating",
+      "description": "Design and deploy the core state machine mapping media assets from physical on-site handling to post-production and final delivery.",
+      "priority": "high",
+      "target_date": "2026-04-24"
+    },
+    {
+      "id": "obj_ast_2",
+      "project_id": "proj_assetosx",
+      "title": "Restructure Org Hierarchy & Dynamic Approvals",
+      "description": "Build nested organizational models allowing complex client hierarchies (parent corp, agencies, teams) and mapped approval rights.",
+      "priority": "medium",
+      "target_date": "2026-05-09"
+    },
+    {
+      "id": "obj_ast_3",
+      "project_id": "proj_assetosx",
+      "title": "Integrate Stripe Billing & Technician Payouts",
+      "description": "Implement end-to-end financial workflows mapping client SaaS billing to automated contractor/technician payouts.",
+      "priority": "high",
+      "target_date": "2026-05-24"
+    },
+    {
+      "id": "obj_ast_4",
+      "project_id": "proj_assetosx",
+      "title": "Establish Technician Lifecycle & Permissions",
+      "description": "End-to-end management of on-site technicians, from vetting and equipment assignment to rating and offboarding.",
+      "priority": "medium",
+      "target_date": "2026-06-08"
+    },
+    {
+      "id": "obj_jrv_1",
+      "project_id": "proj_jarvis_sys",
+      "title": "Architect Execution Dashboard & Projects Container",
+      "description": "Build the central nervous system UI and backend containers where all high-level projects and statuses are monitored.",
+      "priority": "high",
+      "target_date": "2026-04-24"
+    },
+    {
+      "id": "obj_jrv_2",
+      "project_id": "proj_jarvis_sys",
+      "title": "Build Agent Lifecycle & Orchestration Engine",
+      "description": "Create the core control plane that spawns, monitors, and terminates autonomous AI agents across the system.",
+      "priority": "high",
+      "target_date": "2026-05-09"
+    },
+    {
+      "id": "obj_jrv_3",
+      "project_id": "proj_jarvis_sys",
+      "title": "Develop Memory System (Projects, Knowledge, Decisions)",
+      "description": "Establish Long-Term Memory (LTM) utilizing vector databases and structural logs to give Jarvis persistent context.",
+      "priority": "high",
+      "target_date": "2026-05-24"
+    },
+    {
+      "id": "obj_jrv_4",
+      "project_id": "proj_jarvis_sys",
+      "title": "System Brain & Autonomous Prioritization",
+      "description": "Create an autonomous decision matrix that ranks tasks, assigns computing resources, and acts dynamically without prompts.",
+      "priority": "medium",
+      "target_date": "2026-06-23"
+    },
+    {
+      "id": "obj_oc_1",
+      "project_id": "proj_openclaw",
+      "title": "Provider Abstraction & Model Routing",
+      "description": "Create a universal interface to abstract Anthropic, OpenAI, Local models, and Groq behind a single intelligent router.",
+      "priority": "high",
+      "target_date": "2026-04-24"
+    },
+    {
+      "id": "obj_oc_2",
+      "project_id": "proj_openclaw",
+      "title": "Budget Enforcement & Telemetry",
+      "description": "Deploy strict financial guardrails to prevent token-burn alongside massive observability into model performance.",
+      "priority": "high",
+      "target_date": "2026-05-09"
+    },
+    {
+      "id": "obj_oc_3",
+      "project_id": "proj_openclaw",
+      "title": "Fallback Mechanisms & Offline Degradation",
+      "description": "Ensure the execution engine never fails entirely by routing down to smaller models progressively if outages occur.",
+      "priority": "medium",
+      "target_date": "2026-05-24"
+    },
+    {
+      "id": "obj_oc_4",
+      "project_id": "proj_openclaw",
+      "title": "System Prompt Management & Guardrails",
+      "description": "Build centralized tools for managing, versioning, and testing core AI system prompts across all capabilities.",
+      "priority": "medium",
+      "target_date": "2026-06-08"
+    },
+    {
+      "id": "obj_cor_1",
+      "project_id": "proj_cortana",
+      "title": "Primary Assistant Interface",
+      "description": "Build the polished, user-facing conversational product layer focusing on speed, context, and immediate actionability.",
+      "priority": "high",
+      "target_date": "2026-04-24"
+    },
+    {
+      "id": "obj_cor_2",
+      "project_id": "proj_cortana",
+      "title": "Workflow Automation Integrations",
+      "description": "Transform the assistant from absolute text into an agent that connects to external tools, APIs, and executes complex logic.",
+      "priority": "medium",
+      "target_date": "2026-05-09"
+    },
+    {
+      "id": "obj_cor_3",
+      "project_id": "proj_cortana",
+      "title": "User Memory & Personalization Engine",
+      "description": "Establish long-term persistent context so the AI remembers the user's preferences, projects, and biographical facts natively.",
+      "priority": "medium",
+      "target_date": "2026-05-24"
+    },
+    {
+      "id": "obj_cor_4",
+      "project_id": "proj_cortana",
+      "title": "Local Device Control & OS Integration",
+      "description": "Extend the assistant beyond the browser, allowing native desktop and mobile interactions like file management and application control.",
+      "priority": "medium",
+      "target_date": "2026-06-08"
+    },
+    {
+      "id": "obj_msc_1",
+      "project_id": "proj_medellin",
+      "title": "Invite-Only Onboarding System",
+      "description": "Build an ultra-exclusive, highly vetted onboarding pipeline utilizing rich user data extraction and review gating.",
+      "priority": "high",
+      "target_date": "2026-04-24"
+    },
+    {
+      "id": "obj_msc_2",
+      "project_id": "proj_medellin",
+      "title": "Event Management & Experience Booking",
+      "description": "Deploy a global event system with strict access controls, limited inventory, and dynamic tier-based visibility.",
+      "priority": "high",
+      "target_date": "2026-05-09"
+    },
+    {
+      "id": "obj_msc_3",
+      "project_id": "proj_medellin",
+      "title": "Admin Concierge & Members Directory",
+      "description": "Provide premium concierge tools and a carefully curated internal directory for members to network.",
+      "priority": "medium",
+      "target_date": "2026-05-24"
+    },
+    {
+      "id": "obj_msc_4",
+      "project_id": "proj_medellin",
+      "title": "Internal Trust & Moderation Engine",
+      "description": "Ensure the community remains high-quality through automated flagging, strike systems, and strict content moderation.",
+      "priority": "medium",
+      "target_date": "2026-06-08"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "task_h8l7ksxuc",
+      "title": "Architect media state machine DB schema",
+      "description": "Design states (ingest, raw, proxy, review, approved, delivered) and audit logs for transitions.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Draft Prisma schema",
+        "Build state transition service",
+        "Write unit tests for invalid transitions",
+        "Create DB migrations"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_98cewashh",
+      "title": "Implement high-throughput presigned URL ingestion",
+      "description": "Create the ingestion API that generates S3 presigned URLs for raw multi-gigabyte files.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Setup S3 CORS",
+        "Implement presign API",
+        "Implement progress tracking webhook",
+        "Optimize chunk sizes"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_jse09giqs",
+      "title": "Establish proxy generation queue worker",
+      "description": "Build an EventBridge + Lambda pipeline to automatically generate 720p proxies from raw 4K footage.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write Lambda handler",
+        "Configure FFmpeg layer",
+        "Setup SQS queue for failures",
+        "Update DB on completion"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_fubot36qy",
+      "title": "Develop Media Gating access control middleware",
+      "description": "Create permissions middleware that blocks unapproved clients from accessing raw bucket URLs.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write auth middleware",
+        "Map roles to asset states",
+        "Write JWT validation",
+        "Test unauthorized access blocks"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_2exi95tbc",
+      "title": "Implement multi-file batch approval endpoints",
+      "description": "Create atomic endpoints for clients/reviewers to approve, reject, or request changes on a batch of files.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Define API payload",
+        "Handle transaction rollback",
+        "Trigger email notifications",
+        "Update asset states via batch"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_gpenwufqp",
+      "title": "Build robust file versioning logic",
+      "description": "Allow editors to upload specific revisions of a file without overwriting the master file history.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Update schema for asset_versions",
+        "Write version increment logic",
+        "Implement rollback endpoint",
+        "Map versions to UI preview"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_18buvu3xp",
+      "title": "Create watermarking proxy service",
+      "description": "Automatically burn in timecodes and client names into proxy clips for secure review gating.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Integrate FFmpeg watermark filter",
+        "Dynamically render overlay text",
+        "Handle encoding artifacts",
+        "Store watermarked asset safely"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_gkb8nlsli",
+      "title": "Develop on-site media offload validation",
+      "description": "Build a utility/API for on-site technicians to verify checksums (MD5) before marking offload complete.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement checksum generation schema",
+        "Write client verification logic",
+        "Log offload metadata",
+        "Trigger ingest start event"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_ssqed0cp8",
+      "title": "Build external client share-link generator",
+      "description": "Implement securely hashed, time-expiring share links for unauthenticated reviewers.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Create ShareLink table",
+        "Implement AES encryption for link parameters",
+        "Write token validation middleware",
+        "Build read-only UI handler"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_7fwlikn41",
+      "title": "Implement CDN edge caching for proxies",
+      "description": "Configure CloudFront to aggressively cache review proxies to reduce latency for global clients.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Setup CloudFront distribution",
+        "Map S3 origin with OAI",
+        "Configure cache invalidation triggers",
+        "Test edge latency"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_1",
+      "comments": []
+    },
+    {
+      "id": "task_0v2p0rsqo",
+      "title": "Design nested organization DB schema",
+      "description": "Move from flat tenant model to hierarchical structural tables (Organization, Department, Team).",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Add parent_org_id to schema",
+        "Write recursive CTE queries for ancestry",
+        "Handle circular loops",
+        "Migrate existing tenant data"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_56sa8wgdu",
+      "title": "Develop RBAC matrix mapping",
+      "description": "Define standard roles (Admin, Manager, Creative, Viewer) across organizational scopes.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create Role table",
+        "Map permissions enum",
+        "Write validation service",
+        "Audit existing assignments"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_wqb7xgl3n",
+      "title": "Implement dynamic approval workflows",
+      "description": "Allow organizations to define custom multi-step approval pipelines (e.g. Legal -> Brand -> Final).",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Design Workflow schema",
+        "Create step runner engine",
+        "Implement parallel vs sequential logic",
+        "Write approval webhook"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_nuu6v92ps",
+      "title": "Build custom client dashboard scopes",
+      "description": "Ensure clients only see assets assigned to their specific nodes in the organizational tree.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Refactor asset listing API",
+        "Apply RLS (Row Level Security) via Prisma",
+        "Write scope injection middleware",
+        "Test cross-tenant leaks"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_sk8daz1vg",
+      "title": "Implement cross-org sharing mechanisms",
+      "description": "Allow a parent corp to securely delegate specific asset visibility down to an external agency.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create OrgShare schema",
+        "Write delegation verification",
+        "Prevent transitive sharing bugs",
+        "Audit log all share events"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_a772rvy8j",
+      "title": "Create organizational onboarding workflows",
+      "description": "Automate the process for a new client adopting the system, including default role generation.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Build Org seed script",
+        "Trigger welcome emails",
+        "Setup default project folders",
+        "Assign initial limits"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_hsqerxy91",
+      "title": "Build team membership invitation system",
+      "description": "Develop email + token based invites with specific role assignments tied to a sub-department.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create TeamInvite table",
+        "Write SendGrid integration",
+        "Handle token expiration",
+        "Implement accept/reject logic"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_r7qzpz3yi",
+      "title": "Develop audit trail reporting API",
+      "description": "Expose endpoints for enterprise clients to download CSVs of all user actions (views, downloads, approvals).",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create AuditLog table context",
+        "Write async CSV generator",
+        "Secure download endpoint",
+        "Setup data retention cron"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_la6sshu0g",
+      "title": "Implement automated NDA gatekeeping",
+      "description": "Require new members in specific organizational units to accept a digital NDA before accessing the hierarchy.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Build NDA state flag",
+        "Create interceptor middleware",
+        "Record timestamps and IP",
+        "Store PDF snapshot of terms"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_rlcbwtmev",
+      "title": "Migrate legacy user roles to new hierarchy",
+      "description": "Write standard operating procedures and migration scripts to port current users without data loss.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Write dry-run script",
+        "Map old roles to new matrix",
+        "Handle orphaned users",
+        "Execute production migration"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_2",
+      "comments": []
+    },
+    {
+      "id": "task_qzzpz1nwi",
+      "title": "Implement Stripe Connect for technicians",
+      "description": "Setup custom Stripe Connect onboarding flows to allow technicians to receive payouts directly.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Configure Connect webhooks",
+        "Write onboarding URL generator",
+        "Handle account status verification",
+        "Store Stripe Account IDs"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_s8wu6tdbt",
+      "title": "Build metered storage billing logic",
+      "description": "Calculate daily bucket sizes per client and report to Stripe usage-based billing endpoints.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write S3 size aggregator script",
+        "Map to Stripe Price IDs",
+        "Implement cron reporter",
+        "Handle usage discrepancies"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_8u5t4fryn",
+      "title": "Develop project-based invoicing system",
+      "description": "Allow admins to trigger manual line-item invoices for on-site productions inside the app.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Generate invoice via Stripe API",
+        "Map to internal Project entity",
+        "Sync payment success webhook",
+        "Handle partial payments"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_cu95fbdot",
+      "title": "Implement automated contractor ledger",
+      "description": "When a project completes, calculate technician splits and queue payouts on the internal ledger.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Design LedgerEntry schema",
+        "Calculate net vs gross",
+        "Write queue worker",
+        "Handle currency conversions"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_wdjw0v5g9",
+      "title": "Create manual payout override controls",
+      "description": "Give admins a UI back-office endpoint to hold, reverse, or boost a technician's payout before execution.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Build pause payout API",
+        "Write adjustment log",
+        "Recalculate ledger balances",
+        "Issue updated receipt"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_hgnpvnwkq",
+      "title": "Sync Stripe subscription statuses",
+      "description": "Listen to subscription updated/deleted webhooks and automatically restrict or downgrade orgs.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Register webhook endpoints",
+        "Map status to Org active flag",
+        "Trigger grace period logic",
+        "Email downgrade warnings"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_kja5foqkj",
+      "title": "Implement tax documentation collection",
+      "description": "Use Stripe or internal forms to ensure W9s/1099s are collected before payouts exceed threshold.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Track YTD earnings per tech",
+        "Block payouts over $600 without tax info",
+        "Integrate Stripe Tax",
+        "Generate annual summary"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_phc360c2n",
+      "title": "Develop client billing dashboard API",
+      "description": "Aggregate current cycle usage, past invoices, and active subscriptions for the client portal.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Fetch Stripe Invoice history",
+        "Calculate upcoming prorations",
+        "Format PDF download links",
+        "Expose as GraphQL/REST"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_mlu0ws21w",
+      "title": "Build cost-margin reporting engine",
+      "description": "Compare incoming client invoice payments against outgoing technician payouts to evaluate project margins.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write aggregation query",
+        "Group by date/project",
+        "Calculate percentage yield",
+        "Expose charting data"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_obd8p07xy",
+      "title": "Implement failed payment dunning logic",
+      "description": "Create a systematic workflow for retrying failed invoices and gradually restricting platform access.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Set retry schedules",
+        "Lock user write access",
+        "Lock download access",
+        "Trigger warning banners"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_3",
+      "comments": []
+    },
+    {
+      "id": "task_9e18dj6il",
+      "title": "Design Technician profile database schema",
+      "description": "Store skills, certifications, equipment lists, and geographic availability.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Create TechProfile table",
+        "Map nested equipment JSON",
+        "Write GeoJSON location fields",
+        "Link to Base User ID"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_8yf9257en",
+      "title": "Build equipment manifest module",
+      "description": "Allow techs to register specific gear (cameras, lenses) making them searchable for specific project needs.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write CRUD for gear",
+        "Implement search filters for gear",
+        "Validate serialization formats",
+        "Sync with payout tiers"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_kvn32sdgy",
+      "title": "Implement geography-based assignment routing",
+      "description": "Create an API to pull available technicians within a 50-mile radius of a new production location.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Implement PostGIS/Geo queries",
+        "Build availability calendar sync",
+        "Write sorting algorithm",
+        "Return ranked candidates"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_b8hlmq15a",
+      "title": "Develop post-project rating engine",
+      "description": "Allow Project Managers to submit 5-star ratings and private notes on technician performance.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Create Rating schema",
+        "Aggregate average scores",
+        "Implement decay curves for old ratings",
+        "Trigger low-rating alerts"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_jazu5qjcb",
+      "title": "Build automated availability checking",
+      "description": "Send SMS or email pings to candidate technicians for a new job, locking in the first to accept.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Integrate Twilio SMS",
+        "Write expiring token logic",
+        "Handle race conditions on acceptance",
+        "Trigger confirmation to PM"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_87nacpdvn",
+      "title": "Create strike system for no-shows",
+      "description": "Implement a moderation protocol that automatically flags or suspends technicians with repeated infractions.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Define strike thresholds",
+        "Write suspension middleware",
+        "Create admin appeal endpoint",
+        "Log all infractions"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_zanht1h4a",
+      "title": "Implement NDA and IP tracking per technician",
+      "description": "Track which sensitive projects a technician has touched and enforce strict IP offboarding.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Map ProjectAccess logs",
+        "Require digital signature for offboard",
+        "Automate password revocations",
+        "Generate compliance certificate"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_ac86lonua",
+      "title": "Develop real-time on-site status tracking",
+      "description": "Allow technicians to check-in/out of locations via GPS to verify time logic.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Build mobile-friendly check-in API",
+        "Validate against project coordinates",
+        "Log timestamps",
+        "Compare with estimated hours"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_fhg4lz95n",
+      "title": "Build credential verification workflows",
+      "description": "Create internal admin queues for manually verifying driver's licenses, passports, or union cards.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Build upload presign for secure docs",
+        "Create pending approval queue",
+        "Add expiration trackers",
+        "Trigger renewal warnings"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_00hbqfqf1",
+      "title": "Implement tier-progression system",
+      "description": "Create logic that promotes technicians from Junior to Lead based on successful completions and high ratings.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Define tier requirements",
+        "Write nightly evaluation cron",
+        "Update billing rates automatically",
+        "Send congratulatory emails"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_assetosx",
+      "objective_id": "obj_ast_4",
+      "comments": []
+    },
+    {
+      "id": "task_tsy6pjahz",
+      "title": "Develop isolated Project Container data models",
+      "description": "Create logical boundaries ensuring specific agents and memories are sandboxed within a Project ID.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Create Project context schema",
+        "Enforce strict relations",
+        "Write isolation tests",
+        "Migrate existing tasks"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_jye1yqtiw",
+      "title": "Build unified execution dashboard API",
+      "description": "Aggregate task velocity, active agent processes, and blockers into a single summary payload.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write complex aggregation queries",
+        "Calculate burnout/velocity metrics",
+        "Format standard dashboard JSON",
+        "Implement sub-50ms caching"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_s69las4cg",
+      "title": "Implement internal Mission Control views",
+      "description": "Render global views of all active tasks and AI streams, replacing legacy hardcoded models.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Design Mission Control layout",
+        "Connect to WS streams",
+        "Build global filter bars",
+        "Remove legacy project models"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_qpzxkrbnm",
+      "title": "Develop unified project configuration files",
+      "description": "Allow projects to have a `jarvis.json` or YAML defining specific agent rules and environment variables.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write parser service",
+        "Validate schema",
+        "Inject into agent context",
+        "Implement hot-reloading"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_uhfxarl0o",
+      "title": "Build global timeline visualization data layer",
+      "description": "Format tasks and agent activities into a timeline structure for UI rendering (Gantt-style).",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Calculate critical paths",
+        "Format D3/Chart data",
+        "Resolve date conflicts",
+        "Expose pagination"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_osvsiqa1z",
+      "title": "Implement WebSockets for real-time task updates",
+      "description": "Push real-time state changes from backend directly to the Mission Control dashboard.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Setup Socket.io/WS layer",
+        "Map connection auth",
+        "Emit task transition events",
+        "Handle reconnect state"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_ucmanu5pp",
+      "title": "Create quick-action command palette",
+      "description": "Allow power-users to trigger background scripts or task creations via a keyboard-first API overlay.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Define command schemas",
+        "Implement fuzzy search",
+        "Write execution handler",
+        "Wire to UI overlay"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_bsx4k48m8",
+      "title": "Develop cross-project dependency graphs",
+      "description": "Allow Task A in Jarvis to block Task B in AssetOSX, visualizing these nodes via API.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Create Dependency schema",
+        "Write cycle-detection validation",
+        "Implement blocking logic on status",
+        "Expose graph payload"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_xbl2qzzba",
+      "title": "Implement global search across all containers",
+      "description": "Index all tasks, files, and project metadata into a unified search endpoint.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Integrate Meilisearch/Elastic",
+        "Create standard index schema",
+        "Write ingestion workers",
+        "Expose fast search API"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_re1cf0m4o",
+      "title": "Build automated project health scoring",
+      "description": "Run heuristics (stale tasks, missing updates) to assign a Red/Yellow/Green status to projects.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Define heuristic weights",
+        "Write scoring cron job",
+        "Update project metadata",
+        "Emit alerts on drops"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_1",
+      "comments": []
+    },
+    {
+      "id": "task_lwodz2szy",
+      "title": "Implement persistent Agent State Machine",
+      "description": "Define initialization, processing, waiting, and dead states for agents mapped into the database.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Draft Agent schema",
+        "Write state transition logic",
+        "Implement heartbeat monitor",
+        "Create failure recovery logs"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_6duta04yo",
+      "title": "Develop Docker-based execution sandboxes",
+      "description": "Spawn agents into isolated Docker containers to prevent rogue system access during execution.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Configure Docker Engine API",
+        "Build base agent image",
+        "Implement container orchestration",
+        "Setup volume mounts"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_o99kp5esw",
+      "title": "Architect agent-to-agent message bus",
+      "description": "Use Redis Pub/Sub or similar queue to allow heterogeneous agents to pass JSON payloads and context reliably.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Configure Redis streams",
+        "Write publisher abstractions",
+        "Write subscriber listen loop",
+        "Implement message durability"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_scsi6dmsy",
+      "title": "Build filesystem control plane for agents",
+      "description": "Provide agents with restricted virtual filesystems mapping back to real directories with strict bounds.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Implement virtual FS middleware",
+        "Enforce directory jail",
+        "Provide safe read/write endpoints",
+        "Audit file mutations"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_iifsj5zn6",
+      "title": "Implement autonomous task consumption logic",
+      "description": "Allow designated agents to pull 'todo' tasks, analyze them, and transition them to 'in_progress'.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Write queue polling logic",
+        "Add LLM decision step for suitability",
+        "Implement locking mechanism",
+        "Log assignment context"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_hb7p09u7r",
+      "title": "Develop agent timeout and kill switches",
+      "description": "Automatically terminate agents that loop infinitely or exceed expected runtime thresholds.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Define max execution times",
+        "Write health check monitor",
+        "Implement force-kill Docker command",
+        "Log panic reasons"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_yeglawk43",
+      "title": "Build agent capability registration system",
+      "description": "Allow new agents to register themselves and their specific toolsets to the orchestration engine.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create Capability schema",
+        "Implement registration payload",
+        "Map tools to LLM functions",
+        "Update global agent directory"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_8c1sj6dla",
+      "title": "Implement human-in-the-loop blocking states",
+      "description": "When an agent lacks confidence, it must pause and request human input securely via the DB.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create 'blocked_on_user' state",
+        "Send webhook alert to Mission Control",
+        "Expose resume API",
+        "Inject human response to LLM"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_p1ita2bki",
+      "title": "Develop cost-accumulation tracking per agent",
+      "description": "Track total token usage and map cost to the specific agent instance and task it was performing.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Hook into OpenClaw callbacks",
+        "Aggregate total costs",
+        "Enforce local budgets",
+        "Halt agent on limit hit"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_7ul5m5d0a",
+      "title": "Build replayable execution traces",
+      "description": "Store exact prompts, tool calls, and LLM responses natively so any agent's workflow can be precisely debugged.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create Trace Log table",
+        "Serialize complex JSON arrays",
+        "Optimize storage compression",
+        "Expose replay endpoint"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_2",
+      "comments": []
+    },
+    {
+      "id": "task_tnmamya1g",
+      "title": "Architect multi-tiered memory taxonomy",
+      "description": "Create structural divisions between ephemeral context, project rules, and global immutable knowledge.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Design memory schemas",
+        "Define retention policies",
+        "Implement tiered access APIs",
+        "Write architecture doc"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_38eur5b6y",
+      "title": "Implement Pinecone/ChromaDB integrations",
+      "description": "Set up vector database clusters for semantic retrieval of past decisions and codebase specifics.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Provision vector DB",
+        "Write generic upsert wrappers",
+        "Implement search queries",
+        "Handle dimension scaling"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_92v2w04cf",
+      "title": "Build automatic codebase ingestion engine",
+      "description": "Periodically scan git repositories, chunk files, and generate embeddings for agent search.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write file parser",
+        "Implement semantic chunking",
+        "Call embedding model",
+        "Upsert to vector DB"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_cpwojo21c",
+      "title": "Develop decision abstraction layers",
+      "description": "When an agent concludes a task, automatically distill the 'why' and store it as a core architectural principle.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Draft abstraction prompt",
+        "Implement post-task hook",
+        "Save localized rule",
+        "Broadcast to project context"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_hpaig1j0d",
+      "title": "Implement context-window management logic",
+      "description": "Dynamically construct prompts by querying vector DB and packing relevant memory without exceeding limits.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write token estimator",
+        "Implement priority ranking for context",
+        "Build prompt assembler",
+        "Test truncation limits"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_ntln5mswh",
+      "title": "Build memory conflict resolution algorithms",
+      "description": "When a new rule contradicts an old one, synthesize the conflict or flag for human review.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Detect contradictory embeddings",
+        "Prompt LLM for conflict resolution",
+        "Mark old memory deprecated",
+        "Alert Mission Control"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_ovynj63tj",
+      "title": "Develop memory decay and forgetting curves",
+      "description": "Slowly deprecate older, less-accessed episodic memories to keep retrieval fast and context sharp.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write daily decay cron",
+        "Lower memory relevance scores",
+        "Archive dead memories",
+        "Optimize index size"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_x7vemrsk9",
+      "title": "Implement user preference memory layer",
+      "description": "Specifically track the founder's explicit instructions (e.g. 'Never use tabs') globally across all agents.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Design strict preference schema",
+        "Inject into system prompts universally",
+        "Create UI to manage overrides",
+        "Test compliance"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_0s20a2gb6",
+      "title": "Build episodic task logging",
+      "description": "Store complete histories of high-complexity tasks as 'episodes' for few-shot prompting in the future.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Define episode JSON structure",
+        "Filter out noise logs",
+        "Compress successful flows",
+        "Expose as few-shot examples"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_fxutxwgc3",
+      "title": "Develop memory debugging interface",
+      "description": "Create a UI view to manually inspect, edit, or delete the vector embeddings and raw memories.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Build admin query API",
+        "Render memory graphs",
+        "Provide manual edit/delete tools",
+        "Log manual adjustments"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_3",
+      "comments": []
+    },
+    {
+      "id": "task_mjz0ne37p",
+      "title": "Implement Eisenhower Matrix prioritization heuristics",
+      "description": "Algorithmically weigh urgency, dependency locks, and project priority to rank global tasks.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Define calculation weights",
+        "Write sorting algorithm",
+        "Update ranks hourly",
+        "Expose top 10 queue"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_6jrptxf9q",
+      "title": "Develop autonomous routine triggers",
+      "description": "Allow the Brain to spawn agents daily for maintenance, code review, or status checking without human input.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Build cron scheduler for agents",
+        "Write routine definition files",
+        "Map to specific agents",
+        "Log routine outcomes"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_advk9fd7k",
+      "title": "Build resource allocation dynamic limits",
+      "description": "If multiple projects demand agents, prioritize high-value projects while restricting token usage for lower tiers.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Implement token budget distributor",
+        "Calculate current active limits",
+        "Pause low-priority agents",
+        "Monitor via Mission Control"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_ab19zlt17",
+      "title": "Implement deadline anticipation modeling",
+      "description": "Analyze task history to predict if an objective will miss its due date and alert the founder proactively.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Map velocity history",
+        "Run predictive model",
+        "Flag at-risk objectives",
+        "Suggest scope cuts"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_lxt9tbq1v",
+      "title": "Develop multi-agent debate protocols",
+      "description": "For architectural decisions, spawn two agents with different system prompts to debate and reach consensus.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Write orchestrator script",
+        "Define back-and-forth prompt rules",
+        "Parse final output",
+        "Log debate transcript"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_gohc9osec",
+      "title": "Build system anomaly detection",
+      "description": "Monitor error rates, high latency, or weird agent loops and trigger a global 'defcon' state if necessary.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Define baseline metrics",
+        "Write anomaly detection script",
+        "Implement system lock-down modes",
+        "Fire external alerts"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_di175nfw0",
+      "title": "Implement asynchronous user-polling hooks",
+      "description": "If the Brain needs input on priority, queue an async message to the user and wait across sessions.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Write message queue schema",
+        "Build polling UI",
+        "Map response back to Brain context",
+        "Handle timeout defaults"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_oty9n7d8l",
+      "title": "Develop cost-benefit analysis endpoints",
+      "description": "Before starting a massive DB migration task, estimate total LLM cost and require founder approval if over $X.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Estimate token count via task size",
+        "Calculate expected cost",
+        "Implement approval gate",
+        "Trigger notification"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_aeuzv61qi",
+      "title": "Build objective auto-generation logic",
+      "description": "Allow Jarvis to look at a high-level goal and automatically break it down into 10 executable tasks.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Draft breakdown system prompt",
+        "Implement recursive check",
+        "Validate output against rules",
+        "Bulk insert tasks to DB"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_mud9y6a2m",
+      "title": "Deploy the 'Founder Mode' override system",
+      "description": "A simple global toggle that immediately pauses all autonomous execution, leaving only manual control.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-23",
+      "checklist": [
+        "Implement global kill-switch flag",
+        "Hook into all polling mechanisms",
+        "Broadcast WS pause event",
+        "Log manual intervention"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_jarvis_sys",
+      "objective_id": "obj_jrv_4",
+      "comments": []
+    },
+    {
+      "id": "task_58dmx32co",
+      "title": "Architect Unified Model Interface",
+      "description": "Design a common interface ensuring payloads for all providers normalize gracefully.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Define Standard Payload schema",
+        "Implement translation layers",
+        "Handle tool-calling mapping",
+        "Map standard response objects"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_qpnrqcocz",
+      "title": "Implement intelligent model routing logic",
+      "description": "Dynamically choose Claude for coding, GPT-4 for reasoning, and Local/Groq for fast classification.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write routing heuristic engine",
+        "Define task categories",
+        "Map models to categories",
+        "Test routing accuracy"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_epd6z77ft",
+      "title": "Develop Groq integration for sub-50ms tasks",
+      "description": "Set up specific high-speed pipelines to Groq for cheap, rapid tasks like JSON validation.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Integrate Groq SDK",
+        "Write fallback to OpenAI",
+        "Benchmark latency",
+        "Optimize prompt sizes"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_j6tegj0a9",
+      "title": "Build streaming normalization wrapper",
+      "description": "Ensure Server-Sent Events (SSE) from different APIs look identical to downstream Jarvis consumers.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Normalize chunk structures",
+        "Handle provider-specific disconnects",
+        "Write unified stream parser",
+        "Test UI rendering"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_n2vcymh6r",
+      "title": "Implement multimodal abstraction logic",
+      "description": "Abstract image and audio inputs uniformly regardless of the targeted provider.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Create generic multimodal payload",
+        "Implement base64 encoders",
+        "Map to Anthropic Vision",
+        "Map to GPT-4V"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_b2hw66i6a",
+      "title": "Develop local model failover via Ollama",
+      "description": "Allow seamless degradation to local Ollama models if external APIs drop or budget hits zero.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Configure Ollama endpoints",
+        "Map models (Llama3/Mistral)",
+        "Test hardware latency",
+        "Implement silent fallback"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_5rd9guq4t",
+      "title": "Build system prompt injection middleware",
+      "description": "Create standard layers that silently inject context/memory before the request hits the provider.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write injection concatenator",
+        "Enforce max token limits",
+        "Log final prompt",
+        "Secure keys"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_xe6i64uji",
+      "title": "Implement tool-calling unified registry",
+      "description": "Standardize how tools are sent and invoked across Anthropic and OpenAI formats.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Create Tool Schema standard",
+        "Write parser for Claude JSON",
+        "Write parser for GPT JSON",
+        "Test execution mapping"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_6sdazs775",
+      "title": "Develop retry and backoff mechanisms",
+      "description": "Implement exponential backoff specifically tuned to the rate limits of each provider.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write retry logic wrapper",
+        "Intercept 429 errors",
+        "Implement jitter",
+        "Log provider downtime"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_lds8vbou3",
+      "title": "Build prompt caching optimizations",
+      "description": "Integrate Anthropic's prompt caching for massive system prompts to drastically reduce costs.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement cache control headers",
+        "Structure block logic for caching",
+        "Verify cache hit rates",
+        "Calculate cost savings"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_1",
+      "comments": []
+    },
+    {
+      "id": "task_npp2h0wd5",
+      "title": "Develop global budget enforcement layer",
+      "description": "Hard-stop all requests if global daily/monthly token costs exceed configured bounds.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create Budget schema",
+        "Implement Redis counter",
+        "Write interceptor",
+        "Alert on 80% and 100% threshold"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_edockix9k",
+      "title": "Implement cost attribution per project/agent",
+      "description": "Track exact costs and assign them to specific internal projects to identify expensive workflows.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Map cost to Project ID in DB",
+        "Write aggregation scripts",
+        "Calculate mixed provider costs",
+        "Expose reporting API"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_wtkorso5w",
+      "title": "Build latency and Time-to-First-Token monitoring",
+      "description": "Log millisecond-accurate TTFT and total request times for every LLM call.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Implement timing wrappers",
+        "Stream telemetry to DB",
+        "Setup dashboards for slow models",
+        "Alert on degradation"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_kq1gxj04k",
+      "title": "Develop automated context-window throttling",
+      "description": "If cost spikes locally, force models to dynamically truncate context or use cheaper models.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Write dynamic context slicer",
+        "Inject token constraints",
+        "Map trigger to budget spikes",
+        "Test graceful degradation"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_rjn092uo5",
+      "title": "Implement prompt injection defense proxy",
+      "description": "Run lightweight heuristics or local models to scan inputs for jailbreaks before expensive API calls.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Design prompt firewall",
+        "Integrate Llama-Guard or local heuristics",
+        "Block malicious requests",
+        "Log IP/User"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_few65gf5e",
+      "title": "Build response quality scoring mechanisms",
+      "description": "Randomly sample LLM outputs and use a secondary cheaper model to assign a quality score (1-10).",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Write sampling cron",
+        "Construct evaluator prompt",
+        "Store scores in telemetry",
+        "Flag models dropping in quality"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_2xcnxwb27",
+      "title": "Develop API Key rotation and secret management",
+      "description": "Securely rotate keys programmatically without downtime, handling multiple workspace environments.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Integrate AWS KMS or Vault",
+        "Write dynamic loader",
+        "Implement auto-rotation scripts",
+        "Validate new keys"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_3cydou1h9",
+      "title": "Implement real-time billing dashboard",
+      "description": "Create a UI component in Mission Control showing rolling 24hr costs categorized by provider.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Write GraphQL/REST endpoint",
+        "Calculate rolling sums",
+        "Format Chart.js payloads",
+        "Sync with Redis counters"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_22trzk954",
+      "title": "Build webhook alerting for rate-limits",
+      "description": "Push alerts directly to Slack/Discord if OpenAI or Anthropic starts returning excessive 429s.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Integrate external webhooks",
+        "Set alert thresholds",
+        "Format alert messages",
+        "Implement cooling-off period"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_nh1yl8l87",
+      "title": "Develop offline reconciliation engine",
+      "description": "Nightly, pull exact API usage logs from OpenAI/Anthropic and reconcile against internal estimates.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Fetch provider billing APIs",
+        "Compare with local DB logs",
+        "Adjust internal algorithms",
+        "Report discrepancies"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_2",
+      "comments": []
+    },
+    {
+      "id": "task_lsitecvbv",
+      "title": "Architect the degradation staircase model",
+      "description": "Design rules for shifting from Claude 3 Opus -> Sonnet -> Haiku -> GPT-3.5 -> Local based on load.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Build staircase JSON map",
+        "Write transition script",
+        "Apply timeout triggers",
+        "Audit loop checks"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_64h9as1wa",
+      "title": "Implement offline capability detection",
+      "description": "On startup, detect available local Docker instances or local Ollama bins for offline capabilities.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write ping utility",
+        "Register local models to internal registry",
+        "Store local active state",
+        "Test instance wake-up"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_mhvvvak2z",
+      "title": "Develop semantic parity checks",
+      "description": "When downgrading from GPT-4 to Haiku, ensure the system prompt is rewritten to fit the smaller model's context.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write prompt summarizer",
+        "Store dual-prompts for tools",
+        "Measure token difference",
+        "Test output structure"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_39dsb599m",
+      "title": "Build automated API status polling",
+      "description": "Constantly ping provider `/v1/models` endpoints to determine uptime independent of user requests.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Set up health cron",
+        "Update global router status",
+        "Cache known-down providers",
+        "Trigger alerts"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_l7iyhply9",
+      "title": "Implement long-running offline batching",
+      "description": "If internet drops, queue low-priority tasks locally and process them automatically upon reconnect.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Use IndexedDB/Redis queue",
+        "Implement connection listener",
+        "Process queue sequentially",
+        "Avoid rate-limit spikes on reconnect"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_e3xt1qqeg",
+      "title": "Develop strict fallback circuit breakers",
+      "description": "Avoid infinite loops across APIs by limiting fallback attempts to max 3 layers before halting the task.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Implement breaker logic",
+        "Write recursion limits",
+        "Set 'failed_routing' state",
+        "Log failure chain"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_6knz430sl",
+      "title": "Build local embeddings failover",
+      "description": "If Pinecone or OpenAI embeddings drop, seamlessly switch to a local SentenceTransformers model.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Load ONNX model",
+        "Write local inference wrapper",
+        "Normalize dimension sizes",
+        "Test cosine similarity accuracy"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_ylyd70klz",
+      "title": "Implement fallback logging and analytics",
+      "description": "Track exactly how often Jarvis degrades to offline models and calculate the cost savings or latency hits.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Store fallback events",
+        "Query performance drop-offs",
+        "Generate weekly reliability reports",
+        "Expose in OpenClaw UI"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_dz7i3mj1o",
+      "title": "Develop failover testing harnesses",
+      "description": "Create simulated outages to test if the Jarvis orchestration engine successfully switches to Ollama within 100ms.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write chaos engineering script",
+        "Mock Anthropic 503s",
+        "Measure switch latency",
+        "Ensure task success"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_e3sk1lcei",
+      "title": "Implement data residency constraints",
+      "description": "Allow certain project IDs to forbid API routing, enforcing that sensitive files are ONLY processed via local failovers.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Create 'local_only' project flag",
+        "Enforce router block logic",
+        "Return pre-flight errors on API attempt",
+        "Test secure parsing"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_3",
+      "comments": []
+    },
+    {
+      "id": "task_95ijbdrb5",
+      "title": "Architect the Prompt Registry DB schema",
+      "description": "Create tables to hold versioned prompt templates, variables, and performance metadata.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Draft PromptTemplate schema",
+        "Create versioning links",
+        "Store A/B test states",
+        "Implement migration"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_xovsnwx4r",
+      "title": "Implement variable interpolation engine",
+      "description": "Allow dynamic injection of context (e.g. {{user_name}}, {{current_date}}) into raw prompts at runtime.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write handlebar parser",
+        "Enforce missing variable errors",
+        "Sanitize inputs against injection",
+        "Test dynamic loading"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_aoczlz0ma",
+      "title": "Develop prompt version control UI",
+      "description": "Build an internal dashboard to edit, rollback, and branch system prompts like a Git repository.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Design editor UI",
+        "Implement diff viewer",
+        "Create commit logic",
+        "Deploy draft states"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_b6syz479x",
+      "title": "Build A/B testing framework for prompts",
+      "description": "Route 10% of agent tasks to 'Prompt Variant B' and measure explicit success rates automatically.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Implement split router",
+        "Assign task to variant",
+        "Calculate completion velocity",
+        "Generate comparison metrics"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_tfhm1vhcz",
+      "title": "Implement rigorous guardrail middleware",
+      "description": "Run an explicit check on outputs ensuring they match predefined JSON schemas before passing back to Jarvis.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write JSON schemaValidator",
+        "Trigger auto-retry on syntax error",
+        "Draft repair prompt",
+        "Log hallucination events"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_zk3p1eicr",
+      "title": "Develop automated regression testing for prompts",
+      "description": "Before deploying a prompt update, run it against 50 past task logs to verify it still solves them correctly.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write test runner",
+        "Mock past memories",
+        "Assert exact JSON outputs",
+        "Generate fail/pass report"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_3m36e77r8",
+      "title": "Implement role-playing personality consistency",
+      "description": "Ensure the 'Cortana' user-facing prompts maintain a specific tone, separating them from dry 'Jarvis' system prompts.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Map tone files",
+        "Inject tone strings",
+        "Test personality adherence",
+        "Create negative constraints (e.g.",
+        " 'don't be overeager')"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_vy35bj6p4",
+      "title": "Build external prompt fetching API",
+      "description": "Allow authorized external apps to fetch the latest approved system prompts via JWT.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Create read-only GraphQL endpoint",
+        "Implement cache layer",
+        "Add API keys",
+        "Test access limits"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_um0uab3mc",
+      "title": "Develop toxicity and bias scanners",
+      "description": "Scan LLM outputs periodically for unacceptable language or biases, especially in user-facing Cortana logs.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Integrate moderation endpoint",
+        "Write regex fallbacks",
+        "Flag logs for admin review",
+        "Update system restraints"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_lppcrjjot",
+      "title": "Implement dynamic context injection caps",
+      "description": "Automatically truncate historical messages or vector memories if the assembled prompt exceeds the model's max limit.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write token counter",
+        "Drop oldest memories first",
+        "Keep system instructions intact",
+        "Log truncation events"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_openclaw",
+      "objective_id": "obj_oc_4",
+      "comments": []
+    },
+    {
+      "id": "task_nmgawql5w",
+      "title": "Architect main chat UI component",
+      "description": "Build the core React/Next.js interface with extremely low-latency streaming and markdown rendering.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement React Markdown",
+        "Build SSE consumer",
+        "Style with Tailwind CSS",
+        "Manage scroll anchor"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_6kdt562qa",
+      "title": "Implement polymorphic action rendering",
+      "description": "When Cortana returns structured data, render a UI widget (e.g. a chart or interactive card) instead of raw text.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Define Action schemas",
+        "Build widget registry",
+        "Intercept JSON in stream",
+        "Render dynamic components"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_6tq4xh2s1",
+      "title": "Develop local offline queue system",
+      "description": "If the user drops connection, queue chat messages locally via IndexedDB and sync upon reconnect.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement Service Worker",
+        "Write IndexedDB wrappers",
+        "Build sync manager",
+        "Handle message ordering conflicts"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_4sr2rhqsh",
+      "title": "Build context-aware file attachments",
+      "description": "Allow users to drag-and-drop PDFs, images, or code files instantly attaching them to the context window.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement Dropzone",
+        "Process base64/URL payloads",
+        "Map to multimodal backend",
+        "Show visual file tokens"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_cndviba9g",
+      "title": "Implement branching conversation trees",
+      "description": "Allow users to 'edit' a past message, branching the core conversation invisibly without losing history.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Update Message schema with parent_id",
+        "Write logic to traverse tree branches",
+        "Implement UI to swap branches",
+        "Ensure context integrity"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_hpirorcuc",
+      "title": "Develop natural language command parsing",
+      "description": "Detect slash commands or explicit directives (e.g. '/deploy') inside chat and route to fast background services.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write regex parsers",
+        "Implement fast-path routing",
+        "Bypass main LLM for strict commands",
+        "Return instant confirmations"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_103y0cus4",
+      "title": "Build personalized voice-input integration",
+      "description": "Use Whisper API to allow seamless voice interactions, auto-sending when user stops speaking.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement Web Audio API",
+        "Handle silence detection",
+        "Stream audio to Whisper",
+        "Inject transcribed text"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_9kqnrkxy7",
+      "title": "Implement cross-platform syncing",
+      "description": "Ensure active chat sessions, typed inputs, and history sync perfectly via WebSockets across desktop and mobile.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Store draft state in Redis",
+        "Emit sync events",
+        "Rehydrate state on load",
+        "Handle race conditions"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_569xegx1z",
+      "title": "Develop contextual 'suggestions' engine",
+      "description": "Analyze current screen state or recent messages to provide 3 highly relevant quick-action buttons.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Feed context to fast Groq model",
+        "Generate 3 short intents",
+        "Render as UI chips",
+        "Auto-execute on click"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_d5i0meple",
+      "title": "Build accessibility and keyboard-first navigation",
+      "description": "Ensure the entire chat interface, works flawlessly without a mouse.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement ARIA roles",
+        "Handle global shortcut keys",
+        "Manage focus traps",
+        "Test with screen readers"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_1",
+      "comments": []
+    },
+    {
+      "id": "task_oww5dc9hw",
+      "title": "Architect external API integration framework",
+      "description": "Create a standardized plugin system allowing Cortana to securely hold OAuth tokens and hit external REST APIs.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Design Plugin schema",
+        "Implement OAuth flow",
+        "Store encrypted tokens",
+        "Write proxy execution layer"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_27cq65642",
+      "title": "Implement Google Workspace integrations",
+      "description": "Allow reading and drafting emails, modifying calendar events, and extracting Drive documents.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Setup GCP OAuth",
+        "Write Gmail API wrappers",
+        "Implement Calendar conflict logic",
+        "Register as Cortana tools"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_1r2241igv",
+      "title": "Develop multi-step trigger automation",
+      "description": "Allow the assistant to build 'When X happens, do Y' background automations for the user.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Draft Automation schema",
+        "Implement webhook listener",
+        "Write rule evaluator engine",
+        "Execute action sequence"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_u127dvfxt",
+      "title": "Build local system execution tools",
+      "description": "Provide a secure bridge allowing Cortana to run local shell scripts or modify local files based on user requests.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Implement local companion app",
+        "Write secure RPC bridge",
+        "Restrict shell permissions",
+        "Audit all local commands"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_1s1ve5q2m",
+      "title": "Implement human-in-loop approval for workflows",
+      "description": "When a workflow initiates a destructive action, require one-click UI confirmation.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Design Approval state",
+        "Render confirmation widget in chat",
+        "Pause execution queue",
+        "Handle timeout rejection"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_t8vj1b19y",
+      "title": "Develop custom API builder interface",
+      "description": "Allow the founder to paste a Swagger/OpenAPI spec, automatically generating a usable tool within Cortana's context.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Parse OpenAPI JSON",
+        "Generate dynamic schemas",
+        "Register tool dynamically",
+        "Test endpoint health"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_ns8n2nbqf",
+      "title": "Build automated summarization crons",
+      "description": "Schedule Cortana to read specified RSS feeds or emails daily, generating a morning brief.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Setup cron scheduler",
+        "Write ingestion scripts",
+        "Use inexpensive models for summarization",
+        "Push notification via UI"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_gahuppjlf",
+      "title": "Implement Stripe and financial integrations",
+      "description": "Connect viewing dashboards of revenue, failed payments, and executing internal refunds via chat commands.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Register Stripe API tools",
+        "Write read-only summaries",
+        "Implement secure refund logic",
+        "Restrict logic by user role"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_n2lvtlokb",
+      "title": "Develop contextual browser extension",
+      "description": "Create an extension that can inject the current active web page text directly into Cortana's context window.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Build Chrome Extension manifest",
+        "Extract DOM text cleanly",
+        "Send via local WebSocket",
+        "Handle extension auth"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_t0an3h1u9",
+      "title": "Build failure recovery for automations",
+      "description": "If an API breaks mid-workflow, allow the assistant to use its reasoning capability to find an alternative route or notify.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Implement try/catch wrappers",
+        "Inject error logs to LLM context",
+        "Prompt LLM to self-correct",
+        "Log final failure state"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_2",
+      "comments": []
+    },
+    {
+      "id": "task_77rms1wv2",
+      "title": "Architect the Graph Memory database for users",
+      "description": "Map user relationships, preferences, and facts using a Graph DB approach suitable for the LLM to query.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Setup Neo4j or EdgeDB",
+        "Draft Node schema for facts",
+        "Write Cypher query generator",
+        "Test relationship traversal"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_k4232cemx",
+      "title": "Implement implicit preference extraction",
+      "description": "Analyze ongoing chat patterns silently in the background to deduce and store preferences (e.g., 'Prefers bullet points').",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Deploy background agent crawler",
+        "Write abstraction prompts",
+        "Update User Profile JSON",
+        "Inject into system loop"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_3ky10fhsm",
+      "title": "Develop explicit 'Remember this' functions",
+      "description": "Create a direct slash command (`/remember`) that instantly commits a specific string to permanent memory with priority weighting.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Implement slash command handler",
+        "Write secure DB insert",
+        "Provide visual confirmation chip",
+        "Tag with timestamp"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_2tyt5e5an",
+      "title": "Build context-window distillation algorithms",
+      "description": "Prevent the prompt size from bloating by distilling old session logs into dense summary paragraphs nightly.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write summarization cron",
+        "Replace old chat rows with summaries",
+        "Ensure searchable vectors remain",
+        "Calculate token savings"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_kt4vyg8du",
+      "title": "Implement user emotion and tone matching",
+      "description": "Dynamically shift Cortana's response tone (formal, empathetic, concise) based on the user's current session sentiment.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Setup sentiment analyzer module",
+        "Map sentiment to prompt modifiers",
+        "Test emotional transitions",
+        "Ensure fallback neutral tone"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_joijv6yeu",
+      "title": "Develop multi-device session continuity",
+      "description": "Ensure that a user ending a voice chat in the car can immediately resume the exact context on desktop text chat.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Store active context in Redis cache",
+        "Broadcast state via WebSockets",
+        "Sync UI inputs in real-time",
+        "Handle offline delta merges"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_qmb7bihds",
+      "title": "Build biometric or secure voice identification",
+      "description": "Authenticate the user via voice print before exposing highly sensitive financial context within a voice session.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Integrate Azure Voice ID or similar",
+        "Write enrollment flow",
+        "Enforce strict fallback",
+        "Lock secure tool execution"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_6ercbubud",
+      "title": "Implement proactive 'check-in' capabilities",
+      "description": "Allow Cortana to initiate conversations based on calendar events or external triggers without user input.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write proactive message engine",
+        "Send push notifications",
+        "Handle quiet hours logic",
+        "Render UI chat bubble smoothly"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_b8tfwouem",
+      "title": "Develop memory debugging and deletion UI",
+      "description": "Give the user an interface to see exactly 'what Cortana knows about me' and easily delete incorrect facts.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Render categorized fact list",
+        "Implement delete/edit endpoints",
+        "Sync updates to vector DB",
+        "Ensure GDPR compliance"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_phc29gs2a",
+      "title": "Build specialized 'Coding Persona' memory triggers",
+      "description": "Automatically switch memory contexts if the user says 'Let's write code', loading their preferred languages and git setups.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Implement context-switch detector",
+        "Load specific tech stack rules",
+        "Drop casual memory constraints",
+        "Provide coding UI enhancements"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_3",
+      "comments": []
+    },
+    {
+      "id": "task_81tk6xzmr",
+      "title": "Architect Tauri-based Desktop Application",
+      "description": "Wrap the web experience in a Rust-based Tauri app to gain native OS capabilities without massive overhead.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Initialize Tauri project",
+        "Migrate web assets",
+        "Configure build pipelines for macOS/Windows",
+        "Implement auto-updaters"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_1tnqvkyp0",
+      "title": "Implement bidirectional file system bridging",
+      "description": "Allow Cortana to securely read local directories and create files when instructed by the user.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write Rust FS APIs",
+        "Expose safe invoke targets to JS",
+        "Implement UI permission gates",
+        "Audit file creation logic"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_fyfkx2995",
+      "title": "Develop AppleScript / PowerShell execution layers",
+      "description": "Give the assistant tools to open native applications, adjust volume, or move windows on the user's machine.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Map OS-specific scripts",
+        "Write execution wrappers",
+        "Parse return statuses",
+        "Prompt user for script approval"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_lxffb5rmo",
+      "title": "Build global keyboard shortcut triggers",
+      "description": "Allow hitting a universal hotkey (e.g., Cmd+Space) to instantly summon the Cortana interface over any application.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Implement global hotkey listener",
+        "Manage OS window focus",
+        "Create transparent overlay UI",
+        "Test multi-monitor support"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_yay76iz9e",
+      "title": "Implement local clipboard context injection",
+      "description": "Add a tool that allows Cortana to automatically read the OS clipboard if the user references it (e.g. 'Fix this code').",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write clipboard read API",
+        "Detect textual intent",
+        "Warn user of privacy access",
+        "Execute and clear buffer"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_56lr0vw4g",
+      "title": "Develop native notifications and deep linking",
+      "description": "Push system notifications that link directly back into specific conversational states or required approvals.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Integrate Rust desktop notifications",
+        "Parse deep links",
+        "Route React Router state",
+        "Handle app waking from sleep"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_ipvnoxxqk",
+      "title": "Build offline Llama.cpp degradation model",
+      "description": "Embed a lightweight local model directly in the desktop app for basic tasks if Wi-Fi is unavailable.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Bundle Llama.cpp binary",
+        "Manage model downloading/caching",
+        "Detect network offline state",
+        "Switch API endpoints transparently"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_k38zfivh3",
+      "title": "Implement local calendar and contact syncing",
+      "description": "Allow the app to read native Apple Contacts or Outlook locally without relying exclusively on cloud OAuth.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write OS-level calendar hooks",
+        "Normalize events to internal schema",
+        "Sync changes upstream",
+        "Respect OS privacy settings"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_b8er6v1po",
+      "title": "Develop 'Screen Context' snapshotting",
+      "description": "Take scheduled screenshots (with explicit permission), process via local OCR, to give the assistant context on what the user is looking at.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Implement screenshot utility",
+        "Run Tesseract/local OCR",
+        "Discard image immediately",
+        "Pass text to context window"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_nwvxgsqsj",
+      "title": "Build isolated execution environments (Sandboxing)",
+      "description": "Ensure any shell scripts drafted by the AI are executed within a restricted local Docker container or tight sandbox.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Setup local VM/sandbox tech",
+        "Restrict network access of scripts",
+        "Mount specific safe directories",
+        "Catch execution traps"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_cortana",
+      "objective_id": "obj_cor_4",
+      "comments": []
+    },
+    {
+      "id": "task_pk5223azl",
+      "title": "Architect multi-step application database schema",
+      "description": "Define complex application states, tracking external data, social links, and internal referral webs.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Draft Application schema",
+        "Create Review state enums",
+        "Implement referral mapping",
+        "Write initial migrations"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_4h76tw1oy",
+      "title": "Build dynamic encrypted application forms",
+      "description": "Create frontend form components that store data progressively and handle rich media uploads securely.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement React Hook Form",
+        "Build progressive saving logic",
+        "Handle secure S3 uploads",
+        "Encrypt sensitive fields"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_n3otbcbze",
+      "title": "Implement social graph referral verifications",
+      "description": "Connect applicant profiles to existing members, mapping a network graph to identify trusted nodes.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Write referral input logic",
+        "Calculate network proximity score",
+        "Graph DB mapping",
+        "Flag high-value nodes"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_igb7oqn7k",
+      "title": "Develop automated OSINT enrichment",
+      "description": "When an application is submitted, use Clearbit or similar APIs to pull public LinkedIn/X data for verification.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Integrate enrichment APIs",
+        "Parse external payloads",
+        "Display summary on admin dashboard",
+        "Flag discrepancies"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_00kxhawjz",
+      "title": "Build the Admin Review Queue dashboard",
+      "description": "Create a complex table view for admins to process, reject, or waitlist applications with bulk actions.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement complex data tables",
+        "Handle status filtering",
+        "Render side-by-side profile comparisons",
+        "Implement bulk change APIs"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_immuhowz6",
+      "title": "Implement secure magical-link authentication",
+      "description": "Remove standard passwords entirely; use secure, expiring email/SMS links for login and application tracking.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Build token generator",
+        "Write JWT issuance",
+        "Configure SendGrid transactional loops",
+        "Handle token expiration"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_pjmh2vfrg",
+      "title": "Develop tiered waitlisting logic",
+      "description": "Algorithmically slot approved users into specific waitlist positions based on internal scores and region caps.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Calculate waitlist score",
+        "Implement region quotas",
+        "Write slot allocation logic",
+        "Expose user status API"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_v00fai79k",
+      "title": "Build localized Stripe onboarding flows",
+      "description": "When off the waitlist, trigger a localized Stripe checkout page mapping to specific membership tiers.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Implement Stripe Checkout",
+        "Handle local currencies",
+        "Sync subscription status to DB",
+        "Activate member profile"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_6fzk5mijr",
+      "title": "Implement secret-keeper invite generation",
+      "description": "Allow 'Founder' tier members to generate single-use, cryptographic invite codes that bypass standard waitlisting.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Design InviteCode schema",
+        "Write cryptographic generator",
+        "Enforce generation limits",
+        "Track code redemption lineage"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_9s4lgeosm",
+      "title": "Develop welcome experience personalization",
+      "description": "Upon first login, customize the portal UI, greeting, and available events based on the user's vetted persona.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-04-24",
+      "checklist": [
+        "Construct Persona tags",
+        "Implement UI state variations",
+        "Draft personalized automated welcome email",
+        "Log first login metrics"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_1",
+      "comments": []
+    },
+    {
+      "id": "task_9qhoyimog",
+      "title": "Architect high-concurrency Event & Ticket schemas",
+      "description": "Design robust models to handle hundreds of users attempting to book 20 available spots simultaneously.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Draft Event and Booking schemas",
+        "Implement DB-level row locking",
+        "Handle transaction rollbacks",
+        "Test high-load scenarios"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_ssh4el7du",
+      "title": "Implement dynamic tier visibility rules",
+      "description": "Ensure an exclusive 'Inner Circle' dinner is invisible to standard 'Member' tiers across all APIs.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Write visibility middleware",
+        "Map tier enums to Event access rules",
+        "Test restricted API calls",
+        "Audit GraphQL resolvers"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_qufgat8gf",
+      "title": "Develop location-aware event discovery",
+      "description": "Filter and notify users of events happening in their current city or flagged travel destinations.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Integrate GeoIP tracking",
+        "Write radius-based queries",
+        "Implement 'My Trips' tagging",
+        "Push specialized alerts"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_lzbr393qk",
+      "title": "Build mobile-first booking UI flows",
+      "description": "Create frictionless purchasing flows optimized specifically for iOS/Android WebView contexts.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Design mobile touch-points",
+        "Integrate Stripe Elements natively",
+        "Handle connection drops cleanly",
+        "Generate digital receipt"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_54opyted5",
+      "title": "Implement digital ticket generation via Apple/Google Wallet",
+      "description": "Generate .pkpass files mapping internal RSVPs to native mobile wallets with dynamic QR codes.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Integrate PKPass generator",
+        "Map QR codes to Booking IDs",
+        "Configure push notifications for updates",
+        "Test cross-device rendering"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_gfkc2f6f3",
+      "title": "Develop on-site QR scanner admin capability",
+      "description": "Build a specific view inside the app for event staff to rapid-scan and check-in attendees via camera.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Implement HTML5 QR decoder",
+        "Write fast check-in mutation",
+        "Handle offline sync caching",
+        "Render guest list fallback"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_u2i9mwes7",
+      "title": "Build algorithmic event waitlists",
+      "description": "If an event is full, allow users to join a queue; if a spot opens, auto-charge and notify the next in line.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Implement queue schema",
+        "Write cancellation webhooks",
+        "Execute Stripe auto-charge",
+        "Implement fairness checks"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_savd706es",
+      "title": "Implement guest-pass allocation logic",
+      "description": "Allow high-tier members to assign temporary digital guest passes to non-members for specific public events.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Create GuestPass entity",
+        "Generate temporary magic links",
+        "Limit quantities per event",
+        "Require basic guest info"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_bzfu3sqsc",
+      "title": "Develop post-event gallery and engagement features",
+      "description": "Release locked photo galleries visible only to verified attendees, allowing discrete saving and sharing.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Hook to S3 secure buckets",
+        "Verify attendance records via API",
+        "Implement long-press save protection",
+        "Log viewing metrics"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_10626tul5",
+      "title": "Build automated event ROI reporting",
+      "description": "Generate financial reports for admins comparing ticket revenue versus estimated costs per experience.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-09",
+      "checklist": [
+        "Write data aggregation pipelines",
+        "Calculate profit margins",
+        "Analyze attendance drop-off rates",
+        "Export as PDF"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_2",
+      "comments": []
+    },
+    {
+      "id": "task_85n13pc7v",
+      "title": "Architect the Members Directory privacy schema",
+      "description": "Allow users to opt-in or strictly obscure specific contact points (email, phone, socials) from other members.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Design Privacy Settings table",
+        "Write query sanitization logic",
+        "Verify strict masking",
+        "Add default-off values"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_qcmtclccp",
+      "title": "Build high-performance directory search interface",
+      "description": "Develop an Algolia-like instant search for the member base, filtering by industry, city, and interests.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Integrate Meilisearch",
+        "Index verified profiles",
+        "Build frontend debounced search UI",
+        "Implement pagination"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_y3t10cv3o",
+      "title": "Implement secure member-to-member direct messaging",
+      "description": "Allow members to message each other within the platform without exposing native phone numbers or emails.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Design Message schema",
+        "Write WebSocket delivery",
+        "Implement push notifications",
+        "Provide blocking mechanics"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_zmmh6ttg8",
+      "title": "Develop dynamic Concierge request ticketing",
+      "description": "Build a polished form where members can request specific global reservations or assistance mapping to a Zendesk-like admin queue.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Create Request schema",
+        "Design request categories",
+        "Write webhook to internal Slack channel",
+        "Expose resolution API updates"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_v8fx6y865",
+      "title": "Build the internal admin CMS for concierge",
+      "description": "Give staff a dashboard to assign, track, and resolve member requests, charging the Stripe account directly if needed.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Implement Kanban board UI",
+        "Write assignment logic",
+        "Implement Stripe immediate charge mechanism",
+        "Generate resolution receipts"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_g7oig1cfy",
+      "title": "Implement AI-assisted concierge routing",
+      "description": "Use LLMs to automatically categorize a user's request (e.g. 'Restaurant Booking' vs 'Travel Visa Assist') and auto-assign to the correct staff.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write categorization prompt",
+        "Map outputs to staff IDs",
+        "Log accuracy",
+        "Provide admin override"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_mwk2hosr8",
+      "title": "Develop 'City Guides' CMS & UI",
+      "description": "Create curated, admin-managed city guides available to members based on their travel itineraries.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Design Guide schemas",
+        "Implement rich-text editor for admins",
+        "Render engaging mobile views",
+        "Link guides to member locations"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_vaizhln6x",
+      "title": "Build automated birthday and milestone triggers",
+      "description": "Automatically alert the concierge team 7 days before a VIP member's birthday to organize gifts or experiences.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Write daily scanning cron",
+        "Hook into birthdate field",
+        "Generate automated Slack alert",
+        "Track gift fulfillment history"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_7j53e5b00",
+      "title": "Implement global timezone synchronization",
+      "description": "Ensure timezone-agnostic interactions where a member in Tokyo sees concierge availability and messages correctly mapped against staff in NY.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Force UTC DB storage",
+        "Write robust frontend date parsers",
+        "Implement localized formatting",
+        "Test DST edge cases"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_fgtnfhqfj",
+      "title": "Develop cross-member 'Introduction' workflows",
+      "description": "Allow members to officially request introductions to other members, brokered through the concierge team for privacy.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-05-24",
+      "checklist": [
+        "Design Introduction entity",
+        "Implement double-opt-in mechanic",
+        "Send brokered emails",
+        "Log success rates"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_3",
+      "comments": []
+    },
+    {
+      "id": "task_7jbbo9kuj",
+      "title": "Architect global strike and moderation schema",
+      "description": "Track specific user infractions (no-shows, harassment reports) maintaining a numerical strike tally against their profile.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Design Strike table",
+        "Map infraction categories",
+        "Implement cumulative tallying",
+        "Create threshold limits"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_7i2kgfb36",
+      "title": "Implement anonymous reporting APIs",
+      "description": "Allow any member to report messages, profiles, or event behavior securely and anonymously to the moderation team.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write report ingestion endpoint",
+        "Scrub identifying metadata conditionally",
+        "Alert admins immediately",
+        "Log resolution actions"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_lwgpstwv7",
+      "title": "Develop automated spam/solicitation detection",
+      "description": "Scan member-to-member messages algorithmically for crypto-scams, unsolicited pitching, or mass-messaging.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Integrate basic NLP filters",
+        "Implement message rate-limiting",
+        "Flag suspicious outlier accounts",
+        "Auto-suspend severe violations"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_kgfbogpul",
+      "title": "Build the Moderation Queue UI",
+      "description": "Create an isolated admin dashboard specifically for reviewing flagged content, providing quick buttons to ban, warn, or dismiss.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Implement complex filtering",
+        "Render context of reported message natively",
+        "Bind quick-action mutations",
+        "Ensure audit logging"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_nottxikem",
+      "title": "Implement algorithmic event no-show penalties",
+      "description": "Automatically issue a strike and fine the member's underlying Stripe card if they RSVP but fail to check-in via QR.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Calculate attendance discrepancy",
+        "Execute Stripe fine",
+        "Update strike tally",
+        "Send automated warning email"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_jgvcf7xyf",
+      "title": "Develop progressive account restriction mechanisms",
+      "description": "If a user hits '2 strikes', restrict their ability to direct message other members for 30 days without fully banning them.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write restriction middleware",
+        "Map active restrictions to JWT tokens",
+        "Filter disabled actions on UI",
+        "Implement automated expiry"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_2ak94fwis",
+      "title": "Build external vetting data-refresh cron",
+      "description": "Periodically re-verify members against public databases (e.g. criminal records, sanctions lists) to ensure ongoing compliance.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Integrate third-party KYB/KYC API",
+        "Run quarterly batch verifications",
+        "Flag changed statuses",
+        "Suspend immediately on critical match"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_5hm9t97s0",
+      "title": "Implement automated warning generation",
+      "description": "When admins hit 'Warn' on a minor infraction, use an LLM to generate a polite but firm custom warning email based on the context.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Draft moderation prompt context",
+        "Pass API payload to LLM",
+        "Review drafted email in UI before sending",
+        "Dispatch via SendGrid"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_hip3rmmvm",
+      "title": "Develop membership revocation workflows",
+      "description": "Create a one-click 'Nuke' capability that handles banning the user, canceling active Stripe subs, refunding pending tickets, and deleting profile data.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Write destructive transaction query",
+        "Execute external API cancelations",
+        "Perform GDPR soft-delete",
+        "Log revocation reason"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    },
+    {
+      "id": "task_th34xg0l4",
+      "title": "Build the Appeals mechanism API",
+      "description": "Allow restricted members a one-time 500-character submission box to explain circumstances or appeal decisions.",
+      "status": "todo",
+      "start_date": "2026-03-25",
+      "due_date": "2026-06-08",
+      "checklist": [
+        "Create Appeal schema",
+        "Link to specific Strike ID",
+        "Render in Moderation Queue",
+        "Finalize irreversible outcome"
+      ],
+      "members": [
+        "Roy"
+      ],
+      "project_id": "proj_medellin",
+      "objective_id": "obj_msc_4",
+      "comments": []
+    }
+  ]
+}
